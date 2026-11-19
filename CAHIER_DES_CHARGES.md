@@ -24,6 +24,7 @@ Lancer une première version en ligne sur **une zone test (Île-de-France)** et 
 | **Offre de prix** (négociation) | 50 % du prix affiché au minimum, 3 offres par annonce, validité 48 h, une contre-proposition |
 | **Déstockage enseignes** | commission 8 %, 2 unités par client et par lot, retrait sous 7 jours |
 | **Services entre membres** | frais de service client 8 %, commission prestataire 12 % (0 % pour un artisan abonné), 8 h au plus par réservation, métiers réglementés réservés aux professionnels |
+| **Assurance des services** (option) | client : 6 % du prix, 2 € minimum ; prestataire particulier : 4 % déduits du versement ; jamais cochée d’avance |
 | Fiches techniques PDF | gratuites |
 | **Rendez-vous** | 3 créneaux proposés au plus, de 8 h à 20 h hors dimanche, annulation gratuite jusqu’à 24 h avant |
 

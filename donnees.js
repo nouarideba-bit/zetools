@@ -256,7 +256,7 @@
 
   // Services proposés par des membres : particuliers (coups de main occasionnels) et professionnels (SIRET)
   const SERVICES = [
-    { id: 's1', modes: ['service'], titre: 'Montage de meubles en kit et pose d’étagères', metier: 'bricolage', membre: 'm1', siret: false,
+    { id: 's1', modes: ['service'], titre: 'Montage de meubles en kit et pose d’étagères', metier: 'bricolage', membre: 'm1', siret: false, assurePlateforme: true,
       tarif: 22, unite: 'heure', dureeMin: 1, ville: 'Montreuil', cp: '93100', rayonKm: 8, outils: true, photo: U('1623161551706-318825cd18ef'),
       description: 'Armoires, lits, bureaux, dressings : je monte vos meubles en kit et je fixe étagères et meubles hauts. Je viens avec ma visseuse, mon niveau et mes chevilles.',
       inclus: ['Déplacement dans un rayon de 8 km', 'Outillage et petite quincaillerie', 'Nettoyage en fin de montage'] },

@@ -237,12 +237,13 @@
   }
 
   /* --- fiche outil : réservation, achat, échange --- */
-  let selection = { debut: null, fin: null, mois: null, onglet: null, assurance: true };
+  // l'assurance n'est jamais cochée d'avance : une option payante exige un choix exprès du client
+  let selection = { debut: null, fin: null, mois: null, onglet: null, assurance: false };
   function vueFiche(id) {
     const a = Z.appliquerOffres(annonce(id), etat.offres, maintenant());
     if (!a) return '<div class="page"><div class="conteneur vide">Annonce introuvable. <a href="#/annonces">Retour aux annonces</a></div></div>';
     const m = membre(a.membre);
-    if (selection.id !== id) selection = { id, debut: null, fin: null, mois: AUJOURDHUI.slice(0, 7), onglet: a.modes[0], assurance: true };
+    if (selection.id !== id) selection = { id, debut: null, fin: null, mois: AUJOURDHUI.slice(0, 7), onglet: a.modes[0], assurance: false };
     return `<div class="page"><div class="conteneur">
       <div class="fil"><a href="#/">Accueil</a> › <a href="#/annonces?cat=${a.categorie}">${catNom(a.categorie)}</a> › ${esc(a.titre)}</div>
       <div class="fiche">
@@ -315,8 +316,9 @@
         detail = `<div class="alerte alerte-ok">Du ${Z.formatDate(selection.debut)} au ${Z.formatDate(selection.fin)} · ${d.jours} jour${d.jours > 1 ? 's' : ''}</div>
           <div class="ligne"><span>${Z.euros(a.prixJour)} × ${d.jours} j</span><span>${Z.euros(d.brut)}</span></div>
           ${d.remise ? `<div class="ligne" style="color:var(--vert)"><span>Remise longue durée</span><span>− ${Z.euros(d.remise)}</span></div>` : ''}
-          <label class="ligne" style="cursor:pointer"><span><input type="checkbox" id="assurance" ${selection.assurance ? 'checked' : ''}> Assurance casse et vol</span><span>${Z.euros(d.assurance)}</span></label>
+          <label class="ligne" style="cursor:pointer"><span><input type="checkbox" id="assurance" ${selection.assurance ? 'checked' : ''}> <b>Je prends l’assurance</b> casse et vol</span><span>${Z.euros(d.assurance)}</span></label>
           <div class="ligne"><span>Frais de service</span><span>${Z.euros(d.fraisService)}</span></div>
+          ${selection.assurance ? '' : '<div class="ligne discret"><span>Sans assurance, la casse et le vol sont couverts par votre seule caution.</span><span></span></div>'}
           <div class="ligne total"><span>Total</span><span>${Z.euros(d.totalLocataire)}</span></div>
           <div class="ligne discret"><span>Caution (empreinte, non débitée)</span><span>${Z.euros(d.caution)}</span></div>
           <button class="btn btn-cta" style="width:100%;margin-top:10px" data-action="reserver">Réserver et payer ${Z.euros(d.totalLocataire)}</button>`;
@@ -571,6 +573,7 @@
       ['Quand le propriétaire est-il payé ?', 'Le loyer est versé 24 h après le retour de l’outil, si aucun litige n’est ouvert. Pour une vente, après confirmation de la remise par l’acheteur.'],
       ['Un échange est-il protégé ?', 'Oui : chacun règle des frais de mise en relation et une caution croisée peut être demandée pour les outils de valeur différente.'],
       ['Puis-je négocier le prix ?', 'Oui. Sur chaque annonce de vente ou de location, « Proposer mon prix » envoie votre offre au propriétaire. Il a 48 h pour accepter, refuser ou vous faire une contre-proposition. Rien n’est débité avant l’accord, et le paiement reste sécurisé.'],
+      ['La prestation d’un particulier est-elle assurée ?', 'Un particulier n’a pas d’assurance professionnelle. Deux protections existent : le prestataire peut prendre l’assurance responsabilité civile ZETools (badge « Assuré »), et vous pouvez cocher « Je prends l’assurance » à la réservation pour couvrir les dégâts causés chez vous. Sans l’une ni l’autre, la fiche l’indique clairement avant le paiement.'],
       ['Pourquoi les prix sont-ils plafonnés ?', 'ZETools est une place de marché d’outils à petit prix. Un outil d’occasion se vend au plus à 50 % du neuf en très bon état, 40 % en bon état, 30 % en état correct. Même un outil neuf, jamais servi, reste sous le prix du magasin (70 % au plus). Le prix neuf de référence et la remise sont affichés sur chaque annonce.'],
       ['Comment fixer un rendez-vous pour des travaux ou un échange ?', 'Depuis la fiche d’un artisan ou d’une annonce, cliquez sur « Proposer un rendez-vous » : choisissez jusqu’à 3 créneaux dans le calendrier. L’autre partie en accepte un, et le rendez-vous s’inscrit dans votre agenda. Annulation gratuite jusqu’à 24 h avant.'],
       ['Qu’est-ce que le déstockage des enseignes ?', 'Des professionnels (grandes surfaces de bricolage, négoces, fabricants, loueurs) y écoulent leurs fins de série et surstocks : des produits neufs, à prix cassés, payés en ligne et retirés en magasin, avec les garanties légales du vendeur.'],
@@ -1127,7 +1130,7 @@
       cases += `<button type="button" disabled class="${t < AUJOURDHUI ? 'passe' : ''} ${conf ? 'rdv-ok' : prop ? 'rdv-attente' : ''}">${j}</button>`;
     }
     const groupe = (titre, liste, rendu) => `<div class="panneau"><h3 style="margin-top:0">${titre} <span class="discret">(${liste.length})</span></h3>${liste.map(rendu).join('') || '<p class="discret">Rien pour le moment.</p>'}</div>`;
-    const entete = (r) => `<div><span class="badge badge-echange">${esc(Z.REGLES.typesRdv[r.type])}</span> <b>${esc(r.objet)}</b><br><span class="discret">avec ${esc(nomContact(r.avec))} · ${r.dureeHeures >= 8 ? 'journée' : r.dureeHeures + ' h'} · ${esc(r.lieu)}</span>${r.message ? `<p class="citation">« ${esc(r.message)} »</p>` : ''}</div>`;
+    const entete = (r) => `<div><span class="badge badge-echange">${esc(Z.REGLES.typesRdv[r.type])}</span> <b>${esc(r.objet)}</b><br><span class="discret">avec ${esc(nomContact(r.avec))} · ${r.dureeHeures >= 8 ? 'journée' : r.dureeHeures + ' h'} · ${esc(r.lieu)}${r.type === 'service' ? (r.assure ? ' · 🛡️ assurée' : ' · ⚠️ non assurée') : ''}</span>${r.message ? `<p class="citation">« ${esc(r.message)} »</p>` : ''}</div>`;
     const recus = etat.rdv.filter((r) => r.sens === 'recu' && r.statut === 'proposé');
     const envoyes = etat.rdv.filter((r) => r.sens === 'envoye' && r.statut === 'proposé');
     const confirmes = rdvConfirmes().slice().sort((a, b) => a.creneau.localeCompare(b.creneau));
@@ -1179,7 +1182,7 @@
     const m = membre(s.membre);
     return `<a class="carte" href="#/service/${s.id}">
       <div class="visuel">${s.photo ? `<img loading="lazy" src="${s.photo}" alt="${esc(s.titre)}">` : ''}
-        <div class="badges"><span class="badge badge-service">Service</span>${s.siret ? '<span class="badge badge-vente">PRO</span>' : ''}</div></div>
+        <div class="badges"><span class="badge badge-service">Service</span>${s.siret ? '<span class="badge badge-vente">PRO</span>' : ''}${s.siret || s.assurePlateforme ? '<span class="badge badge-echange">🛡️ Assuré</span>' : ''}</div></div>
       <div class="infos"><span class="badge badge-etat" style="align-self:start">${metierIco(s.metier)} ${esc(metierNom(s.metier))}</span>
         <h3>${esc(s.titre)}</h3><div class="prix">${Z.euros(s.tarif)} <small>${uniteService(s)}</small></div>
         <div class="meta"><span>📍 ${esc(s.ville)} · ${s.rayonKm} km</span><span>★ ${m.note.toFixed(1)} (${m.avis})</span></div></div></a>`;
@@ -1216,7 +1219,8 @@
     }
     const pris = rdvConfirmes().map((r) => r.creneau);
     const slots = selService.jour ? Z.creneauxJour(selService.jour, { maintenant: maintenant(), pris }) : [];
-    const d = Z.devisService(s, selService.heures);
+    const d = Z.devisService(s, selService.heures, { assurance: selService.assurance });
+    const prixAssurance = Z.devisService(s, selService.heures, { assurance: true }).assurance;
     const heures = s.unite === 'forfait' ? '' : `<label class="ligne">Durée <select id="heures-svc">${Array.from({ length: Z.REGLES.service.heuresMax - (s.dureeMin || 1) + 1 }, (_, i) => i + (s.dureeMin || 1)).map((h) => `<option value="${h}" ${h === d.heures ? 'selected' : ''}>${h} h</option>`).join('')}</select></label>`;
     return `<div class="ligne"><span>Tarif</span><b>${Z.euros(s.tarif)}${uniteService(s)}</b></div>
       <div class="ligne discret"><span>${s.unite === 'forfait' ? `Forfait d’environ ${s.dureeForfait || 1} h` : `${s.dureeMin || 1} h minimum`} · se déplace à ${s.rayonKm} km</span><span></span></div>
@@ -1226,6 +1230,8 @@
       ${selService.creneau ? `<div class="alerte alerte-ok" style="text-transform:none">${quand(selService.creneau)} · ${d.heures} h</div>
         <div class="ligne"><span>${d.forfait ? 'Forfait' : `${Z.euros(s.tarif)} × ${d.heures} h`}</span><span>${Z.euros(d.base)}</span></div>
         <div class="ligne"><span>Frais de service</span><span>${Z.euros(d.fraisService)}</span></div>
+        <label class="ligne" style="cursor:pointer"><span><input type="checkbox" id="assurance-svc" ${selService.assurance ? 'checked' : ''}> <b>Je prends l’assurance</b> dommages</span><span>${Z.euros(prixAssurance)}</span></label>
+        <div class="alerte ${d.couverture.assure ? 'alerte-ok' : 'alerte-erreur'}" style="text-transform:none">${d.couverture.assure ? '🛡️' : '⚠️'} ${esc(d.couverture.message)}${selService.assurance ? '' : ' L’assurance dommages ZETools couvre les dégâts causés chez vous pendant la prestation.'}</div>
         <div class="ligne total"><span>Total</span><span>${Z.euros(d.total)}</span></div>
         <div class="ligne discret"><span>Payé au prestataire une fois le service rendu</span><span>${Z.euros(d.versementPrestataire)}</span></div>
         <button class="btn btn-cta" style="width:100%;margin-top:10px" data-action="reserver-service">Réserver et payer ${Z.euros(d.total)}</button>` : ''}
@@ -1236,7 +1242,7 @@
     const s = Z.appliquerOffres(service(id), etat.offres, maintenant());
     if (!s) return '<div class="page"><div class="conteneur vide">Service introuvable. <a href="#/services">Retour aux services</a></div></div>';
     const m = membre(s.membre);
-    if (selService.id !== id) selService = { id, mois: AUJOURDHUI.slice(0, 7), jour: '', creneau: '', heures: s.dureeMin || 1 };
+    if (selService.id !== id) selService = { id, mois: AUJOURDHUI.slice(0, 7), jour: '', creneau: '', heures: s.dureeMin || 1, assurance: false };
     return `<div class="page"><div class="conteneur">
       <div class="fil"><a href="#/">Accueil</a> › <a href="#/services">Services</a> › ${esc(s.titre)}</div>
       <div class="fiche">
@@ -1246,6 +1252,7 @@
             <h2 style="margin-top:0">Le service</h2><p>${esc(s.description)}</p>
             <div class="ligne"><span>Métier</span><b>${metierIco(s.metier)} ${esc(metierNom(s.metier))}</b></div>
             <div class="ligne"><span>Prestataire</span><b>${statutPrestataire(s)}${s.decennale ? ' · assurance décennale' : ''}</b></div>
+            <div class="ligne"><span>Assurance</span><b>${s.siret ? '🛡️ Responsabilité civile professionnelle' : s.assurePlateforme ? '🛡️ Assuré par ZETools à chaque prestation' : '⚠️ Non assuré : prenez l’assurance à la réservation'}</b></div>
             <div class="ligne"><span>Outils</span><b>${s.outils ? 'Vient avec ses outils' : 'Sur vos outils (ou loués sur ZETools)'}</b></div>
             <div class="ligne"><span>Zone d’intervention</span><b>📍 ${esc(s.ville)} (${esc(s.cp)}) · ${s.rayonKm} km autour</b></div>
             ${(s.inclus || []).length ? `<h3>Compris dans le prix</h3><ul class="liste-avantages">${s.inclus.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}
@@ -1267,7 +1274,10 @@
     const zone = document.getElementById('zone-service'); if (!zone) return;
     const courant = () => Z.appliquerOffres(service(id), etat.offres, maintenant());
     const rafraichir = () => { zone.innerHTML = zoneService(courant()); };
-    zone.addEventListener('change', (e) => { if (e.target.id === 'heures-svc') { selService.heures = Number(e.target.value); rafraichir(); } });
+    zone.addEventListener('change', (e) => {
+      if (e.target.id === 'heures-svc') { selService.heures = Number(e.target.value); rafraichir(); }
+      if (e.target.id === 'assurance-svc') { selService.assurance = e.target.checked; rafraichir(); }
+    });
     zone.addEventListener('click', (e) => {
       const b = e.target.closest('button'); if (!b) return;
       const s = courant();
@@ -1282,13 +1292,13 @@
         toast(`Offre de ${Z.euros(montant)} envoyée. Réponse sous 48 h.`); return aller('#/offres');
       }
       if (b.dataset.action === 'reserver-service') {
-        const d = Z.devisService(s, selService.heures);
-        const rdv = { id: 'r' + Date.now(), sens: 'envoye', type: 'service', avec: s.membre, serviceId: s.id, objet: s.titre, creneaux: [selService.creneau], dureeHeures: d.heures,
+        const d = Z.devisService(s, selService.heures, { assurance: selService.assurance });
+        const rdv = { id: 'r' + Date.now(), sens: 'envoye', type: 'service', assure: d.couverture.assure, assuranceClient: !!selService.assurance, avec: s.membre, serviceId: s.id, objet: s.titre, creneaux: [selService.creneau], dureeHeures: d.heures,
           lieu: 'À mon domicile (adresse transmise après réservation)', statut: 'proposé', montant: d.total, message: '' };
         const v = Z.verifierProposition(rdv, maintenant()); if (!v.ok) return toast(v.erreurs[0]);
         const c = Z.confirmerRdv(rdv, selService.creneau, etat.rdv); if (!c.ok) return toast(c.raison);
         etat.rdv.push(c.rdv); deverrouillerConversation(s.id); sauver();
-        toast(`Prestation réservée (simulation) : ${Z.euros(d.total)} payés et conservés jusqu’à la fin du service.`);
+        toast(`Prestation réservée (simulation) : ${Z.euros(d.total)} payés et conservés jusqu’à la fin du service${selService.assurance ? ', assurance dommages incluse' : ''}.`);
         selService = { id: null }; aller('#/agenda');
       }
     });
@@ -1306,6 +1316,7 @@
         <label>Code postal<input name="cp" required pattern="\\d{5}" placeholder="94300"></label>
         <label>Rayon de déplacement (km)<input name="rayon" type="number" min="1" max="50" value="10"></label>
         <label class="case"><input type="checkbox" name="outils" checked> Je viens avec mes outils</label>
+        <label class="large case"><input type="checkbox" name="assurePlateforme"> <span><b>Je prends l’assurance</b> responsabilité civile ZETools : ${Math.round(Z.REGLES.service.assurancePrestataireTaux * 100)} % déduits de chaque prestation, et le badge « Assuré » sur mon annonce. Conseillé si vous êtes un particulier, sans assurance professionnelle.</span></label>
         <label class="large">Description<textarea name="description" rows="4" placeholder="Votre expérience, ce qui est compris, ce qui ne l’est pas… (vos coordonnées seront masquées)"></textarea></label>
         <div class="large alerte alerte-info" id="aide-service">Particulier : seuls les petits services occasionnels sont ouverts (petit bricolage, montage, jardinage, cours). L’électricité, la plomberie et la maçonnerie sont réservées aux professionnels qualifiés, avec SIRET. Vos revenus sont à déclarer ; une activité régulière suppose un statut professionnel (micro-entreprise).</div>
         <div class="large"><button class="btn btn-cta">Publier mon service</button></div>
@@ -1318,7 +1329,7 @@
       const pos = Z.positionCodePostal(cp);
       const s = { id: 'us' + Date.now(), modes: ['service'], titre: String(fd.get('titre')), metier: String(fd.get('metier')), membre: 'moi', siret: fd.get('statut') === 'pro',
         tarif: Number(fd.get('tarif')), unite: String(fd.get('unite')), dureeMin: forfait ? 1 : Number(fd.get('duree')) || 1, dureeForfait: forfait ? Number(fd.get('duree')) || 1 : undefined,
-        ville: pos ? pos.libelle : 'Île-de-France', cp, rayonKm: Number(fd.get('rayon')) || 10, outils: fd.get('outils') === 'on', photo: PHOTOS.artisans,
+        ville: pos ? pos.libelle : 'Île-de-France', cp, rayonKm: Number(fd.get('rayon')) || 10, outils: fd.get('outils') === 'on', assurePlateforme: fd.get('assurePlateforme') === 'on', photo: PHOTOS.artisans,
         description: Z.masquerCoordonnees(String(fd.get('description') || ''), false).texte, inclus: [] };
       const v = Z.verifierService(s);
       if (!v.ok) return toast(v.erreurs[0]);

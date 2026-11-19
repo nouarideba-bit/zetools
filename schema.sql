@@ -548,3 +548,10 @@ CREATE TABLE fiches_techniques (
   telechargements integer NOT NULL DEFAULT 0,
   publiee_le  timestamptz
 );
+
+-- ---------- Assurances optionnelles des services (ajout du 19/11/2026) ----------
+-- Jamais cochées par défaut (art. L.121-17 C. conso). La couverture affichée au client est conservée comme preuve de son information.
+ALTER TABLE prestations ADD COLUMN assure_plateforme boolean NOT NULL DEFAULT false;  -- RC ZETools du prestataire particulier, 4 % déduits
+ALTER TABLE rendez_vous ADD COLUMN assurance_client   integer NOT NULL DEFAULT 0;      -- prime payée par le client, en centimes (0 = non souscrite)
+ALTER TABLE rendez_vous ADD COLUMN couverture_affichee text;                           -- message « assurée par… / non assurée » vu avant paiement
+ALTER TABLE rendez_vous ADD COLUMN assurance_choisie_le timestamptz;                   -- horodatage du choix exprès du client

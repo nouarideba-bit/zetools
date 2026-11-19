@@ -154,6 +154,7 @@ Documents liés :
 - **Agenda :** tables `rendez_vous` et `rdv_creneaux`, contrainte d’exclusion contre les doubles réservations, rappels par notification 24 h et 2 h avant, flux iCalendar par membre.
 - **Documents juridiques :** `juridique.js` (site) et dossier `juridique/` (Markdown pour l’avocat).
 - **Services :** table `prestations` ; une réservation crée un `rendez_vous` de type `service` et une transaction séquestrée. Prévoir un plafond d’activité pour les comptes « particulier » et la vérification du SIRET.
+- **Assurance des services :** option « Je prends l’assurance » côté client et côté prestataire particulier ; la couverture (qui assure, ou « non assurée ») est calculée et affichée avant paiement, puis enregistrée avec la réservation. Aucune option payante n’est cochée par défaut, y compris l’assurance casse et vol des locations.
 - **Fiches techniques :** table `fiches_techniques` (contenu structuré : outils, fournitures, étapes, sécurité). La maquette produit le PDF dans le navigateur (`pdf.js`) ; en production, le produire côté serveur et le mettre en cache sur le CDN, avec un compteur de téléchargements.
 
 **[Vigilance] Services rendus par des particuliers.** Risque de travail dissimulé si l’activité devient habituelle, et métiers soumis à qualification : voir les notes remises à l’avocat.
@@ -174,7 +175,7 @@ Documents liés :
 
 ## 6. Ce que la maquette valide déjà
 
-128 tests automatisés réussis :
+135 tests automatisés réussis :
 - prix, remises et commissions ;
 - disponibilités ;
 - masquage des coordonnées ;

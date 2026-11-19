@@ -39,7 +39,10 @@
     offres: { plancher: 0.5, validiteHeures: 48, maxParAnnonce: 3, seuilAcceptationDemo: 0.8 },
     typesRdv: { travaux: 'Travaux', echange: 'Échange de matériel', reparation: 'Réparation', remise: 'Remise d’un outil', service: 'Prestation de service' },
     // Services proposés par les membres (particuliers et professionnels), réservés à l'heure ou au forfait
-    service: { fraisClient: 0.08, commission: 0.12, heuresMax: 8, metiersReglementes: ['plomberie', 'electricite', 'maconnerie'] },
+    service: { fraisClient: 0.08, commission: 0.12, heuresMax: 8, metiersReglementes: ['plomberie', 'electricite', 'maconnerie'],
+      // assurances optionnelles, jamais cochées d'avance (art. L.121-17 C. conso) :
+      assuranceClientTaux: 0.06, assuranceClientMin: 2,   // « Je prends l'assurance » : dommages chez le client pendant la prestation
+      assurancePrestataireTaux: 0.04 },                   // responsabilité civile du prestataire particulier, déduite de son versement
   };
 
   const arrondi = (x) => Math.round(x * 100) / 100;
@@ -402,7 +405,20 @@
     const base = arrondi(forfait ? s.tarif : s.tarif * h);
     const fraisService = arrondi(base * S.fraisClient);
     const commission = opts.abonne ? 0 : arrondi(base * S.commission);
-    return { heures: h, forfait, base, fraisService, total: arrondi(base + fraisService), commission, versementPrestataire: arrondi(base - commission) };
+    const assurance = opts.assurance ? arrondi(Math.max(S.assuranceClientMin, base * S.assuranceClientTaux)) : 0;
+    const cotisationPrestataire = s.assurePlateforme ? arrondi(base * S.assurancePrestataireTaux) : 0;
+    return { heures: h, forfait, base, fraisService, assurance, total: arrondi(base + fraisService + assurance), commission, cotisationPrestataire,
+      versementPrestataire: arrondi(base - commission - cotisationPrestataire), couverture: couvertureService(s, opts.assurance) };
+  }
+  /** Qui assure la prestation ? Sert à informer clairement le client avant qu'il paie. */
+  function couvertureService(s, assuranceClient) {
+    const sources = [];
+    if (s.siret) sources.push('responsabilité civile professionnelle du prestataire');
+    if (s.assurePlateforme) sources.push('assurance responsabilité civile ZETools du prestataire');
+    if (assuranceClient) sources.push('votre assurance dommages ZETools');
+    return { assure: sources.length > 0, sources,
+      message: sources.length ? 'Prestation couverte par : ' + sources.join(' ; ') + '.'
+        : 'Prestation non assurée : ce prestataire est un particulier sans assurance professionnelle. Un dommage éventuel serait à régler directement avec lui.' };
   }
   function filtrerServices(services, f = {}) {
     const q = (f.q || '').trim().toLowerCase(); const lieu = (f.lieu || '').trim().toLowerCase();
@@ -474,7 +490,7 @@
     positionCodePostal, distanceKm, positionApprochee, formatDistance, artisansProches, demandesPourArtisan, abonnementActif, coutAbonnement, peutRepondre,
     plafondPrix, verifierPrix, remiseSurNeuf,
     stockLot, verifierLot, devisLot, retirerDuStock,
-    estReglemente, verifierService, devisService, filtrerServices,
+    estReglemente, verifierService, devisService, couvertureService, filtrerServices,
     verifierOffre, creerOffre, offreExpiree, repondreOffre, reponseVendeurDemo, appliquerOffres,
     creneauxJour, avancer, verifierProposition, confirmerRdv, annulationGratuite, versIcs,
   };
