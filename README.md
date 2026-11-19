@@ -15,7 +15,7 @@ Plateforme communautaire et sécurisée pour **acheter, louer ou échanger des o
 
 | Écran | Contenu |
 |---|---|
-| Accueil | Héro avec recherche par transaction (vente / location / échange), catégorie et lieu ; les 3 modes ; 7 catégories ; annonces à la une ; réassurance ; parcours en 4 étapes ; offre pro ; L’Atelier |
+| Accueil | Vidéo de fond, héro avec recherche par transaction (vente / location / échange), catégorie et lieu ; les 3 modes ; 7 catégories illustrées en vidéo ; annonces à la une ; réassurance ; parcours en 4 étapes ; offre pro ; L’Atelier |
 | Catalogue | Filtres par transaction, catégorie, ville ou code postal, recherche plein texte |
 | Fiche outil | Calendrier de disponibilité, devis détaillé (remises, assurance, frais, caution), achat avec séquestre, proposition d’échange |
 | Messagerie | Masquage automatique des téléphones, e-mails, IBAN, adresses, liens et messageries externes tant qu’aucune transaction n’est payée |
@@ -35,6 +35,14 @@ Plateforme communautaire et sécurisée pour **acheter, louer ou échanger des o
 - [`CAHIER_DES_CHARGES.md`](CAHIER_DES_CHARGES.md) : règles économiques et prérequis.
 - [`CAHIER_DES_CHARGES_TECHNIQUE.md`](CAHIER_DES_CHARGES_TECHNIQUE.md) : architecture, fonctions, conformité, phases.
 - [`schema.sql`](schema.sql) : modèle de données PostgreSQL + PostGIS.
+
+## Vidéos
+
+Onze vidéos réelles [Mixkit](https://mixkit.co/license/#videoFree) (licence gratuite, usage commercial autorisé, sans attribution obligatoire) :
+- en fond de l'accueil, de « Trouver un artisan » et de « Outils à réparer » ;
+- une par catégorie de produits (tuiles de l'accueil et bandeau du catalogue filtré).
+
+Elles sont muettes, en boucle, chargées seulement quand elles deviennent visibles, et figées si le système demande de limiter les animations. Elles sont créditées dans la page « Crédits ».
 
 ## Photos
 

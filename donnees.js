@@ -13,6 +13,27 @@
     atelier: U('1774963711952-713bb7a52c4e', 1400),
   };
 
+  // Vidéos Mixkit (licence gratuite Mixkit : usage commercial autorisé, sans attribution obligatoire)
+  const MX = (id, titre) => ({ id, titre,
+    hd: `https://assets.mixkit.co/videos/${id}/${id}-720.mp4`,
+    sd: `https://assets.mixkit.co/videos/${id}/${id}-360.mp4`,
+    poster: `https://assets.mixkit.co/videos/${id}/${id}-thumb-720-0.jpg`,
+    page: `https://mixkit.co/free-stock-video/${id}/` });
+  const VIDEOS = {
+    accueil: MX(777, 'Perçage d’une planche à l’établi'),
+    artisans: MX(44861, 'Menuisier préparant son chantier'),
+    reparer: MX(41930, 'Réparation d’un moteur au garage'),
+    categories: {
+      electro: MX(44858, 'Assemblage d’un cadre à la visseuse sans fil'),
+      main: MX(775, 'Ciseaux à bois rangés à l’atelier'),
+      meca: MX(4716, 'Mécanicien réparant un moteur de voiture'),
+      jardin: MX(43697, 'Rempotage au jardin, gants et outils'),
+      chantier: MX(21021, 'Mortier sur un mur de briques en chantier'),
+      atelier: MX(29995, 'Établi d’atelier et outillage rangé'),
+      epi: MX(20910, 'Soudeur équipé de son masque de protection'),
+    },
+  };
+
   const CATEGORIES = [
     { id: 'electro', nom: 'Électroportatif', icone: '⚡' },
     { id: 'main', nom: 'Outillage à main', icone: '🔧' },
@@ -195,7 +216,7 @@
 
   PHOTOS.artisans = U('1621905251918-48416bd8575a', 1400);
 
-  const D = { PHOTOS, CATEGORIES, MEMBRES, ANNONCES, RESERVATIONS, ARTICLES, CREDITS, METIERS, ARTISANS, DEMANDES };
+  const D = { PHOTOS, VIDEOS, CATEGORIES, MEMBRES, ANNONCES, RESERVATIONS, ARTICLES, CREDITS, METIERS, ARTISANS, DEMANDES };
   if (typeof module !== 'undefined' && module.exports) module.exports = D;
   else racine.ZT_DONNEES = D;
 })(typeof window !== 'undefined' ? window : globalThis);

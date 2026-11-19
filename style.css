@@ -246,6 +246,26 @@ table.tableau { width: 100%; border-collapse: collapse; background: var(--carte)
 .form-reponse { display: grid; gap: 8px; margin-top: 10px; }
 .form-reponse textarea, .form-reponse input { padding: 9px 10px; border: 1px solid var(--bord); border-radius: 8px; font: inherit; }
 
+
+/* --- Vidéos réelles --- */
+.video-fond { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+.hero-video { overflow: hidden; }
+.hero-video::before { z-index: 1; }
+.hero-video .conteneur { z-index: 2; }
+.categorie-video { position: relative; overflow: hidden; padding: 0; aspect-ratio: 3 / 4; border: 0; background: var(--anthracite); display: block; }
+.categorie-video .video-fond { transition: transform .4s; }
+.categorie-video:hover .video-fond { transform: scale(1.06); }
+.categorie-video::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(25,28,31,0) 40%, rgba(25,28,31,.85) 100%); }
+.categorie-video .etiquette { position: absolute; left: 10px; right: 10px; bottom: 10px; z-index: 1; color: #fff; font-weight: 700; font-size: .88rem; line-height: 1.2; text-align: left; }
+.categorie-video .etiquette .ico { display: block; width: auto; height: auto; margin: 0 0 4px; background: none; border-radius: 0; font-size: 1.3rem; }
+.bandeau-video { position: relative; overflow: hidden; border-radius: 16px; min-height: 200px; margin: 6px 0 22px; background: var(--anthracite); color: #fff; display: flex; align-items: flex-end; }
+.bandeau-video::before { content: ""; position: absolute; inset: 0; z-index: 1; background: linear-gradient(100deg, rgba(25,28,31,.9) 0%, rgba(25,28,31,.4) 70%, rgba(25,28,31,.15) 100%); }
+.bandeau-video .texte { position: relative; z-index: 2; padding: 24px; }
+.bandeau-video .surtitre { color: var(--jaune); }
+.bandeau-video h2 { margin: 4px 0; }
+.bandeau-video p { margin: 0; color: #e7eaee; }
+@media (prefers-reduced-motion: reduce) { .categorie-video .video-fond { transition: none; } }
+
 /* --- Adaptation mobile --- */
 @media (max-width: 1000px) {
   .categories { grid-template-columns: repeat(4, 1fr); }
@@ -260,6 +280,7 @@ table.tableau { width: 100%; border-collapse: collapse; background: var(--carte)
   .moteur { grid-template-columns: 1fr; }
   .modes, .articles, .offres, .fiche, .mise-en-page, .bandeau-pro, .formulaire, .messagerie { grid-template-columns: 1fr; }
   .categories { grid-template-columns: repeat(2, 1fr); }
+  .categorie-video { aspect-ratio: 4 / 3; }
   .garanties, .etapes { grid-template-columns: 1fr; }
   .filtres { position: static; }
   .conversations { border-right: 0; border-bottom: 1px solid var(--bord); }

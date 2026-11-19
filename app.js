@@ -1,7 +1,7 @@
 /* ZETOOLS · application de la maquette (routeur par #, vues, état local). */
 (function () {
   'use strict';
-  const { PHOTOS, CATEGORIES, MEMBRES, ANNONCES, RESERVATIONS, ARTICLES, CREDITS } = window.ZT_DONNEES;
+  const { PHOTOS, VIDEOS, CATEGORIES, MEMBRES, ANNONCES, RESERVATIONS, ARTICLES, CREDITS } = window.ZT_DONNEES;
   const Z = window.ZT;
   const AUJOURDHUI = Z.versTexte(Z.versDate(new Date()));
   const vue = document.getElementById('vue');
@@ -75,10 +75,34 @@
   });
 
   /* ---------- vues ---------- */
+
+  /* ---------- vidéos ---------- */
+  // Vidéo de fond : muette, en boucle, jamais bloquante (l'affiche reste visible si la vidéo ne charge pas)
+  function videoFond(v, qualite) {
+    if (!v) return '';
+    return `<video class="video-fond" data-auto muted loop playsinline preload="none" poster="${v.poster}" aria-hidden="true" tabindex="-1"><source src="${qualite === 'sd' ? v.sd : v.hd}" type="video/mp4"></video>`;
+  }
+  // Lance les vidéos visibles, met en pause les autres ; rien ne bouge si l'utilisateur limite les animations
+  let observateurVideos = null;
+  function activerVideos() {
+    const videos = document.querySelectorAll('video[data-auto]');
+    if (!videos.length) return;
+    const calme = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (calme) return;
+    const lire = (v) => { const p = v.play(); if (p && p.catch) p.catch(() => {}); };
+    if (!('IntersectionObserver' in window)) { videos.forEach(lire); return; }
+    if (observateurVideos) observateurVideos.disconnect();
+    observateurVideos = new IntersectionObserver((entrees) => {
+      entrees.forEach((e) => { if (e.isIntersecting) lire(e.target); else e.target.pause(); });
+    }, { threshold: 0.25 });
+    videos.forEach((v) => observateurVideos.observe(v));
+  }
+
   function vueAccueil() {
     const une = toutesAnnonces().slice(0, 8);
     return `
-    <section class="hero" style="background-image:url('${PHOTOS.hero}')">
+    <section class="hero hero-video" style="background-image:url('${PHOTOS.hero}')">
+      ${videoFond(VIDEOS.accueil)}
       <div class="conteneur">
         <h1>Vos outils méritent <em>une seconde vie</em>. Les vôtres aussi.</h1>
         <p class="sous">Achetez à prix réduit, louez à deux rues de chez vous ou troquez ce qui dort au garage. Paiement sécurisé, caution protégée, profils vérifiés.</p>
@@ -106,7 +130,7 @@
 
     <section class="bloc" style="padding-top:0"><div class="conteneur">
       <div class="titre-section"><div><div class="surtitre">Catégories</div><h2>Trouvez le bon matériel</h2></div></div>
-      <div class="categories">${CATEGORIES.map((c) => `<a class="categorie" href="#/annonces?cat=${c.id}"><div class="ico">${c.icone}</div><span>${c.nom}</span></a>`).join('')}</div>
+      <div class="categories categories-video">${CATEGORIES.map((c) => `<a class="categorie categorie-video" href="#/annonces?cat=${c.id}" title="${esc(VIDEOS.categories[c.id] ? VIDEOS.categories[c.id].titre : c.nom)}">${videoFond(VIDEOS.categories[c.id], 'sd')}<span class="etiquette"><span class="ico">${c.icone}</span>${c.nom}</span></a>`).join('')}</div>
     </div></section>
 
     <section class="bloc" style="padding-top:0"><div class="conteneur">
@@ -168,6 +192,7 @@
     const titre = f.mode === 'vente' ? 'Outils à vendre' : f.mode === 'location' ? 'Outils à louer' : f.mode === 'echange' ? 'Outils à échanger' : 'Toutes les annonces';
     return `<div class="page"><div class="conteneur">
       <div class="fil"><a href="#/">Accueil</a> › ${titre}</div>
+      ${f.categorie && VIDEOS.categories[f.categorie] ? (() => { const c = CATEGORIES.find((x) => x.id === f.categorie); const v = VIDEOS.categories[f.categorie]; return `<div class="bandeau-video">${videoFond(v)}<div class="texte"><div class="surtitre">${c.icone} Catégorie</div><h2>${esc(c.nom)}</h2><p>${esc(v.titre)}</p></div></div>`; })() : ''}
       <div class="mise-en-page">
         <form class="filtres" id="filtres">
           <label>Recherche<input name="q" value="${esc(f.q)}" placeholder="Outil, marque…"></label>
@@ -478,9 +503,12 @@
   }
 
   function vueCredits() {
-    return `<div class="page"><div class="conteneur" style="max-width:820px"><div class="panneau"><h2>Crédits photos</h2>
+    return `<div class="page"><div class="conteneur" style="max-width:820px"><div class="panneau"><h2>Crédits photos et vidéos</h2>
       <p>Photographies issues d’<a href="https://unsplash.com/license" target="_blank" rel="noopener">Unsplash</a>, sous licence Unsplash : utilisation gratuite, y compris commerciale, sans attribution obligatoire. Nous créditons tout de même les auteurs.</p>
       ${CREDITS.map(([sujet, auteur, id]) => `<div class="ligne"><span>${esc(sujet)}</span><span>${esc(auteur)} · <a href="https://images.unsplash.com/photo-${id}" target="_blank" rel="noopener">source</a></span></div>`).join('')}
+      <h3 style="margin-top:28px">Vidéos</h3>
+      <p>Vidéos issues de <a href="https://mixkit.co/license/#videoFree" target="_blank" rel="noopener">Mixkit</a>, sous licence gratuite Mixkit : usage commercial autorisé, sans attribution obligatoire. Elles sont lues sans son et s’arrêtent si vous avez demandé à limiter les animations.</p>
+      ${[VIDEOS.accueil, VIDEOS.artisans, VIDEOS.reparer, ...Object.values(VIDEOS.categories)].map((v) => `<div class="ligne"><span>${esc(v.titre)}</span><span>Mixkit n° ${v.id} · <a href="${v.page}" target="_blank" rel="noopener">source</a></span></div>`).join('')}
     </div></div></div>`;
   }
 
@@ -556,7 +584,7 @@
   let filtreTravaux = { rayon: 10, metier: '', vise: '' };
   function vueTravaux() {
     const res = posClient ? Z.artisansProches(posClient, artisansAbonnes(), { rayonKm: filtreTravaux.rayon, metier: filtreTravaux.metier }) : [];
-    return `<section class="hero hero-court" style="background-image:url('${PHOTOS.artisans}')"><div class="conteneur">
+    return `<section class="hero hero-court hero-video" style="background-image:url('${PHOTOS.artisans}')">${videoFond(VIDEOS.artisans)}<div class="conteneur">
         <div class="surtitre" style="color:var(--jaune)">Petits, moyens et gros travaux</div>
         <h1>Un artisan vérifié <em>près de chez vous</em>, avec ses outils.</h1>
         <p class="sous">Décrivez vos travaux : les artisans abonnés de votre secteur reçoivent votre demande et vous envoient leur devis. Gratuit et sans engagement pour vous.</p>
@@ -746,7 +774,7 @@
   function vueReparer() {
     const aReparer = toutesAnnonces().filter((a) => a.etat === 'À réparer');
     const reparateurs = artisansAbonnes().filter((a) => a.metiers.includes('reparation'));
-    return `<section class="hero hero-court" style="background-image:url('${PHOTOS.atelier}')"><div class="conteneur">
+    return `<section class="hero hero-court hero-video" style="background-image:url('${PHOTOS.atelier}')">${videoFond(VIDEOS.reparer)}<div class="conteneur">
         <div class="surtitre" style="color:var(--jaune)">Outils à réparer</div>
         <h1>Un outil en panne n’est pas <em>un déchet</em>.</h1>
         <p class="sous">Faites-le réparer par un réparateur près de chez vous, vendez-le pour pièces, ou offrez-lui une seconde vie entre les mains d’un bricoleur.</p>
@@ -797,6 +825,7 @@
     }
     vue.innerHTML = html;
     if (apres) apres();
+    activerVideos();
     document.getElementById('bulle-msg').textContent = etat.conversations.length;
     if (!seg[0] || seg[0] !== 'favoris') window.scrollTo(0, 0);
   }
