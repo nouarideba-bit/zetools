@@ -559,3 +559,93 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
   .to-ligne span[data-t]::before { content: attr(data-t) " : "; font-weight: 600; }
 }
 @media (max-width: 520px) { .entete .actions-entete { flex-wrap: wrap; row-gap: 6px; max-width: 100%; } }
+
+/* ---------- Passeport outil ---------- */
+.badge-sante { background: #fff; color: var(--vert); border: 1px solid var(--vert-clair); }
+.badge-garantie { background: var(--vert-clair); color: var(--vert); font-weight: 700; }
+.jauge { --t: 96px; width: var(--t); height: var(--t); flex: none; border-radius: 50%; display: grid; place-items: center;
+  background: conic-gradient(var(--c) calc(var(--v) * 1%), #e6e9ec 0); }
+.jauge > div { width: calc(var(--t) - 14px); height: calc(var(--t) - 14px); border-radius: 50%; background: var(--carte); display: grid; place-content: center; text-align: center; line-height: 1; }
+.jauge b { font-size: calc(var(--t) * .3); color: var(--texte); }
+.jauge small { font-size: calc(var(--t) * .11); color: var(--texte-doux); }
+.passeport-fiche { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; margin-top: 16px; }
+.etapes-passeport { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+.etapes-passeport > div { background: var(--carte); border-radius: var(--rayon); box-shadow: var(--ombre); padding: 18px; }
+.etapes-passeport span { display: inline-grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--jaune); font-weight: 800; margin-bottom: 6px; }
+.etapes-passeport p { margin: 6px 0 0; color: var(--texte-doux); font-size: .92rem; }
+.liste-passeports { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 12px; }
+.ligne-passeport { display: flex; gap: 12px; align-items: center; background: var(--carte); border-radius: var(--rayon); box-shadow: var(--ombre); padding: 12px; color: inherit; text-decoration: none; }
+.ligne-passeport:hover { outline: 2px solid var(--jaune); }
+.ligne-passeport img { width: 64px; height: 64px; object-fit: cover; border-radius: 10px; }
+.ligne-passeport small { display: block; color: var(--texte-doux); margin-top: 3px; }
+.passeport { display: grid; grid-template-columns: 340px 1fr; gap: 20px; align-items: start; }
+.passeport-photo { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 12px; }
+.qr-passeport { display: grid; justify-items: center; gap: 6px; margin: 14px 0; }
+.qr-passeport small { color: var(--texte-doux); }
+.score-passeport { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
+.score-passeport > div:last-child { flex: 1; min-width: 220px; }
+.facteurs { list-style: none; padding: 0; margin: 8px 0 0; }
+.facteurs li { display: flex; justify-content: space-between; gap: 12px; padding: 5px 0; border-top: 1px solid rgba(0,0,0,.06); font-size: .93rem; }
+.facteurs .moins { color: #c92a2a; } .facteurs .plus { color: var(--vert); }
+.barre-batterie { height: 12px; border-radius: 6px; background: #e6e9ec; overflow: hidden; margin-top: 8px; }
+.barre-batterie span { display: block; height: 100%; background: linear-gradient(90deg, var(--vert), #4caf6a); }
+.historique { list-style: none; padding: 0; margin: 8px 0 0; }
+.historique li { display: grid; grid-template-columns: 110px 1fr; gap: 2px 12px; padding: 8px 0; border-top: 1px solid rgba(0,0,0,.06); }
+.historique time { color: var(--texte-doux); font-size: .88rem; grid-row: span 2; }
+.historique small { color: var(--texte-doux); }
+.onde { display: flex; gap: 3px; align-items: center; height: 44px; margin: 8px 0 12px; }
+.onde i { flex: 1; background: var(--jaune); border-radius: 2px; height: 20%; animation: onde .9s ease-in-out infinite alternate; }
+.onde i:nth-child(3n) { animation-delay: -.3s; } .onde i:nth-child(4n+1) { animation-delay: -.6s; } .onde i:nth-child(5n+2) { animation-delay: -.45s; }
+@keyframes onde { to { height: 100%; } }
+@media (prefers-reduced-motion: reduce) { .onde i { animation: none; height: 60%; } }
+.champ-court { display: grid; gap: 4px; font-weight: 600; font-size: .9rem; }
+.champ-court input { padding: 8px; border: 1px solid var(--acier-clair); border-radius: 8px; }
+
+/* ---------- Mode Projet ---------- */
+.lien-projet-hero { display: inline-block; margin-top: 12px; color: #fff; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+.lien-projet-hero:hover { color: var(--jaune); }
+.deux-espaces { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+.tuile-projet { background: linear-gradient(135deg, var(--vert), #1e4529); }
+.tuile-projet em, .tuile-passeport em { color: var(--jaune); }
+.tuile-passeport { background: linear-gradient(135deg, #2f3439, #4b545c); }
+.grille-projets { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+.carte-projet { display: grid; gap: 6px; background: var(--carte); border-radius: var(--rayon); box-shadow: var(--ombre); padding: 20px; color: inherit; text-decoration: none; border-top: 5px solid var(--jaune); }
+.carte-projet:hover { transform: translateY(-2px); }
+.carte-projet .ico { font-size: 2rem; } .carte-projet small { color: var(--texte-doux); } .carte-projet em { font-style: normal; font-weight: 700; color: var(--vert); }
+.form-projet { display: flex; gap: 12px; flex-wrap: wrap; align-items: end; }
+.form-projet label { display: grid; gap: 4px; font-weight: 600; font-size: .9rem; }
+.form-projet input, .form-projet select { padding: 8px 10px; border: 1px solid var(--acier-clair); border-radius: 8px; min-width: 110px; }
+.form-projet .case { display: flex; align-items: center; gap: 8px; font-weight: 500; }
+.form-projet .case input { min-width: 0; }
+.projet { display: grid; grid-template-columns: 1fr 340px; gap: 22px; align-items: start; }
+.projet h3 { margin: 22px 0 10px; }
+.ligne-kit { display: grid; grid-template-columns: 72px 1fr auto; gap: 12px; align-items: center; background: var(--carte); border-radius: var(--rayon); box-shadow: var(--ombre); padding: 10px 14px; margin-bottom: 10px; }
+.ligne-kit img { width: 72px; height: 72px; object-fit: cover; border-radius: 10px; }
+.ligne-kit a { color: inherit; }
+.ligne-kit small { display: block; color: var(--texte-doux); margin-top: 2px; }
+.ligne-kit .etape-kit { display: block; font-size: .78rem; text-transform: uppercase; letter-spacing: .04em; color: var(--vert); font-weight: 700; }
+.ligne-kit.partage { display: block; background: transparent; box-shadow: none; border: 1px dashed var(--acier-clair); padding: 8px 14px; }
+.prix-kit { text-align: right; font-weight: 800; font-size: 1.1rem; }
+.prix-kit small { font-weight: 400; font-size: .78rem; }
+.bascule-mode { display: inline-flex; margin-top: 6px; border: 1px solid var(--acier-clair); border-radius: 999px; overflow: hidden; font-size: .82rem; }
+.bascule-mode > * { padding: 4px 10px; text-decoration: none; }
+.bascule-mode .actif { background: var(--anthracite); color: #fff; font-weight: 700; }
+.savoir { display: flex; gap: 8px; flex-wrap: wrap; }
+.recap-projet { position: sticky; top: 90px; }
+.btn-petit { padding: 6px 10px; font-size: .82rem; }
+@media (max-width: 900px) {
+  .passeport, .projet, .etapes-passeport, .deux-espaces { grid-template-columns: 1fr; }
+  .recap-projet { position: static; }
+}
+@media (max-width: 520px) { .ligne-kit { grid-template-columns: 56px 1fr; } .ligne-kit img { width: 56px; height: 56px; } .prix-kit { grid-column: 1 / -1; text-align: left; } }
+
+/* ---------- Icônes vectorielles (remplacent les émojis) ---------- */
+.icone { display: block; flex: none; }
+.icone-btn { display: inline-grid; place-items: center; }
+.espace-tuile .ico { width: 48px; height: 48px; border-radius: 12px; background: rgba(255,255,255,.14); display: grid; place-items: center; }
+.tuile-cadeau .ico { background: rgba(35,39,43,.1); }
+.garantie .ico { width: 52px; height: 52px; margin: 0 auto 10px; border-radius: 14px; background: var(--vert-clair); color: var(--vert); display: grid; place-items: center; }
+.visuel-fiche .icone { color: var(--jaune); }
+.coeur { display: grid; place-items: center; color: var(--anthracite); }
+.coeur.actif { color: #d6336c; }
+.ico:empty { display: none; }

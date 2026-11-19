@@ -621,6 +621,153 @@
     return { ok: true, debit, resteAPayer: arrondi(montantDu - debit), coupon: c };
   }
 
+  /* ---------- Passeport outil : le carnet de santé de chaque outil ---------- */
+  Object.assign(REGLES, {
+    passeport: {
+      seuilGarantie: 80,          // score minimal pour la garantie « ça marche ou remboursé »
+      joursGarantie: 30,
+      controleValideJours: 90,    // un contrôle plus ancien ne suffit plus pour la garantie
+      pointsParAn: 4, maxAge: 30, // l'âge pèse au plus 30 points
+      heuresSeuil: 200, maxUsage: 20,
+      batterieSeuil: 80,          // capacité restante en % sous laquelle le score baisse
+      // estimation de la batterie à partir de sa date de fabrication (gravée) et de son usage déclaré :
+      // ordre de grandeur pour une batterie lithium-ion d'outillage, à affiner avec les fabricants
+      batteriePerteParAn: 3, batteriePerteParCycle: 0.04, batterieMin: 0,
+      dureeTestAcoustique: 5,     // secondes de marche à vide devant le micro
+    },
+    locationAchat: { delaiJours: 1 },  // « Je le garde » possible jusqu'au lendemain de la fin de location
+    projet: { rayonsKm: [5, 10, 20], rayonDefautKm: 5 },
+  });
+  const JOURS = (a, b) => Math.round((versDate(b) - versDate(a)) / JOUR);
+  const NIVEAUX_SANTE = [[80, 'Excellent'], [60, 'Bon'], [40, 'À surveiller'], [0, 'Fatigué']];
+
+  function dernierControle(p) {
+    return (p.controles || []).slice().sort((x, y) => (x.date < y.date ? 1 : -1))[0] || null;
+  }
+
+  /** Score de santé sur 100, avec le détail de chaque point retiré pour que l'acheteur comprenne la note. */
+  function scoreSante(p, aujourdHui) {
+    const P = REGLES.passeport, facteurs = [];
+    const retirer = (points, libelle) => { if (points > 0) facteurs.push({ libelle, points: -Math.round(points) }); };
+    const ans = Math.max(0, JOURS(p.misEnService + (p.misEnService.length === 7 ? '-01' : ''), aujourdHui) / 365);
+    retirer(Math.min(P.maxAge, ans * P.pointsParAn), `Âge : ${ans < 1 ? 'moins d’un an' : Math.floor(ans) + (Math.floor(ans) > 1 ? ' ans' : ' an')}`);
+    if (p.heures > P.heuresSeuil) retirer(Math.min(P.maxUsage, (p.heures - P.heuresSeuil) / 20), `Usage intensif : ${p.heures} h de fonctionnement`);
+    const d = dernierControle(p);
+    if (!d) retirer(15, 'Aucun contrôle enregistré');
+    else {
+      const age = JOURS(d.date, aujourdHui);
+      if (age > 180) retirer(15, `Dernier contrôle il y a ${age} jours`);
+      else if (age > P.controleValideJours) retirer(5, `Dernier contrôle il y a ${age} jours`);
+    }
+    (p.controles || []).filter((c) => JOURS(c.date, aujourdHui) <= 365).forEach((c) => {
+      if (c.resultat === 'echec') retirer(25, `Contrôle échoué le ${formatDate(c.date)}`);
+      else if (c.resultat === 'reserve') retirer(10, `Réserve au contrôle du ${formatDate(c.date)}`);
+    });
+    if (p.batterie && p.batterie.capacite < P.batterieSeuil) retirer((P.batterieSeuil - p.batterie.capacite) / 2, `Batterie à ${p.batterie.capacite} % de sa capacité`);
+    const bonus = (p.reparations || []).filter((r) => r.pro && JOURS(r.date, aujourdHui) <= 365).length ? 5 : 0;
+    if (bonus) facteurs.push({ libelle: 'Révisé par un réparateur professionnel cette année', points: bonus });
+    const score = Math.max(0, Math.min(100, 100 + facteurs.reduce((t, f) => t + f.points, 0)));
+    return { score, niveau: NIVEAUX_SANTE.find(([min]) => score >= min)[1], facteurs, dernier: d };
+  }
+
+  /** La garantie « ça marche ou remboursé » : vente seulement, bon score, contrôle récent. */
+  function garantiePasseport(p, annonce, aujourdHui) {
+    const P = REGLES.passeport, s = scoreSante(p, aujourdHui), d = s.dernier;
+    if (!annonce.modes.includes('vente')) return { ok: false, raison: 'La garantie s’applique aux achats.' };
+    if (s.score < P.seuilGarantie) return { ok: false, raison: `Score inférieur à ${P.seuilGarantie} / 100.` };
+    if (!d || JOURS(d.date, aujourdHui) > P.controleValideJours || d.resultat !== 'ok') return { ok: false, raison: `Il faut un contrôle réussi de moins de ${P.controleValideJours} jours.` };
+    return { ok: true, jours: P.joursGarantie };
+  }
+
+  /** Ajoute un contrôle (vidéo de 10 s au retour, ou passage en atelier) et renvoie un nouveau passeport. */
+  function ajouterControle(p, c) {
+    if (!['ok', 'reserve', 'echec'].includes(c.resultat)) throw new Error('Résultat de contrôle inconnu');
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(c.date)) throw new Error('Date de contrôle invalide');
+    return Object.assign({}, p, { controles: (p.controles || []).concat([Object.assign({}, c)]) });
+  }
+
+  /** Estime la capacité restante d'une batterie : date de fabrication gravée + nombre de charges déclaré. Une estimation, pas une mesure. */
+  function estimerBatterie(dateFabrication, cycles, aujourdHui) {
+    const P = REGLES.passeport;
+    const d = /^\d{4}-\d{2}$/.test(dateFabrication || '') ? dateFabrication + '-01' : dateFabrication;
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(d || '') || d > aujourdHui) return null;
+    const ans = JOURS(d, aujourdHui) / 365, n = Math.max(0, Math.round(Number(cycles) || 0));
+    const capacite = Math.max(P.batterieMin, Math.min(100, Math.round(100 - ans * P.batteriePerteParAn - n * P.batteriePerteParCycle)));
+    return { capacite, cycles: n, estimee: true, fabrication: d.slice(0, 7) };
+  }
+
+  /** Test acoustique : lit les mesures du son du moteur à vide (régularité, bruit aigu de frottement, à-coups).
+      Dans la maquette, les mesures sont simulées ; en production, un modèle entraîné par type d'outil les fournirait. */
+  function analyseAcoustique(m) {
+    const alertes = [];
+    if (m.regularite < 0.85) alertes.push('régime irrégulier (à-coups, charbons ou interrupteur)');
+    if (m.aigus > 0.35) alertes.push('sifflement ou frottement aigu (roulement usé)');
+    if (m.chocs > 2) alertes.push('claquements répétés (pignon ou percussion)');
+    const resultat = alertes.length === 0 ? 'ok' : alertes.length === 1 ? 'reserve' : 'echec';
+    return { resultat, alertes, note: alertes.length ? 'Test acoustique : ' + alertes.join(', ') : 'Test acoustique : moteur régulier, aucun frottement détecté' };
+  }
+
+  /** Location-achat : « Je le garde ». La location payée (hors frais de service et assurance) est déduite du prix de vente. */
+  function prixSiJeLeGarde(outil, reservation, aujourdHui) {
+    if (!outil.modes.includes('vente') || !(outil.prixVente > 0)) return { ok: false, raison: 'Cet outil n’est pas à vendre.' };
+    if (reservation.statut !== 'confirmée') return { ok: false, raison: 'La location n’est plus active.' };
+    if (aujourdHui > versTexte(new Date(versDate(reservation.fin).getTime() + REGLES.locationAchat.delaiJours * JOUR))) return { ok: false, raison: 'Le délai pour garder l’outil est dépassé.' };
+    const loyer = devisLocation(outil, reservation.debut, reservation.fin, { assurance: false }).location;
+    const deduit = arrondi(Math.min(loyer, outil.prixVente));
+    return { ok: true, prixVente: outil.prixVente, deduit, reste: arrondi(outil.prixVente - deduit) };
+  }
+
+  /* ---------- Mode Projet : un chantier décrit, un kit complet, un seul paiement ---------- */
+  /** Quantité de conditionnements de chaque consommable selon la taille du projet. */
+  function consommablesProjet(projet, quantite) {
+    const q = Math.max(1, Math.round(Number(quantite) || 1));
+    return (projet.consommables || []).map((c) => {
+      const besoin = c.parProjet != null ? c.parProjet : c.parUnite * q, paquets = Math.ceil(besoin / c.conditionnement - 1e-9);
+      return { nom: c.nom, besoin: Math.round(besoin * 100) / 100, unite: c.unite, paquets, prix: c.prix, total: arrondi(paquets * c.prix) };
+    });
+  }
+
+  /** Compose le kit : pour chaque besoin, l'outil le plus proche dans le rayon choisi, loué (s'il est libre) ou acheté ;
+      un même outil sert à plusieurs besoins. opts.achats : identifiants que le client préfère acheter. */
+  function composerProjet(projet, opts) {
+    const { quantite, cp, debut, fin, annonces, reservations, aujourdHui } = opts;
+    const achats = new Set(opts.achats || []), rayon = opts.rayonKm || null;
+    const client = positionCodePostal(cp);
+    const v = verifierDisponibilite({ id: '__' }, [], debut, fin, aujourdHui);
+    if (!v.ok) return { ok: false, raison: v.raison };
+    const choisis = new Map(), lignes = [], manquants = [];
+    for (const b of projet.besoins) {
+      const deja = b.outils.find((id) => choisis.has(id));
+      if (deja) { lignes.push({ besoin: b.libelle, annonce: choisis.get(deja).annonce, partage: true }); continue; }
+      const candidats = b.outils.map((id) => annonces.find((a) => a.id === id)).filter(Boolean)
+        .map((a) => {
+          const pos = positionCodePostal(a.cp);
+          const libre = a.modes.includes('location') && verifierDisponibilite(a, reservations || [], debut, fin, aujourdHui).ok;
+          const vente = a.modes.includes('vente') && a.prixVente > 0;
+          const mode = vente && (achats.has(a.id) || !libre) ? 'achat' : libre ? 'location' : null;
+          // achat « par défaut » (aucune location libre) : seulement si rien d'autre ne convient
+          const parDefaut = mode === 'achat' && !achats.has(a.id);
+          return { annonce: a, mode, libre, vente, parDefaut, km: client && pos ? Math.round(distanceKm(client, pos) * 10) / 10 : null };
+        })
+        .filter((c) => c.mode && (rayon == null || c.km == null || c.km <= rayon))
+        .sort((x, y) => (x.parDefaut - y.parDefaut) || ((x.km ?? 99) - (y.km ?? 99)));
+      if (!candidats.length) { manquants.push(b.libelle); continue; }
+      const c = candidats[0];
+      if (c.mode === 'location') { c.devis = devisLocation(c.annonce, debut, fin, { assurance: false }); c.prix = c.devis.totalLocataire; }
+      else c.prix = c.annonce.prixVente;
+      choisis.set(c.annonce.id, c); lignes.push(Object.assign({ besoin: b.libelle, partage: false }, c));
+    }
+    const consommables = consommablesProjet(projet, quantite);
+    const outils = [...choisis.values()];
+    const totalOutils = arrondi(outils.reduce((t, c) => t + c.prix, 0));
+    const totalConsommables = arrondi(consommables.reduce((t, c) => t + c.total, 0));
+    return { ok: true, lignes, outils, manquants, consommables, totalOutils, totalConsommables,
+      total: arrondi(totalOutils + totalConsommables),
+      cautions: arrondi(outils.filter((c) => c.mode === 'location').reduce((t, c) => t + (c.annonce.caution || 0), 0)),
+      achats: outils.filter((c) => c.mode === 'achat').length, locations: outils.filter((c) => c.mode === 'location').length,
+      proprietaires: new Set(outils.map((c) => c.annonce.membre)).size };
+  }
+
   const ZT = {
     REGLES, MASQUE, nbJours, tauxRemise, tauxCommission, devisLocation, devisVente,
     verifierDisponibilite, joursOccupes, masquerCoordonnees, filtrer, formatDate, euros, versTexte, versDate,
@@ -632,6 +779,8 @@
     creneauxJour, avancer, verifierProposition, confirmerRdv, annulationGratuite, versIcs,
     joursFeries, majorationUrgence, devisUrgence, artisansUrgence,
     genererCodeCoupon, verifierCodeCoupon, formaterCode, ajouterMois, verifierCoupon, creerCoupon, couponExpire, utiliserCoupon,
+    scoreSante, garantiePasseport, ajouterControle, dernierControle, consommablesProjet, composerProjet,
+    estimerBatterie, analyseAcoustique, prixSiJeLeGarde,
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = ZT;
   else racine.ZT = ZT;

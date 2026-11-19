@@ -463,7 +463,64 @@
     { id: 'o-demo-2', sens: 'recue', avec: 'm1', titre: 'Votre échelle télescopique 3,80 m', mode: 'location', prixAffiche: 5, montant: 4, statut: 'en attente', expire: '2026-12-31T20:00' },
   ];
 
-  const D = { PHOTOS, VIDEOS, CATEGORIES, MEMBRES, ANNONCES, RESERVATIONS, ARTICLES, CREDITS, METIERS, ARTISANS, DEMANDES, TYPES_ENSEIGNE, ENSEIGNES, LOTS, RDV_DEMO, OFFRES_DEMO, SERVICES, FICHES, SITE_PUBLIC, TYPES_URGENCE, THEMES_VIDEO, VIDEOS_TUTOS, THEME_FICHE, THEMES_COUPON, PROCHES };
+  /* Passeports outil (fictifs) : carnet de santé de l'outil, consultable par QR code.
+     Contrôle « vidéo » : 10 secondes de l'outil en marche filmées au retour de location ; « atelier » : passage chez un réparateur. */
+  const PASSEPORTS = {
+    a1: { misEnService: '2023-04', heures: 120, batterie: { capacite: 91, cycles: 140 },
+      controles: [{ date: '2026-06-02', type: 'video', resultat: 'ok', note: 'Couple et percussion normaux' }, { date: '2026-10-28', type: 'video', resultat: 'ok', note: 'Retour de location, aucun jeu dans le mandrin' }],
+      reparations: [] },
+    a2: { misEnService: '2021-09', heures: 260,
+      controles: [{ date: '2026-03-14', type: 'video', resultat: 'reserve', note: 'Percussion un peu faible' }, { date: '2026-04-02', type: 'atelier', resultat: 'ok', note: 'Charbons changés' }, { date: '2026-11-08', type: 'video', resultat: 'ok', note: 'Retour de location, frappe nette' }],
+      reparations: [{ date: '2026-04-02', objet: 'Remplacement des charbons', par: 'Répar’Outils 93', pro: true }] },
+    a3: { misEnService: '2024-02', heures: 60, batterie: { capacite: 95, cycles: 70 },
+      controles: [{ date: '2026-09-21', type: 'video', resultat: 'ok', note: 'RAS' }], reparations: [] },
+    a10: { misEnService: '2019-05', heures: 0,
+      controles: [{ date: '2026-10-05', type: 'video', resultat: 'ok', note: 'Inventaire complet : 120 pièces sur 120' }], reparations: [] },
+    a11: { misEnService: '2018-11', heures: 310, batterie: { capacite: 35, cycles: 620 },
+      controles: [{ date: '2026-08-30', type: 'video', resultat: 'echec', note: 'La batterie ne tient pas la charge' }], reparations: [] },
+    a13: { misEnService: '2022-06', heures: 0,
+      controles: [{ date: '2026-11-02', type: 'video', resultat: 'ok', note: 'Montée sous 2 t, aucune fuite hydraulique' }], reparations: [] },
+    a14: { misEnService: '2022-03', heures: 90, batterie: { capacite: 84, cycles: 210 },
+      controles: [{ date: '2026-10-19', type: 'video', resultat: 'ok', note: 'Couple de desserrage conforme' }], reparations: [] },
+    a16: { misEnService: '2024-09', heures: 0,
+      controles: [{ date: '2026-11-11', type: 'video', resultat: 'ok', note: 'Logiciel à jour, lecture OBD testée sur deux véhicules' }], reparations: [] },
+    a17: { misEnService: '2023-01', heures: 0, batterie: { capacite: 78, cycles: 95 },
+      controles: [{ date: '2026-07-15', type: 'video', resultat: 'ok', note: 'Démarrage d’un diesel 2.0 réussi' }], reparations: [] },
+    a18: { misEnService: '2024-05', heures: 0,
+      controles: [{ date: '2026-10-30', type: 'atelier', resultat: 'ok', note: 'Continuité et isolement contrôlés' }], reparations: [] },
+    a20: { misEnService: '2020-02', heures: 0,
+      controles: [{ date: '2026-09-12', type: 'atelier', resultat: 'ok', note: 'Étalonnage vérifié' }],
+      reparations: [{ date: '2026-09-12', objet: 'Changement des cordons de mesure', par: 'Répar’Outils 93', pro: true }] },
+  };
+
+  /* Mode Projet : le client décrit son chantier, ZETools compose le kit (outils des voisins + consommables + aide).
+     Prix des consommables : indicatifs, fournis par un partenaire à désigner. */
+  const PROJETS = [
+    { id: 'etageres', icone: '📚', titre: 'Fixer des étagères au mur', unite: 'étagère', uniteLibelle: 'Nombre d’étagères', defaut: 3, max: 20,
+      besoins: [{ libelle: 'Percer le mur', outils: ['a2', 'a1'] }, { libelle: 'Visser les supports', outils: ['a1', 'a3'] }],
+      consommables: [{ nom: 'Chevilles adaptées au mur', unite: 'chevilles', parUnite: 4, conditionnement: 20, prix: 6.5 },
+        { nom: 'Vis 5 × 50 mm', unite: 'vis', parUnite: 4, conditionnement: 25, prix: 4.2 },
+        { nom: 'Foret béton 6 mm', unite: 'foret', parProjet: 1, conditionnement: 1, prix: 4.9 }],
+      fiche: 'f2', service: 's4', duree: '2 h', niveau: 'Facile' },
+    { id: 'meubles', icone: '🪑', titre: 'Monter des meubles en kit', unite: 'meuble', uniteLibelle: 'Nombre de meubles', defaut: 2, max: 10,
+      besoins: [{ libelle: 'Visser l’assemblage', outils: ['a1', 'a3'] }],
+      consommables: [{ nom: 'Kit de fixation anti-basculement', unite: 'kit', parUnite: 1, conditionnement: 1, prix: 4.5 }],
+      fiche: 'f1', service: 's1', duree: '1 h 30 par meuble', niveau: 'Facile' },
+    { id: 'haie', icone: '🌳', titre: 'Tailler une haie', unite: 'mètre', uniteLibelle: 'Longueur de haie (m)', defaut: 15, max: 200,
+      besoins: [{ libelle: 'Tailler', outils: ['a9'] }, { libelle: 'Évacuer les branches', outils: ['a5'] }],
+      consommables: [{ nom: 'Sacs à déchets verts 100 L', unite: 'sacs', parUnite: 0.25, conditionnement: 5, prix: 7.9 }],
+      video: 'PyqQl1B4MkM', service: 's3', duree: 'une demi-journée', niveau: 'Facile' },
+    { id: 'roues', icone: '🛞', titre: 'Changer ses roues été / hiver', unite: 'roue', uniteLibelle: 'Nombre de roues', defaut: 4, max: 4,
+      besoins: [{ libelle: 'Lever le véhicule', outils: ['a13'] }, { libelle: 'Débloquer les écrous', outils: ['a14', 'a23'] }, { libelle: 'Caler les roues', outils: ['a23'] }],
+      consommables: [{ nom: 'Graisse cuivrée anti-grippage', unite: 'tube', parProjet: 1, conditionnement: 1, prix: 8.9 }],
+      duree: '1 h', niveau: 'Intermédiaire', securite: 'Posez toujours les chandelles avant de passer un bras sous la voiture, et resserrez les écrous au couple du constructeur.' },
+    { id: 'demarrage', icone: '🔋', titre: 'Panne de démarrage auto ou moto', unite: 'véhicule', uniteLibelle: 'Nombre de véhicules', defaut: 1, max: 3,
+      besoins: [{ libelle: 'Mesurer la batterie', outils: ['a20'] }, { libelle: 'Redémarrer', outils: ['a17'] }, { libelle: 'Lire les codes défaut', outils: ['a16'] }],
+      consommables: [{ nom: 'Graisse de protection pour cosses', unite: 'flacon', parProjet: 1, conditionnement: 1, prix: 5.9 }],
+      duree: '30 min', niveau: 'Facile', securite: 'Réseau 12 V uniquement : ne touchez jamais au circuit haute tension (câbles orange) d’un véhicule électrique ou hybride.' },
+  ];
+
+  const D = { PHOTOS, VIDEOS, CATEGORIES, MEMBRES, ANNONCES, RESERVATIONS, ARTICLES, CREDITS, METIERS, ARTISANS, DEMANDES, TYPES_ENSEIGNE, ENSEIGNES, LOTS, RDV_DEMO, OFFRES_DEMO, SERVICES, FICHES, SITE_PUBLIC, TYPES_URGENCE, THEMES_VIDEO, VIDEOS_TUTOS, THEME_FICHE, THEMES_COUPON, PROCHES, PASSEPORTS, PROJETS };
   if (typeof module !== 'undefined' && module.exports) module.exports = D;
   else racine.ZT_DONNEES = D;
 })(typeof window !== 'undefined' ? window : globalThis);

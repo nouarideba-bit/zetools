@@ -9,10 +9,10 @@
   /* ---------- état persistant (navigateur seulement) ---------- */
   const CLE = 'zetools-maquette-v1';
   const ETAT_INITIAL = () => ({
-    reservations: [],
+    reservations: [{ id: 'r-garde', outilId: 'a13', debut: Z.versTexte(new Date(Z.versDate(AUJOURDHUI).getTime() - 86400000)), fin: AUJOURDHUI, statut: 'confirmée', locataire: 'Vous', total: 13.44, caution: 80 }],
     favoris: [],
     annonces: [],
-    lots: [], stocks: {}, retraits: [], enseigne: null, services: [], coupons: [], urgences: [],
+    lots: [], stocks: {}, retraits: [], enseigne: null, services: [], coupons: [], urgences: [], controles: {}, batteries: {}, projets: [],
     rdv: window.ZT_DONNEES.RDV_DEMO.map((r) => Object.assign({}, r)),
     offres: window.ZT_DONNEES.OFFRES_DEMO.map((o) => Object.assign({}, o)),
     conversations: [
@@ -44,8 +44,34 @@
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const catNom = (id) => (CATEGORIES.find((c) => c.id === id) || {}).nom || '';
   const initiales = (nom) => nom.split(/\s+/).map((m) => m[0]).join('').slice(0, 2).toUpperCase();
+
+  /* ---------- Icônes : un seul jeu, au trait fin (dessins inspirés de Lucide, licence ISC) ; pas d'émoji dans les pages ---------- */
+  const TRACES = {
+    offre: '<path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r="1"/>',
+    agenda: '<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+    message: '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2z"/>',
+    coeur: '<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>',
+    compte: '<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+    cadenas: '<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+    carte: '<rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/>',
+    verifie: '<circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>',
+    etoile: '<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/>',
+    bouclier: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
+    alerte: '<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4M12 17h.01"/>',
+    lecture: '<circle cx="12" cy="12" r="10"/><path d="m10 8 6 4-6 4z"/>',
+    cadeau: '<rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7M7.5 8a2.5 2.5 0 0 1 0-5C9 3 12 8 12 8s3-5 4.5-5a2.5 2.5 0 0 1 0 5"/>',
+    cle: '<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>',
+    sante: '<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>',
+    fichier: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/>',
+  };
+  function ico(nom, taille, plein) {
+    return `<svg class="icone" viewBox="0 0 24 24" width="${taille || 20}" height="${taille || 20}" fill="${plein ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${TRACES[nom]}</svg>`;
+  }
+  // Charte : aucun émoji pictographique dans les pages (rendu peu professionnel). On garde ★ des notes, ©, ® et ™.
+  const PICTO = /(?:[\u{1F1E6}-\u{1F1FF}]{2}|(?![★©®™])\p{Extended_Pictographic}(?:️|⃣|[\u{1F3FB}-\u{1F3FF}]|‍\p{Extended_Pictographic}️?)*)️? ?/gu;
+  const sansPictos = (html) => String(html).replace(PICTO, '').replace(/<(span|div) class="ico">\s*<\/\1>/g, '');
   function toast(texte) {
-    const t = document.createElement('div'); t.className = 'toast'; t.textContent = texte;
+    const t = document.createElement('div'); t.className = 'toast'; t.textContent = sansPictos(texte);
     document.body.appendChild(t); setTimeout(() => t.remove(), 3800);
   }
   function badges(a) {
@@ -70,8 +96,8 @@
     const m = membre(a.membre); const fav = etat.favoris.includes(a.id);
     return `<a class="carte" href="#/annonce/${a.id}">
       <div class="visuel">${a.photo ? `<img loading="lazy" src="${a.photo}" alt="${esc(a.titre)}">` : ''}
-        <div class="badges">${badges(a)}</div>
-        <button class="coeur" data-fav="${a.id}" aria-label="Ajouter aux favoris">${fav ? '❤️' : '♡'}</button></div>
+        <div class="badges">${badges(a)}${badgeSante(a)}</div>
+        <button class="coeur${fav ? ' actif' : ''}" data-fav="${a.id}" aria-label="Ajouter aux favoris">${ico('coeur', 20, fav)}</button></div>
       <div class="infos"><span class="badge badge-etat" style="align-self:start">${esc(a.etat)}</span>
         <h3>${esc(a.titre)}</h3><div class="prix">${prixPrincipal(a)}</div>${ligneNeuf(a)}
         <div class="meta"><span>📍 ${esc(a.ville)}</span><span>★ ${m.note.toFixed(1)} (${m.avis})</span></div></div></a>`;
@@ -82,7 +108,7 @@
     e.preventDefault(); e.stopPropagation();
     const id = f.dataset.fav;
     etat.favoris = etat.favoris.includes(id) ? etat.favoris.filter((x) => x !== id) : etat.favoris.concat(id);
-    sauver(); f.textContent = etat.favoris.includes(id) ? '❤️' : '♡';
+    sauver(); const fv = etat.favoris.includes(id); f.innerHTML = ico('coeur', 20, fv); f.classList.toggle('actif', fv);
     toast(etat.favoris.includes(id) ? 'Ajouté à vos favoris' : 'Retiré de vos favoris');
   });
 
@@ -127,6 +153,7 @@
           <input name="lieu" placeholder="Ville ou code postal" aria-label="Localisation">
           <button class="btn btn-cta" type="submit">Rechercher</button>
         </form>
+        <a class="lien-projet-hero" href="#/projet">Ou décrivez votre chantier : on réunit les outils, les consommables et l’aide →</a>
         <div class="chiffres-hero"><div><b>×10</b>un outil prêté sert dix fois plus</div><div><b>-70 %</b>louer plutôt qu’acheter pour 2 jours</div><div><b>Île-de-France</b>zone pilote 2027</div></div>
       </div>
     </section>
@@ -142,7 +169,7 @@
 
     <section class="bloc" style="padding-top:0"><div class="conteneur">
       <div class="titre-section"><div><div class="surtitre">Catégories</div><h2>Trouvez le bon matériel</h2></div></div>
-      <div class="categories categories-video">${CATEGORIES.map((c) => `<a class="categorie categorie-video" href="#/annonces?cat=${c.id}" title="${esc(VIDEOS.categories[c.id] ? VIDEOS.categories[c.id].titre : c.nom)}">${videoFond(VIDEOS.categories[c.id], 'sd')}<span class="etiquette"><span class="ico">${c.icone}</span>${c.nom}</span></a>`).join('')}</div>
+      <div class="categories categories-video">${CATEGORIES.map((c) => `<a class="categorie categorie-video" href="#/annonces?cat=${c.id}" title="${esc(VIDEOS.categories[c.id] ? VIDEOS.categories[c.id].titre : c.nom)}">${videoFond(VIDEOS.categories[c.id], 'sd')}<span class="etiquette">${c.nom}</span></a>`).join('')}</div>
     </div></section>
 
     <section class="bloc" style="padding-top:0"><div class="conteneur">
@@ -157,9 +184,13 @@
 
     <section class="bloc" style="padding-top:0"><div class="conteneur">
       <div class="trois-espaces">
-        <a class="espace-tuile tuile-urgence" href="#/urgence"><span class="ico">🚨</span><b>Urgence travaux</b><span>Fuite, panne, porte claquée : un pro vérifié, son délai et son prix ferme avant le déplacement.</span><em>Trouver un pro maintenant →</em></a>
-        <a class="espace-tuile tuile-videos" href="#/videos"><span class="ico">🎬</span><b>Vidéothèque</b><span>Des tutoriels à regarder ici même : montage, perçage, peinture, outils, jardin.</span><em>Regarder les vidéos →</em></a>
-        <a class="espace-tuile tuile-cadeau" href="#/offrir"><span class="ico">🎁</span><b>Offrir des travaux</b><span>Un bon cadeau de 20 à 500 € pour un parent, un enfant, un ami, un collègue.</span><em>Offrir un bon cadeau →</em></a>
+        <a class="espace-tuile tuile-urgence" href="#/urgence"><span class="ico">${ico('alerte', 30)}</span><b>Urgence travaux</b><span>Fuite, panne, porte claquée : un pro vérifié, son délai et son prix ferme avant le déplacement.</span><em>Trouver un pro maintenant →</em></a>
+        <a class="espace-tuile tuile-videos" href="#/videos"><span class="ico">${ico('lecture', 30)}</span><b>Vidéothèque</b><span>Des tutoriels à regarder ici même : montage, perçage, peinture, outils, jardin.</span><em>Regarder les vidéos →</em></a>
+        <a class="espace-tuile tuile-cadeau" href="#/offrir"><span class="ico">${ico('cadeau', 30)}</span><b>Offrir des travaux</b><span>Un bon cadeau de 20 à 500 € pour un parent, un enfant, un ami, un collègue.</span><em>Offrir un bon cadeau →</em></a>
+      </div>
+      <div class="deux-espaces">
+        <a class="espace-tuile tuile-projet" href="#/projet"><span class="ico">${ico('cle', 30)}</span><b>Mode Projet</b><span>« Fixer 3 étagères », « changer mes roues » : les outils de vos voisins, les consommables calculés, la fiche et un coup de main, en un seul paiement.</span><em>Lancer mon projet →</em></a>
+        <a class="espace-tuile tuile-passeport" href="#/passeport"><span class="ico">${ico('sante', 30)}</span><b>Passeport outil</b><span>Chaque outil a son carnet de santé : âge, contrôles, réparations, batterie. Au-dessus de 80 / 100, l’achat est garanti 30 jours.</span><em>Voir les passeports →</em></a>
       </div>
     </div></section>
 
@@ -209,11 +240,11 @@
     return `<section class="bloc reassurance"><div class="conteneur">
       <div class="titre-section"><div><div class="surtitre">Confiance et sécurité</div><h2>Protégé du premier message au retour de l’outil</h2><p>Ces protections ne valent que pour les transactions réglées sur ZETOOLS.</p></div></div>
       <div class="garanties">
-        <div class="garantie"><div class="ico">🔒</div><h3>Paiement sécurisé</h3><p>Fonds en séquestre chez un prestataire agréé, versés au vendeur après confirmation de la remise.</p></div>
-        <div class="garantie"><div class="ico">💳</div><h3>Caution protégée</h3><p>Simple empreinte bancaire pendant la location, libérée au retour de l’outil en bon état.</p></div>
-        <div class="garantie"><div class="ico">✅</div><h3>Profils vérifiés</h3><p>Identité, téléphone et, pour les pros, numéro SIRET contrôlés avant la première annonce payante.</p></div>
-        <div class="garantie"><div class="ico">⭐</div><h3>Avis communautaires</h3><p>Seuls les membres ayant réellement loué, acheté ou échangé peuvent laisser un avis.</p></div>
-        <div class="garantie"><div class="ico">🛡️</div><h3>Assurance casse</h3><p>Option casse et vol pendant la location, à partir de 3 € par réservation.</p></div>
+        <div class="garantie"><div class="ico">${ico('cadenas', 28)}</div><h3>Paiement sécurisé</h3><p>Fonds en séquestre chez un prestataire agréé, versés au vendeur après confirmation de la remise.</p></div>
+        <div class="garantie"><div class="ico">${ico('carte', 28)}</div><h3>Caution protégée</h3><p>Simple empreinte bancaire pendant la location, libérée au retour de l’outil en bon état.</p></div>
+        <div class="garantie"><div class="ico">${ico('verifie', 28)}</div><h3>Profils vérifiés</h3><p>Identité, téléphone et, pour les pros, numéro SIRET contrôlés avant la première annonce payante.</p></div>
+        <div class="garantie"><div class="ico">${ico('etoile', 28)}</div><h3>Avis communautaires</h3><p>Seuls les membres ayant réellement loué, acheté ou échangé peuvent laisser un avis.</p></div>
+        <div class="garantie"><div class="ico">${ico('bouclier', 28)}</div><h3>Assurance casse</h3><p>Option casse et vol pendant la location, à partir de 3 € par réservation.</p></div>
       </div></div></section>`;
   }
 
@@ -266,6 +297,7 @@
             ${a.echangeContre ? `<div class="ligne"><span>Échange recherché</span><b>${esc(a.echangeContre)}</b></div>` : ''}
             <div class="ligne"><span>Remise</span><b>📍 ${esc(a.ville)} (${esc(a.cp)}) · adresse exacte après paiement</b></div>
           </div>
+          ${blocPasseportFiche(a)}
         </div>
         <div>
           <div class="panneau">
@@ -336,6 +368,7 @@
     }
     return `<div class="ligne"><span>Tarif</span><b>${Z.euros(a.prixJour)} / jour</b></div>
       <div class="ligne discret"><span>-10 % dès 3 jours · -20 % dès 7 jours</span><span></span></div>
+      ${a.modes.includes('vente') ? `<div class="alerte alerte-ok">🔁 <b>Louez, puis gardez-le.</b> S’il vous plaît, cliquez « Je le garde » avant le lendemain du retour : la location payée est déduite du prix d’achat (${Z.euros(a.prixVente)}).</div>` : ''}
       ${calendrier(a)}${detail}${blocOffre(a, 'location')}`;
   }
 
@@ -363,7 +396,7 @@
 
   function brancherFiche(a) {
     const zone = document.getElementById('zone-transaction');
-    const rafraichir = () => { zone.innerHTML = zoneTransaction(a); };
+    const rafraichir = () => { zone.innerHTML = sansPictos(zoneTransaction(a)); };
     document.getElementById('onglets-fiche').addEventListener('click', (e) => {
       const b = e.target.closest('[data-onglet]'); if (!b) return;
       selection.onglet = b.dataset.onglet;
@@ -478,9 +511,11 @@
     return `<div class="page"><div class="conteneur">
       <div class="titre-section"><div><h2>Mon espace</h2><p>Compte de démonstration · profil vérifié</p></div><a class="btn btn-cta" href="#/deposer">＋ Déposer une annonce</a></div>
       <h3>Mon calendrier de location</h3>
-      ${mesRes.length ? `<table class="tableau"><thead><tr><th>Outil</th><th>Du</th><th>Au</th><th>Total payé</th><th>Caution bloquée</th><th>Statut</th></tr></thead><tbody>${mesRes.sort((x, y) => x.debut.localeCompare(y.debut)).map((r) => { const a = annonce(r.outilId); return `<tr><td><a href="#/annonce/${a.id}">${esc(a.titre)}</a></td><td>${Z.formatDate(r.debut)}</td><td>${Z.formatDate(r.fin)}</td><td>${r.total ? Z.euros(r.total) : '—'}</td><td>${Z.euros(r.caution ?? a.caution)}</td><td><span class="statut">${esc(r.statut)}</span></td></tr>`; }).join('')}</tbody></table>` : '<div class="vide">Aucune location pour l’instant.</div>'}
+      ${mesRes.length ? `<table class="tableau"><thead><tr><th>Outil</th><th>Du</th><th>Au</th><th>Total payé</th><th>Caution bloquée</th><th>Statut</th><th>Location-achat</th></tr></thead><tbody>${mesRes.sort((x, y) => x.debut.localeCompare(y.debut)).map((r) => { const a = annonce(r.outilId); return `<tr><td><a href="#/annonce/${a.id}">${esc(a.titre)}</a></td><td>${Z.formatDate(r.debut)}</td><td>${Z.formatDate(r.fin)}</td><td>${r.total ? Z.euros(r.total) : '—'}</td><td>${r.statut === 'achetée' ? '—' : Z.euros(r.caution ?? a.caution)}</td><td><span class="statut">${esc(r.statut)}</span></td><td>${celluleGarder(a, r)}</td></tr>`; }).join('')}</tbody></table>` : '<div class="vide">Aucune location pour l’instant.</div>'}
       <h3 style="margin-top:32px">Mes services proposés</h3>
       ${etat.services.length ? `<div class="grille">${etat.services.map(carteService).join('')}</div>` : '<div class="vide">Vous savez monter un meuble, tailler une haie, poser une étagère ? <a href="#/proposer-service">Proposez vos services</a>.</div>'}
+      <h3 style="margin-top:32px">Mes projets</h3>
+      ${(etat.projets || []).length ? `<table class="tableau"><thead><tr><th>Projet</th><th>Du</th><th>Au</th><th>Outils</th><th>Total payé</th></tr></thead><tbody>${etat.projets.map((pj) => `<tr><td>${esc(pj.icone)} ${esc(pj.titre)}</td><td>${Z.formatDate(pj.debut)}</td><td>${Z.formatDate(pj.fin)}</td><td>${pj.outils.length}</td><td>${Z.euros(pj.total)}</td></tr>`).join('')}</tbody></table>` : '<div class="panneau bandeau-action"><div>Décrivez votre chantier : ZETools réunit les outils de vos voisins, les consommables et un coup de main.</div><a class="btn btn-contour" href="#/projet">🧰 Lancer un projet</a></div>'}
       <h3 style="margin-top:32px">Mes bons cadeaux</h3>
       <div class="panneau bandeau-action"><div>${etat.coupons.length ? `${etat.coupons.length} bon(s) · solde disponible ${Z.euros(etat.coupons.filter((c) => !Z.couponExpire(c, AUJOURDHUI)).reduce((t, c) => t + c.solde, 0))}.` : 'Offrez des travaux à un proche, ou saisissez le code d’un bon reçu.'}</div><a class="btn btn-contour" href="#/offrir">🎁 Offrir ou utiliser un bon</a></div>
       <h3 style="margin-top:32px">Mes offres de prix</h3>
@@ -727,7 +762,7 @@
   }
 
   function brancherTravaux() {
-    const rafraichir = () => { vue.innerHTML = vueTravaux(); brancherTravaux(); };
+    const rafraichir = () => { vue.innerHTML = sansPictos(vueTravaux()); brancherTravaux(); };
     const placer = (p) => { posClient = p; rafraichir(); };
     document.getElementById('geoloc').addEventListener('click', () => {
       const etatGeo = document.getElementById('etat-geo');
@@ -1100,7 +1135,7 @@
   function brancherRendezVous() {
     const f = document.getElementById('form-rdv');
     const zone = document.getElementById('zone-calendrier');
-    const redessiner = () => { zone.innerHTML = calendrierRdv(); };
+    const redessiner = () => { zone.innerHTML = sansPictos(calendrierRdv()); };
     zone.addEventListener('click', (e) => {
       const b = e.target.closest('button'); if (!b) return;
       if (b.dataset.moisRdv) { const [a, m] = selRdv.mois.split('-').map(Number); const d = new Date(Date.UTC(a, m - 1 + Number(b.dataset.moisRdv), 1)); selRdv.mois = d.toISOString().slice(0, 7); }
@@ -1288,7 +1323,7 @@
   function brancherService(id) {
     const zone = document.getElementById('zone-service'); if (!zone) return;
     const courant = () => Z.appliquerOffres(service(id), etat.offres, maintenant());
-    const rafraichir = () => { zone.innerHTML = zoneService(courant()); };
+    const rafraichir = () => { zone.innerHTML = sansPictos(zoneService(courant())); };
     zone.addEventListener('change', (e) => {
       if (e.target.id === 'heures-svc') { selService.heures = Number(e.target.value); rafraichir(); }
       if (e.target.id === 'assurance-svc') { selService.assurance = e.target.checked; rafraichir(); }
@@ -1390,7 +1425,7 @@
   }
   function carteFiche(f) {
     return `<a class="carte carte-fiche" href="#/fiche-technique/${f.id}">
-      <div class="visuel visuel-fiche"><span>${f.icone}</span><div class="badges"><span class="badge badge-location">PDF gratuit</span>${(f.videos || []).length ? '<span class="badge badge-echange">▶ Vidéo</span>' : ''}</div></div>
+      <div class="visuel visuel-fiche">${ico('fichier', 56)}<div class="badges"><span class="badge badge-location">PDF gratuit</span>${(f.videos || []).length ? '<span class="badge badge-echange">▶ Vidéo</span>' : ''}</div></div>
       <div class="infos"><span class="badge badge-etat" style="align-self:start">${esc(f.theme)} · ${esc(f.niveau)}</span>
         <h3>${esc(f.titre)}</h3><div class="meta"><span>⏱ ${esc(f.duree)}</span><span>${f.etapes.length} étapes</span></div></div></a>`;
   }
@@ -1446,7 +1481,7 @@
       const b = e.target.closest('[data-lire]'); if (b) { lire(b.dataset.lire, Number(b.dataset.debut) || 0); return; }
       const c = e.target.closest('[data-choix-video]'); if (!c) return;
       const v = f.videos[Number(c.dataset.choixVideo)];
-      cadre.innerHTML = facadeVideo(v);
+      cadre.innerHTML = sansPictos(facadeVideo(v));
       const lien = art.querySelector('[data-lien-yt]'); if (lien) lien.href = `https://www.youtube.com/watch?v=${v.yt}`;
       art.querySelectorAll('[data-choix-video]').forEach((x) => x.classList.toggle('active', x === c));
     });
@@ -1547,10 +1582,10 @@
   function brancherVideos() {
     const cadre = document.getElementById('lecteur'); if (!cadre) return;
     const redessiner = (lire) => {
-      vue.innerHTML = vueVideos(new URLSearchParams()); brancherVideos();
+      vue.innerHTML = sansPictos(vueVideos(new URLSearchParams())); brancherVideos();
       const v = toutesVideos().find((x) => x.yt === selVideo.yt);
       const c = document.getElementById('lecteur');
-      if (lire && consentementYt) c.innerHTML = iframeYt(v, true);
+      if (lire && consentementYt) c.innerHTML = sansPictos(iframeYt(v, true));
       return c;
     };
     vue.querySelector('.filtres-videos').addEventListener('click', (e) => {
@@ -1559,7 +1594,7 @@
     });
     vue.querySelector('.videotheque').addEventListener('click', (e) => {
       const lire = e.target.closest('[data-lire]');
-      if (lire) { consentementYt = true; const v = toutesVideos().find((x) => x.yt === lire.dataset.lire); cadre.innerHTML = iframeYt(v, true); return; }
+      if (lire) { consentementYt = true; const v = toutesVideos().find((x) => x.yt === lire.dataset.lire); cadre.innerHTML = sansPictos(iframeYt(v, true)); return; }
       const t = e.target.closest('[data-video]'); if (!t) return;
       selVideo.yt = t.dataset.video;
       redessiner(true).scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -1657,10 +1692,10 @@
       </div></div>`;
   }
   function brancherUrgence() {
-    const rafraichir = () => { const y = window.scrollY; vue.innerHTML = vueUrgence(new URLSearchParams()); brancherUrgence(); window.scrollTo(0, y); };
+    const rafraichir = () => { const y = window.scrollY; vue.innerHTML = sansPictos(vueUrgence(new URLSearchParams())); brancherUrgence(); window.scrollTo(0, y); };
     vue.querySelectorAll('[data-type-urg]').forEach((b) => b.addEventListener('click', () => { selUrg.type = b.dataset.typeUrg; selUrg.artisan = 'premier'; rafraichir(); }));
     const cadre = vue.querySelector('[data-cadre-urg]');
-    if (cadre) cadre.addEventListener('click', (e) => { const b = e.target.closest('[data-lire]'); if (!b) return; consentementYt = true; cadre.innerHTML = iframeYt(VIDEOS_TUTOS.find((v) => v.yt === b.dataset.lire), true); });
+    if (cadre) cadre.addEventListener('click', (e) => { const b = e.target.closest('[data-lire]'); if (!b) return; consentementYt = true; cadre.innerHTML = sansPictos(iframeYt(VIDEOS_TUTOS.find((v) => v.yt === b.dataset.lire), true)); });
     const geo = document.getElementById('geoloc-urg');
     if (geo) geo.addEventListener('click', () => {
       const etatGeo = document.getElementById('etat-geo-urg');
@@ -1805,10 +1840,10 @@
   function brancherOffrir() {
     const f = document.getElementById('form-cadeau'); if (!f) return;
     const lire = () => { const fd = new FormData(f); ['pour', 'de', 'message', 'autre', 'email', 'date'].forEach((k) => { if (fd.has(k)) selCadeau[k] = String(fd.get(k)); }); selCadeau.mode = fd.get('mode') || 'pdf'; };
-    const redessiner = () => { const y = window.scrollY; vue.innerHTML = vueOffrir(new URLSearchParams()); brancherOffrir(); window.scrollTo(0, y); };
+    const redessiner = () => { const y = window.scrollY; vue.innerHTML = sansPictos(vueOffrir(new URLSearchParams())); brancherOffrir(); window.scrollTo(0, y); };
     const apercu = () => {
       lire(); const m = selCadeau.autre !== '' ? Number(selCadeau.autre) : selCadeau.montant;
-      document.getElementById('apercu-carte').innerHTML = apercuCoupon({ pour: selCadeau.pour, de: selCadeau.de, montant: m, theme: selCadeau.theme, message: selCadeau.message });
+      document.getElementById('apercu-carte').innerHTML = sansPictos(apercuCoupon({ pour: selCadeau.pour, de: selCadeau.de, montant: m, theme: selCadeau.theme, message: selCadeau.message }));
       document.getElementById('compteur-cadeau').textContent = selCadeau.message.length;
       document.getElementById('a-payer').textContent = Number.isFinite(m) && m > 0 ? Z.euros(m) : '—';
       if (f.querySelector('[name=autre]').value !== '') f.querySelectorAll('[data-montant]').forEach((b) => b.classList.remove('active'));
@@ -1834,17 +1869,227 @@
       etat.coupons.push(c); sauver();
       selCadeau = Object.assign({}, selCadeau, { pour: '', message: '', autre: '', email: '', date: '' });
       toast(`Paiement de ${Z.euros(c.montant)} accepté (simulation). Bon cadeau ${c.code} créé.`);
-      vue.innerHTML = vueOffrir(new URLSearchParams()); brancherOffrir(); window.scrollTo(0, 0);
+      vue.innerHTML = sansPictos(vueOffrir(new URLSearchParams())); brancherOffrir(); window.scrollTo(0, 0);
     });
     vue.querySelectorAll('[data-pdf-coupon]').forEach((b) => b.addEventListener('click', () => telechargerCoupon(b.dataset.pdfCoupon)));
     const fermer = vue.querySelector('[data-fermer-confirmation]');
     if (fermer) fermer.addEventListener('click', () => { etat.coupons.forEach((c) => { delete c.nouveau; }); sauver(); redessiner(); });
     document.getElementById('form-code').addEventListener('submit', (e) => {
       e.preventDefault(); lire(); const brut = document.getElementById('code-coupon').value.trim(); codeSaisi = brut ? Z.formaterCode(brut) : '';
-      vue.innerHTML = vueOffrir(new URLSearchParams()); brancherOffrir(); document.getElementById('utiliser-coupon').scrollIntoView();
+      vue.innerHTML = sansPictos(vueOffrir(new URLSearchParams())); brancherOffrir(); document.getElementById('utiliser-coupon').scrollIntoView();
     });
   }
 
+
+
+  /* ---------- Passeport outil ---------- */
+  const { PASSEPORTS, PROJETS } = window.ZT_DONNEES;
+  function passeportDe(id) {
+    const base = PASSEPORTS[id], ajout = (etat.controles || {})[id] || [];
+    if (!base && !ajout.length && !(etat.batteries || {})[id]) return null;
+    const p = base || { misEnService: AUJOURDHUI.slice(0, 7), heures: 0, controles: [], reparations: [] };
+    const bat = (etat.batteries || {})[id];
+    return Object.assign({}, p, { controles: (p.controles || []).concat(ajout) }, bat ? { batterie: bat } : {});
+  }
+  const COULEUR_SANTE = { Excellent: 'var(--vert)', Bon: '#3b7d4f', 'À surveiller': 'var(--orange)', Fatigué: '#c92a2a' };
+  function badgeSante(a) {
+    const p = a && passeportDe(a.id); if (!p) return '';
+    const s = Z.scoreSante(p, AUJOURDHUI);
+    return `<span class="badge badge-sante" title="Passeport outil : ${s.niveau}">Santé ${s.score}/100</span>`;
+  }
+  function jauge(s, taille) {
+    return `<div class="jauge" style="--v:${s.score};--c:${COULEUR_SANTE[s.niveau]};${taille ? `--t:${taille}px` : ''}"><div><b>${s.score}</b><small>/ 100</small></div></div>`;
+  }
+  const TYPE_CONTROLE = { video: '🎥 Contrôle vidéo au retour', atelier: '🛠️ Contrôle en atelier', acoustique: '🎙️ Test acoustique' };
+  const RESULTAT = { ok: ['✅', 'Réussi'], reserve: ['⚠️', 'Avec réserve'], echec: ['❌', 'Échoué'] };
+  function blocPasseportFiche(a) {
+    if (!a.modes || !(a.modes.includes('vente') || a.modes.includes('location'))) return '';
+    const p = passeportDe(a.id);
+    if (!p) return `<div class="panneau passeport-fiche"><div><b>🩺 Passeport outil</b><p class="discret" style="margin:4px 0 0">Pas encore établi : le propriétaire filme 10 secondes de l’outil en marche et le passeport se crée.</p></div><a class="btn btn-contour" href="#/passeport/${a.id}">En savoir plus</a></div>`;
+    const s = Z.scoreSante(p, AUJOURDHUI), g = Z.garantiePasseport(p, a, AUJOURDHUI);
+    return `<div class="panneau passeport-fiche">${jauge(s, 74)}<div style="flex:1"><b>🩺 Passeport outil · ${s.niveau}</b>
+      <p class="discret" style="margin:4px 0">${s.dernier ? `Dernier contrôle : ${RESULTAT[s.dernier.resultat][1].toLowerCase()}, le ${Z.formatDate(s.dernier.date)}` : 'Aucun contrôle'}${p.batterie ? ` · batterie à ${p.batterie.capacite} %` : ''}</p>
+      ${g.ok ? `<span class="badge badge-garantie">✔ Achat garanti ${g.jours} jours : ça marche ou remboursé</span>` : ''}</div>
+      <a class="btn btn-contour" href="#/passeport/${a.id}">Voir le passeport</a></div>`;
+  }
+
+  function vuePasseports() {
+    const liste = toutesAnnonces().filter((a) => passeportDe(a.id)).map((a) => ({ a, s: Z.scoreSante(passeportDe(a.id), AUJOURDHUI) })).sort((x, y) => y.s.score - x.s.score);
+    const P = Z.REGLES.passeport;
+    return `<div class="page"><div class="conteneur">
+      <div class="titre-section"><div><div class="surtitre">Passeport outil</div><h2>Un outil d’occasion dont on connaît l’histoire</h2><p>Âge, heures de marche, contrôles, réparations, santé de la batterie : tout est consigné et lisible avant d’acheter ou de louer.</p></div></div>
+      <div class="etapes-passeport">
+        <div><span>1</span><b>Un QR code sur l’outil</b><p>Collé sous l’outil, il ouvre son passeport depuis n’importe quel téléphone.</p></div>
+        <div><span>2</span><b>10 secondes de vidéo au retour</b><p>À chaque location, l’outil est filmé en marche. Le contrôle s’ajoute au carnet.</p></div>
+        <div><span>3</span><b>Un score sur 100, expliqué</b><p>Chaque point retiré est justifié. À ${P.seuilGarantie} et plus, avec un contrôle de moins de ${P.controleValideJours} jours, l’achat est garanti ${P.joursGarantie} jours.</p></div>
+      </div>
+      <div class="liste-passeports">${liste.map(({ a, s }) => `<a class="ligne-passeport" href="#/passeport/${a.id}">${jauge(s, 56)}<img src="${a.photo}" alt=""><div><b>${esc(a.titre)}</b><small>${esc(a.ville)} · ${s.niveau}${Z.garantiePasseport(passeportDe(a.id), a, AUJOURDHUI).ok ? ' · <span class="badge badge-garantie">garanti 30 jours</span>' : ''}</small></div></a>`).join('')}</div>
+    </div></div>`;
+  }
+
+  function vuePasseport(id) {
+    if (!id) return vuePasseports();
+    const a = annonce(id);
+    if (!a || !a.modes) return '<div class="page"><div class="conteneur vide">Outil introuvable. <a href="#/passeport">Tous les passeports</a></div></div>';
+    const p = passeportDe(id), url = window.ZT_DONNEES.SITE_PUBLIC + '#/passeport/' + id;
+    const qr = window.ZT_QR ? window.ZT_QR.qrSvg(url, 132) : '';
+    const tete = `<div class="fil"><a href="#/">Accueil</a> › <a href="#/passeport">Passeports</a> › ${esc(a.titre)}</div>`;
+    const simulateur = `<div class="panneau"><b>🎙️ Test acoustique (${Z.REGLES.passeport.dureeTestAcoustique} s)</b><p class="discret">Faites tourner l’outil à vide devant le micro du téléphone. L’analyse du son repère un régime irrégulier, un roulement qui frotte ou des claquements. <i>Dans la maquette, les mesures sont simulées : aucun micro n’est utilisé.</i></p>
+      <div class="onde" id="onde" hidden>${'<i></i>'.repeat(24)}</div><button class="btn btn-cta" id="test-acoustique">Lancer le test acoustique</button></div>
+      <div class="panneau"><b>🔋 Santé de la batterie (estimation)</b><p class="discret">Recopiez la date de fabrication gravée sur la batterie et le nombre de charges approximatif. Le passeport en déduit la capacité restante probable.</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:end"><label class="champ-court">Date de fabrication<input type="month" id="bat-date" max="${AUJOURDHUI.slice(0, 7)}"></label><label class="champ-court">Charges environ<input type="number" id="bat-cycles" min="0" max="3000" value="100"></label><button class="btn btn-contour" id="estimer-batterie">Estimer</button></div></div>
+      <div class="panneau"><b>🎥 Contrôle de retour (démonstration)</b><p class="discret">Au retour d’une location, le propriétaire filme 10 secondes de l’outil en marche et note le résultat.</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><select id="resultat-controle" aria-label="Résultat du contrôle"><option value="ok">✅ Réussi</option><option value="reserve">⚠️ Avec réserve</option><option value="echec">❌ Échoué</option></select>
+      <input id="note-controle" placeholder="Observation (facultatif)" maxlength="80" style="flex:1;min-width:160px"><button class="btn btn-cta" id="ajouter-controle">Enregistrer le contrôle</button></div></div>`;
+    if (!p) return `<div class="page"><div class="conteneur">${tete}<div class="panneau"><h2 style="margin-top:0">🩺 Passeport à créer</h2><p>Cet outil n’a pas encore de carnet de santé. Le premier contrôle le crée.</p></div>${simulateur}</div></div>`;
+    const s = Z.scoreSante(p, AUJOURDHUI), g = Z.garantiePasseport(p, a, AUJOURDHUI);
+    const histo = p.controles.map((c) => Object.assign({ genre: 'controle' }, c)).concat((p.reparations || []).map((r) => Object.assign({ genre: 'reparation' }, r))).sort((x, y) => (x.date < y.date ? 1 : -1));
+    return `<div class="page"><div class="conteneur">${tete}
+      <div class="passeport">
+        <div>
+          <div class="panneau" style="text-align:center"><img class="passeport-photo" src="${a.photo}" alt="${esc(a.titre)}"><h1 style="font-size:1.35rem">${esc(a.titre)}</h1><p class="discret">${esc(a.marque)} · en service depuis ${esc(p.misEnService.split('-').reverse().join('/'))}${p.heures ? ` · ${p.heures} h de marche` : ''}</p>
+            <div class="qr-passeport">${qr}<small>Le QR code collé sur l’outil ouvre cette page.</small></div>
+            <a class="btn btn-contour" href="#/annonce/${a.id}">Voir l’annonce</a></div>
+        </div>
+        <div>
+          <div class="panneau score-passeport">${jauge(s, 120)}<div><div class="surtitre">Score de santé</div><h2 style="margin:2px 0">${s.niveau}</h2>
+            <ul class="facteurs">${s.facteurs.length ? s.facteurs.map((f) => `<li><span>${esc(f.libelle)}</span><b class="${f.points > 0 ? 'plus' : 'moins'}">${f.points > 0 ? '+' : ''}${f.points}</b></li>`).join('') : '<li><span>Aucun point retiré</span><b class="plus">100</b></li>'}</ul></div></div>
+          ${g.ok ? `<div class="alerte alerte-ok">✔ <b>Achat garanti ${g.jours} jours : ça marche ou remboursé.</b> Si l’outil ne fonctionne pas comme décrit dans son passeport, ZETools vous rembourse sur retour de l’outil. Cette garantie s’ajoute aux droits légaux du vendeur professionnel, sans les remplacer.</div>` : `<div class="alerte alerte-info">Garantie ZETools non disponible : ${esc(g.raison)}</div>`}
+          ${p.batterie ? `<div class="panneau"><b>🔋 Batterie</b><div class="barre-batterie"><span style="width:${p.batterie.capacite}%"></span></div><p class="discret" style="margin:4px 0 0">${p.batterie.capacite} % de la capacité d’origine · ${p.batterie.cycles} cycles de charge${p.batterie.estimee ? ` · <b>estimation</b> d’après la fabrication (${esc(p.batterie.fabrication.split('-').reverse().join('/'))}), pas une mesure` : ''}</p></div>` : ''}
+          <div class="panneau"><b>📋 Historique</b><ol class="historique">${histo.map((h) => h.genre === 'controle'
+            ? `<li><time>${Z.formatDate(h.date)}</time><span>${RESULTAT[h.resultat][0]} ${TYPE_CONTROLE[h.type] || 'Contrôle'} · ${RESULTAT[h.resultat][1].toLowerCase()}</span>${h.note ? `<small>${esc(h.note)}</small>` : ''}</li>`
+            : `<li><time>${Z.formatDate(h.date)}</time><span>🔧 ${esc(h.objet)}</span><small>par ${esc(h.par)}</small></li>`).join('')}</ol></div>
+          ${simulateur}
+        </div>
+      </div></div></div>`;
+  }
+  function brancherPasseport(id) {
+    if (!id) return;
+    const enregistrer = (c, message) => {
+      etat.controles = etat.controles || {};
+      etat.controles[id] = (etat.controles[id] || []).concat([c]);
+      sauver(); toast(message); router();
+    };
+    const t = document.getElementById('test-acoustique');
+    if (t) t.addEventListener('click', () => {
+      const onde = document.getElementById('onde'); onde.hidden = false; t.disabled = true; t.textContent = 'Écoute en cours…';
+      setTimeout(() => {
+        // mesures simulées, le plus souvent saines ; en production, elles viendraient du micro et d'un modèle par type d'outil
+        const m = { regularite: 0.8 + Math.random() * 0.2, aigus: Math.random() * 0.45, chocs: Math.random() < 0.15 ? 3 : 0 };
+        const res = Z.analyseAcoustique(m);
+        enregistrer({ date: AUJOURDHUI, type: 'acoustique', resultat: res.resultat, note: res.note }, res.resultat === 'ok' ? 'Test acoustique réussi : moteur régulier.' : 'Test acoustique : ' + res.alertes.join(', ') + '.');
+      }, Z.REGLES.passeport.dureeTestAcoustique * 1000);
+    });
+    const e = document.getElementById('estimer-batterie');
+    if (e) e.addEventListener('click', () => {
+      const est = Z.estimerBatterie(document.getElementById('bat-date').value, document.getElementById('bat-cycles').value, AUJOURDHUI);
+      if (!est) return toast('Indiquez le mois et l’année de fabrication gravés sur la batterie.');
+      etat.batteries = etat.batteries || {}; etat.batteries[id] = est;
+      sauver(); toast(`Batterie estimée à ${est.capacite} % de sa capacité d’origine.`); router();
+    });
+    const b = document.getElementById('ajouter-controle'); if (!b) return;
+    b.addEventListener('click', () => {
+      enregistrer({ date: AUJOURDHUI, type: 'video', resultat: document.getElementById('resultat-controle').value, note: document.getElementById('note-controle').value.trim() }, 'Contrôle enregistré : le score est recalculé.');
+    });
+  }
+
+  /* ---------- Mode Projet ---------- */
+  const demain = (j, n) => Z.versTexte(new Date(Z.versDate(j).getTime() + n * 86400000));
+  function lireProjet(params) {
+    const pr = PROJETS.find((x) => x.id === params.get('p'));
+    if (!pr) return null;
+    const RP = Z.REGLES.projet;
+    const q = Math.min(pr.max, Math.max(1, parseInt(params.get('q'), 10) || pr.defaut));
+    const cp = /^\d{5}$/.test(params.get('cp') || '') ? params.get('cp') : '94300';
+    const du = params.get('du') || demain(AUJOURDHUI, 1), au = params.get('au') && params.get('au') >= du ? params.get('au') : du;
+    const rayon = RP.rayonsKm.includes(Number(params.get('r'))) ? Number(params.get('r')) : RP.rayonDefautKm;
+    const achats = (params.get('achat') || '').split(',').filter(Boolean);
+    const aide = params.get('aide') === '1';
+    const r = Z.composerProjet(pr, { quantite: q, cp, debut: du, fin: au, rayonKm: rayon, achats, annonces: toutesAnnonces(), reservations: toutesReservations(), aujourdHui: AUJOURDHUI });
+    const svc = pr.service ? tousServices().find((x) => x.id === pr.service) : null;
+    const dsvc = svc && aide ? Z.devisService(svc, 1) : null;
+    const total = r.ok ? Math.round((r.total + (dsvc ? dsvc.total : 0)) * 100) / 100 : 0;
+    return { pr, q, cp, du, au, rayon, achats, aide, r, svc, dsvc, total };
+  }
+  function urlProjet(o, change) {
+    const u = new URLSearchParams(Object.assign({ p: o.pr.id, q: o.q, cp: o.cp, du: o.du, au: o.au, r: o.rayon, achat: o.achats.join(',') }, o.aide ? { aide: '1' } : {}, change || {}));
+    if (!u.get('achat')) u.delete('achat');
+    return '#/projet?' + u.toString();
+  }
+  function vueProjet(params) {
+    const intro = `<div class="titre-section"><div><div class="surtitre">Mode Projet</div><h2>Décrivez votre chantier, on réunit tout</h2><p>Les outils de vos voisins dans le rayon choisi, à louer ou à acheter, les consommables calculés pour vous, la fiche pas-à-pas et, si vous le souhaitez, un coup de main. Un seul paiement.</p></div></div>`;
+    const o = lireProjet(params);
+    if (!o) return `<div class="page"><div class="conteneur">${intro}<div class="grille-projets">${PROJETS.map((x) => `<a class="carte-projet" href="#/projet?p=${x.id}"><span class="ico">${x.icone}</span><b>${esc(x.titre)}</b><small>${esc(x.niveau)} · ${esc(x.duree)}</small><em>${x.besoins.length} étape${x.besoins.length > 1 ? 's' : ''} outillée${x.besoins.length > 1 ? 's' : ''} →</em></a>`).join('')}</div></div></div>`;
+    const { pr, q, cp, du, au, rayon, achats, aide, r, svc, dsvc, total } = o;
+    const fiche = pr.fiche && window.ZT_DONNEES.FICHES.find((f) => f.id === pr.fiche);
+    const formulaire = `<form class="panneau form-projet" id="form-projet">
+      <input type="hidden" name="p" value="${pr.id}"><input type="hidden" name="achat" value="${esc(achats.join(','))}">
+      <label>${esc(pr.uniteLibelle)}<input type="number" name="q" min="1" max="${pr.max}" value="${q}"></label>
+      <label>Code postal<input name="cp" inputmode="numeric" maxlength="5" value="${esc(cp)}"></label>
+      <label>Rayon<select name="r">${Z.REGLES.projet.rayonsKm.map((k) => `<option value="${k}" ${k === rayon ? 'selected' : ''}>${k} km</option>`).join('')}</select></label>
+      <label>Du<input type="date" name="du" min="${AUJOURDHUI}" value="${du}"></label>
+      <label>Au<input type="date" name="au" min="${du}" value="${au}"></label>
+      ${svc ? `<label class="case"><input type="checkbox" name="aide" value="1" ${aide ? 'checked' : ''}> Un coup de main : ${esc(svc.titre)}</label>` : ''}
+      <button class="btn btn-cta" type="submit">Recalculer mon kit</button></form>`;
+    const entete = `<div class="fil"><a href="#/projet">Mode Projet</a> › ${esc(pr.titre)}</div><h1>${pr.icone} ${esc(pr.titre)}</h1><p class="discret">${esc(pr.niveau)} · ${esc(pr.duree)} · ${q} ${esc(pr.unite)}${q > 1 ? 's' : ''}</p>`;
+    if (!r.ok) return `<div class="page"><div class="conteneur">${entete}${formulaire}<div class="alerte alerte-info">${esc(r.raison)}</div></div></div>`;
+    const plusLarge = Z.REGLES.projet.rayonsKm.find((k) => k > rayon);
+    const bascule = (l) => {
+      if (!(l.vente && l.libre)) return l.mode === 'achat' ? '<small class="discret">aucune location libre : à l’achat</small>' : '';
+      const veut = l.mode === 'achat', liste = veut ? achats.filter((x) => x !== l.annonce.id) : achats.concat(l.annonce.id);
+      const lien = urlProjet(o, { achat: liste.join(',') });
+      return `<span class="bascule-mode">${veut ? `<a href="${lien}">Louer</a>` : '<span class="actif">Louer</span>'}${veut ? `<span class="actif">Acheter ${Z.euros(l.annonce.prixVente)}</span>` : `<a href="${lien}">Acheter ${Z.euros(l.annonce.prixVente)}</a>`}</span>`;
+    };
+    return `<div class="page"><div class="conteneur">${entete}${formulaire}
+      <div class="projet">
+        <div>
+          <h3>🔧 Les outils, chez vos voisins (${rayon} km autour de ${esc(cp)})</h3>
+          ${r.lignes.map((l) => l.partage
+            ? `<div class="ligne-kit partage"><span class="etape-kit">${esc(l.besoin)}</span><span>Même outil que ci-dessus : <b>${esc(l.annonce.titre)}</b></span></div>`
+            : `<div class="ligne-kit"><img src="${l.annonce.photo}" alt=""><div><span class="etape-kit">${esc(l.besoin)}</span><a href="#/annonce/${l.annonce.id}"><b>${esc(l.annonce.titre)}</b></a><small>📍 ${esc(l.annonce.ville)}${l.km != null ? ` · ${Z.formatDistance(l.km)}` : ''} ${badgeSante(l.annonce)}</small>${bascule(l)}</div>
+              <div class="prix-kit">${Z.euros(l.prix)}<small>${l.mode === 'location' ? `location ${l.devis.jours} j · caution ${Z.euros(l.annonce.caution)}` : 'achat, l’outil est à vous'}</small></div></div>`).join('')}
+          ${r.manquants.map((m) => `<div class="alerte alerte-info">Aucun outil pour « ${esc(m)} » dans un rayon de ${rayon} km à ces dates.${plusLarge ? ` <a href="${urlProjet(o, { r: plusLarge })}">Élargir à ${plusLarge} km</a>` : ` <a href="#/annonces">Voir tous les outils</a>`}</div>`).join('')}
+          <h3>🧾 Les consommables, calculés pour vous</h3>
+          <table class="tableau"><thead><tr><th>Produit</th><th>Besoin</th><th>Quantité</th><th>Total</th></tr></thead><tbody>${r.consommables.map((c) => `<tr><td>${esc(c.nom)}</td><td>${c.besoin} ${esc(c.unite)}</td><td>${c.paquets} × ${Z.euros(c.prix)}</td><td>${Z.euros(c.total)}</td></tr>`).join('')}</tbody></table>
+          <p class="discret">Prix indicatifs d’un partenaire à désigner, remis avec le premier outil.</p>
+          <h3>📘 Le savoir-faire</h3>
+          <div class="savoir">${fiche ? `<a class="btn btn-contour" href="#/fiche-technique/${fiche.id}">📄 Fiche : ${esc(fiche.titre)}</a>` : ''}${pr.video ? `<a class="btn btn-contour" href="#/videos?v=${pr.video}">🎬 Regarder le tutoriel</a>` : ''}<a class="btn btn-contour" href="#/videos">Toute la vidéothèque</a></div>
+          ${pr.securite ? `<div class="alerte alerte-info" style="margin-top:12px">⚠️ ${esc(pr.securite)}</div>` : ''}
+        </div>
+        <aside class="panneau recap-projet">
+          <h3 style="margin-top:0">Votre kit projet</h3>
+          <div class="ligne"><span>Outils : ${r.locations} en location, ${r.achats} à l’achat · ${r.proprietaires} voisin${r.proprietaires > 1 ? 's' : ''}</span><b>${Z.euros(r.totalOutils)}</b></div>
+          <div class="ligne"><span>Consommables</span><b>${Z.euros(r.totalConsommables)}</b></div>
+          ${dsvc ? `<div class="ligne"><span>Coup de main (${dsvc.heures} h)</span><b>${Z.euros(dsvc.total)}</b></div>` : ''}
+          <div class="ligne total"><span>Total, un seul paiement</span><b>${Z.euros(total)}</b></div>
+          <div class="ligne discret"><span>Cautions bloquées, non débitées</span><span>${Z.euros(r.cautions)}</span></div>
+          <p class="discret" style="font-size:.85rem">Frais de service inclus. Assurance casse au choix sur chaque location. Une location peut se transformer en achat : « Je le garde », le loyer est déduit du prix.</p>
+          <button class="btn btn-cta" id="reserver-projet" ${r.outils.length ? '' : 'disabled'} style="width:100%">Réserver tout le projet</button>
+          <p class="discret" style="font-size:.8rem;margin-bottom:0">Paiement simulé : aucune carte n’est demandée.</p>
+        </aside>
+      </div></div></div>`;
+  }
+  function brancherProjet(params) {
+    const f = document.getElementById('form-projet');
+    if (f) f.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const d = new FormData(f), u = new URLSearchParams();
+      ['p', 'q', 'cp', 'r', 'du', 'au', 'achat'].forEach((k) => { if (d.get(k)) u.set(k, d.get(k)); });
+      if (d.get('aide')) u.set('aide', '1');
+      aller('#/projet?' + u.toString());
+    });
+    const b = document.getElementById('reserver-projet'); if (!b) return;
+    b.addEventListener('click', () => {
+      const o = lireProjet(params);
+      if (!o || !o.r.ok || !o.r.outils.length) return toast((o && o.r.raison) || 'Aucun outil disponible à ces dates.');
+      const { pr, q, du, au, r, svc, total } = o, idp = 'pj' + Date.now();
+      r.outils.filter((c) => c.mode === 'location').forEach((c, i) => etat.reservations.push({ id: idp + '-' + i, outilId: c.annonce.id, debut: du, fin: au, statut: 'confirmée', locataire: 'Vous', total: c.devis.totalLocataire, caution: c.annonce.caution, projet: idp }));
+      etat.projets = (etat.projets || []).concat([{ id: idp, projetId: pr.id, icone: pr.icone, titre: pr.titre, quantite: q, debut: du, fin: au, total, outils: r.outils.map((c) => ({ id: c.annonce.id, mode: c.mode, prix: c.prix })), service: o.dsvc ? svc.id : null }]);
+      sauver();
+      toast(`Projet réservé (simulation) : ${r.locations} location(s), ${r.achats} achat(s), ${Z.euros(total)} en un seul paiement.`);
+      aller('#/mon-espace');
+    });
+  }
 
   /* ---------- Notre offre : tout ce que propose ZETools, et ce que cela coûte ---------- */
   function vueOffre() {
@@ -1858,6 +2103,8 @@
       ['🚨', 'Urgence travaux', 'Un professionnel vérifié, au plus vite', `Déplacement ${Z.euros(R.urgence.forfaitDeplacement)} · +${pc(R.urgence.majorationNuit)} la nuit, le dimanche et les jours fériés`, `Devis écrit au-delà de ${Z.euros(R.urgence.seuilDevisEcrit)}`, '#/urgence'],
       ['🎁', 'Offrir des travaux', `Bon cadeau de ${R.coupon.min} à ${R.coupon.max} €, valable ${R.coupon.validiteMois} mois`, 'Aucun frais : le bon vaut ce que vous payez', 'Utilisable en plusieurs fois', '#/offrir'],
       ['🏷️', 'Déstockage des enseignes', 'Du neuf en fin de série, retrait en magasin', 'Aucun frais pour l’acheteur', `Enseigne : ${pc(R.commissionDestockage)} par vente`, '#/destockage'],
+      ['🧰', 'Mode Projet', 'Outils des voisins, consommables et aide en un seul panier', 'Les frais de chaque élément, rien de plus', 'Chaque propriétaire : sa commission habituelle', '#/projet'],
+      ['🩺', 'Passeport outil', `Score de santé ; achat garanti ${R.passeport.joursGarantie} jours dès ${R.passeport.seuilGarantie} / 100`, 'Gratuit', 'Gratuit', '#/passeport'],
       ['🎬', 'Vidéos et fiches techniques', 'Tutoriels et pas-à-pas en PDF', 'Gratuit', 'Gratuit', '#/videos'],
     ];
     return `<div class="page"><div class="conteneur">
@@ -1895,6 +2142,8 @@
       case 'deposer': html = vueDeposer(params); apres = brancherDeposer; break;
       case 'pros': html = vuePros(); break;
       case 'offre': html = vueOffre(); break;
+      case 'passeport': html = vuePasseport(seg[1]); apres = () => brancherPasseport(seg[1]); break;
+      case 'projet': html = vueProjet(params); apres = () => brancherProjet(params); break;
       case 'travaux': if (params.get('metier') !== null) { filtreTravaux.metier = params.get('metier'); filtreTravaux.vise = ''; } html = vueTravaux(); apres = brancherTravaux; break;
       case 'espace-artisan': html = vueEspaceArtisan(); apres = brancherEspaceArtisan; break;
       case 'reparer': html = vueReparer(); break;
@@ -1919,7 +2168,7 @@
       case 'credits': html = vueCredits(); break;
       default: html = '<div class="page"><div class="conteneur vide">Page introuvable. <a href="#/">Retour à l’accueil</a></div></div>';
     }
-    vue.innerHTML = html;
+    vue.innerHTML = sansPictos(html);
     if (apres) apres();
     activerVideos();
     document.getElementById('bulle-msg').textContent = etat.conversations.length;
@@ -1946,7 +2195,20 @@
       versAnnonces({ mode: fd.get('mode'), q: fd.get('q'), cat: fd.get('cat'), lieu: fd.get('lieu') });
     });
   }
+  function celluleGarder(a, r) {
+    if (r.statut === 'achetée' && r.achat) return `✔ Acheté ${Z.euros(r.achat.prix)} <small class="discret">(−${Z.euros(r.achat.deduit)})</small>`;
+    if (!etat.reservations.some((x) => x.id === r.id)) return '';
+    const g = Z.prixSiJeLeGarde(a, r, AUJOURDHUI);
+    return g.ok ? `<button class="btn btn-cta btn-petit" data-garder="${r.id}">Je le garde : ${Z.euros(g.reste)}</button><small class="discret" style="display:block">au lieu de ${Z.euros(g.prixVente)}</small>` : '';
+  }
   function brancherEspace() {
+    document.querySelectorAll('[data-garder]').forEach((b) => b.addEventListener('click', () => {
+      const r = etat.reservations.find((x) => x.id === b.dataset.garder), a = r && annonce(r.outilId);
+      const g = a && Z.prixSiJeLeGarde(a, r, AUJOURDHUI);
+      if (!g || !g.ok) return toast((g && g.raison) || 'Impossible de garder cet outil.');
+      r.statut = 'achetée'; r.achat = { prix: g.reste, deduit: g.deduit, date: AUJOURDHUI };
+      sauver(); toast(`Outil acheté (simulation) : ${Z.euros(g.reste)} payés, ${Z.euros(g.deduit)} de location déduits. Caution libérée.`); router();
+    }));
     const b = document.getElementById('reinitialiser');
     if (b) b.addEventListener('click', () => { etat = ETAT_INITIAL(); sauver(); toast('Démonstration réinitialisée.'); router(); });
   }
