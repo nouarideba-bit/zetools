@@ -415,6 +415,29 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
 .marque-fiche .marque-ze { color: var(--jaune-fonce); }
 .marque-fiche b { color: var(--anthracite); letter-spacing: .5px; }
 
+/* ---------- fiches : la fiche en vidéo ---------- */
+.bloc-video { margin: 22px 0 8px; padding: 18px; border-radius: 14px; background: #fff8e1; border: 1px solid #f5d77a; }
+.bloc-video-tete { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.bloc-video-tete h3 { margin: 0 0 12px; }
+.bloc-video-corps { display: grid; grid-template-columns: 1fr 150px; gap: 16px; align-items: start; }
+.video-cadre { position: relative; aspect-ratio: 16 / 9; border-radius: 10px; overflow: hidden; background: var(--anthracite); }
+.video-cadre iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.video-facade { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 18px; text-align: center; color: #fff;
+  background: radial-gradient(circle at 50% 40%, #3a4047, var(--anthracite)); }
+.video-facade .btn-lire { font-size: 1.05rem; padding: 12px 22px; }
+.video-titre { font-weight: 700; line-height: 1.35; }
+.video-titre span { font-weight: 400; opacity: .75; font-size: .88rem; }
+.video-consentement { font-size: .78rem; opacity: .8; max-width: 460px; margin: 0; }
+.video-consentement a { color: #f5b700; }
+.video-telephone { display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; font-size: .82rem; color: var(--texte-doux); }
+.video-telephone svg { border-radius: 8px; background: #fff; }
+.video-telephone b { color: var(--anthracite); }
+.video-choix { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.video-choix .puce { cursor: pointer; border: 1px solid #e3c560; background: #fff; }
+.video-choix .puce.active { background: var(--anthracite); color: #fff; border-color: var(--anthracite); }
+.lien-etape { border: 0; background: #fff3cf; color: var(--anthracite); border-radius: 6px; padding: 1px 7px; font-weight: 700; cursor: pointer; }
+@media (max-width: 640px) { .bloc-video-corps { grid-template-columns: 1fr; } .video-telephone { display: none; } }
+
 </style>
 </head>
 <body>
@@ -1244,43 +1267,49 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
   ];
 
   // Fiches techniques téléchargeables en PDF (contenu rédigé pour ZETools, indicatif)
+  // adresse publique de la maquette (GitHub Pages) ; à remplacer par https://zetools.fr/ une fois le domaine réservé
+  const SITE_PUBLIC = 'https://nouarideba-bit.github.io/zetools/';
+  /* Vidéos des fiches : choisies sur des chaînes de marques, d'enseignes ou de bricoleurs reconnus,
+     vérifiées le 19/11/2026 par le service oEmbed de YouTube (vidéo publique, intégration autorisée).
+     Elles sont intégrées, jamais copiées. « debuts » : secondes de début de chaque étape, à renseigner
+     pour les Tutos ZETOOLS (null tant que la vidéo ne suit pas exactement les étapes de la fiche). */
   const FICHES = [
-    { id: 'f1', pictos: ['espace', 'inventaire', 'trier', 'goutte', 'assembler', 'mesurer', 'redresser', 'fixer'], icone: '🪑', titre: 'Monter un meuble en kit sans se tromper', theme: 'Montage', niveau: 'Débutant', duree: '1 à 2 h', budget: '0 € hors meuble',
+    { id: 'f1', videos: [{ yt: 'dLC-b_5psdM', titre: 'Les conseils pratiques pour monter un meuble en kit', chaine: 'Weldom', debuts: null }, { yt: 'xgK8rc06aVM', titre: 'Monter des meubles en kit', chaine: 'Maisonbrico', debuts: null }], pictos: ['espace', 'inventaire', 'trier', 'goutte', 'assembler', 'mesurer', 'redresser', 'fixer'], icone: '🪑', titre: 'Monter un meuble en kit sans se tromper', theme: 'Montage', niveau: 'Débutant', duree: '1 à 2 h', budget: '0 € hors meuble',
       resume: 'La méthode pour monter une armoire, une commode ou un bureau en kit d’équerre, sans abîmer les panneaux et sans vis en trop à la fin.',
       outils: [{ nom: 'Visseuse sans fil à couple réglable, embouts cruciformes et six pans', q: 'visseuse' }, { nom: 'Maillet en caoutchouc', q: 'maillet' }, { nom: 'Mètre ruban et niveau à bulle', q: 'niveau' }, { nom: 'Petites coupelles pour trier la visserie', q: '' }],
       materiaux: ['Colle à bois vinylique (facultatif, pour les tourillons)', 'Carton d’emballage pour protéger le sol', 'Vis et chevilles adaptées à votre mur pour la fixation anti-basculement'],
       etapes: ['Dégagez une surface plus grande que le meuble couché et protégez le sol avec le carton d’emballage.', 'Faites l’inventaire des panneaux et de la quincaillerie avec la notice. S’il manque une pièce, ne commencez pas.', 'Triez la visserie par type dans des coupelles et repérez chaque panneau par sa lettre ou son numéro.', 'Posez d’abord tourillons et excentriques sur les panneaux. Une goutte de colle dans les trous de tourillons rigidifie le meuble, mais empêche tout démontage.', 'Assemblez la caisse à plat : côtés, dessus, dessous. Serrez les excentriques d’un quart de tour, sans forcer.', 'Contrôlez l’équerrage : les deux diagonales de la caisse doivent être égales. Fixez ensuite le fond, qui bloque l’équerrage.', 'Redressez le meuble à deux. Posez tablettes, portes et tiroirs, puis réglez les charnières avec leurs vis de réglage.', 'Fixez le meuble au mur avec le dispositif anti-basculement fourni.'],
       securite: ['Réglez la visseuse sur un couple faible : l’aggloméré éclate si l’on serre trop fort.', 'Manipulez les grands panneaux à deux.', 'Un meuble haut non fixé au mur peut basculer : la fixation murale est indispensable, surtout avec des enfants.'],
       astuce: 'Gardez la notice et la clé fournie dans une pochette collée au dos du meuble : elles serviront au prochain déménagement.' },
-    { id: 'f2', pictos: ['mur', 'electricite', 'niveau', 'percer', 'nettoyer', 'visser', 'verifier'], icone: '📏', titre: 'Fixer une étagère murale solide et de niveau', theme: 'Fixation', niveau: 'Débutant', duree: '45 min', budget: '10 à 30 €',
+    { id: 'f2', videos: [{ yt: '52hQm7WapzE', titre: 'Fixer une étagère murale sur placo avec chevilles Molly', chaine: 'Brico Dépôt', debuts: null }, { yt: 'nQFQSEtJsXo', titre: 'Fixer une tablette à fixation invisible', chaine: 'Leroy Merlin', debuts: null }], pictos: ['mur', 'electricite', 'niveau', 'percer', 'nettoyer', 'visser', 'verifier'], icone: '📏', titre: 'Fixer une étagère murale solide et de niveau', theme: 'Fixation', niveau: 'Débutant', duree: '45 min', budget: '10 à 30 €',
       resume: 'Choisir la bonne cheville selon le mur, percer proprement et obtenir une étagère parfaitement horizontale.',
       outils: [{ nom: 'Perceuse à percussion ou perforateur', q: 'perforateur' }, { nom: 'Forets adaptés au mur (béton, brique, bois ou métal pour le placo)', q: 'forets' }, { nom: 'Détecteur de câbles et de métaux', q: 'détecteur' }, { nom: 'Niveau à bulle, mètre, crayon', q: 'niveau' }, { nom: 'Visseuse et aspirateur', q: 'visseuse' }],
       materiaux: ['Étagère avec ses équerres ou ses supports invisibles', 'Chevilles adaptées : métalliques à expansion pour la plaque de plâtre, longues ou chimiques pour la brique creuse, nylon pour le béton et la brique pleine', 'Vis du diamètre indiqué sur la boîte de chevilles'],
       etapes: ['Identifiez le mur : il sonne creux (plaque de plâtre, brique creuse) ou plein (béton, brique pleine). La couleur de la poussière au perçage confirme : blanche pour le plâtre, rouge pour la brique, grise pour le béton.', 'Passez le détecteur. Ne percez jamais à l’aplomb ni à l’horizontale d’une prise ou d’un interrupteur.', 'Tracez un trait horizontal au niveau à bulle et marquez les points de perçage à travers les supports.', 'Percez au diamètre de la cheville, un centimètre plus profond que sa longueur. Sans percussion dans la plaque de plâtre, la brique creuse et le carrelage.', 'Aspirez la poussière et enfoncez les chevilles à fleur du mur.', 'Vissez les supports sans les bloquer, contrôlez le niveau, puis serrez.', 'Posez la tablette, fixez-la aux supports et chargez-la progressivement.'],
       securite: ['Portez des lunettes de protection.', 'Près d’un circuit électrique, coupez le courant au tableau avant de percer.', 'Respectez la charge maximale indiquée sur la boîte de chevilles : elle dépend du mur.'],
       astuce: 'Collez une enveloppe pliée sous le point de perçage avec du ruban adhésif : elle recueille la poussière.' },
-    { id: 'f3', pictos: ['plan', 'tracer', 'scier', 'poncer', 'percer', 'assembler', 'visser', 'peindre', 'fixer'], icone: '🪚', titre: 'Fabriquer une étagère en bois sur mesure', theme: 'Fabrication', niveau: 'Intermédiaire', duree: 'Une demi-journée, plus le séchage', budget: '40 à 90 €',
+    { id: 'f3', videos: [{ yt: 'Q1gg45YgYIg', titre: 'Fabriquer une étagère toute simple', chaine: 'Dimitri Elledge', debuts: null }], pictos: ['plan', 'tracer', 'scier', 'poncer', 'percer', 'assembler', 'visser', 'peindre', 'fixer'], icone: '🪚', titre: 'Fabriquer une étagère en bois sur mesure', theme: 'Fabrication', niveau: 'Intermédiaire', duree: 'Une demi-journée, plus le séchage', budget: '40 à 90 €',
       resume: 'Une bibliothèque simple en planches massives, aux dimensions exactes de votre niche ou de votre mur.',
       outils: [{ nom: 'Scie circulaire avec guide, ou scie sauteuse', q: 'scie' }, { nom: 'Ponceuse excentrique', q: 'ponceuse' }, { nom: 'Perceuse-visseuse, foret de 3 mm et fraise à chanfreiner', q: 'perceuse' }, { nom: 'Serre-joints, équerre de menuisier, mètre', q: 'serre-joints' }],
       materiaux: ['Planches de pin ou de chêne, 18 à 22 mm d’épaisseur', 'Vis à bois 4 × 40 mm, colle à bois', 'Abrasifs grains 80, 120, 180 et 240', 'Huile ou vernis de finition', 'Fond en contreplaqué de 5 mm ou traverse arrière'],
       etapes: ['Dessinez un plan coté. Pour une planche de 18 mm chargée de livres, limitez la portée à 80 cm environ entre deux montants.', 'Tracez les coupes à l’équerre et numérotez les pièces.', 'Sciez avec la belle face vers le bas : la lame fait des éclats sur le dessus.', 'Poncez au grain 80, puis 120, puis 180, et cassez légèrement les arêtes.', 'Pré-percez à 3 mm et fraisez l’entrée des trous : le bois ne fend pas et les têtes de vis s’effacent.', 'Assemblez montants et tablettes à la colle et aux vis, sous serre-joints. Contrôlez l’équerrage par les diagonales.', 'Posez le fond ou une traverse arrière : c’est ce qui empêche le meuble de se déformer en parallélogramme.', 'Dépoussiérez, puis appliquez deux couches de finition en égrenant au grain 240 entre les deux.', 'Fixez l’étagère au mur.'],
       securite: ['Lunettes, protections auditives et masque anti-poussière pendant le sciage et le ponçage.', 'Bloquez toujours la pièce avec des serre-joints : ne la tenez jamais à la main près de la lame.', 'Débranchez l’outil ou retirez la batterie avant de changer une lame.'],
       astuce: 'Faites débiter les planches à la bonne longueur en magasin : il ne vous restera que les coupes de finition.' },
-    { id: 'f4', pictos: ['mur', 'electricite', 'percer', 'attention', 'percer', 'attendre', 'nettoyer'], icone: '🧱', titre: 'Percer un mur : le bon foret, la bonne cheville', theme: 'Perçage', niveau: 'Débutant', duree: '20 min', budget: '5 à 15 €',
+    { id: 'f4', videos: [{ yt: 'fQB2NizOMBw', titre: 'Bien percer : choisir une cheville et un foret adéquats', chaine: 'Bricorama', debuts: null }, { yt: 'Vz9dFV93HMc', titre: 'Choisir une cheville en fonction du mur', chaine: 'Robert Longechal', debuts: null }], pictos: ['mur', 'electricite', 'percer', 'attention', 'percer', 'attendre', 'nettoyer'], icone: '🧱', titre: 'Percer un mur : le bon foret, la bonne cheville', theme: 'Perçage', niveau: 'Débutant', duree: '20 min', budget: '5 à 15 €',
       resume: 'Plaque de plâtre, brique, béton, carrelage : à chaque support sa méthode pour un trou net et une fixation qui tient.',
       outils: [{ nom: 'Perceuse à percussion (brique pleine, parpaing) ou perforateur SDS (béton)', q: 'perforateur' }, { nom: 'Jeu de forets : béton, bois, métal, carrelage', q: 'forets' }, { nom: 'Détecteur de câbles et de métaux', q: 'détecteur' }, { nom: 'Aspirateur et ruban adhésif de masquage', q: 'aspirateur' }],
       materiaux: ['Chevilles adaptées au support et à la charge', 'Vis correspondantes'],
       etapes: ['Reconnaissez le support : plaque de plâtre (sonne creux, poussière blanche), brique (poussière rouge), béton (poussière grise, très dur).', 'Repérez câbles et tuyaux au détecteur. Les gaines électriques courent à la verticale et à l’horizontale des prises et interrupteurs.', 'Plaque de plâtre : foret à métaux, sans percussion, cheville métallique à expansion.', 'Brique creuse : sans percussion pour ne pas casser les alvéoles, cheville longue ou scellement chimique.', 'Béton et brique pleine : percussion ou perforateur, foret béton, cheville nylon.', 'Carrelage : collez un ruban de masquage, percez sans percussion avec un foret spécial, à vitesse lente, puis changez de foret pour le mur.', 'Percez bien perpendiculairement, un centimètre plus profond que la cheville, et aspirez le trou avant de la poser.'],
       securite: ['Lunettes de protection ; masque si vous percez beaucoup.', 'Coupez le courant au tableau en cas de doute sur le passage d’un câble.', 'Tenez la machine à deux mains et utilisez la poignée latérale d’un perforateur.'],
       astuce: 'Un morceau de ruban adhésif enroulé sur le foret sert de butée de profondeur.' },
-    { id: 'f5', pictos: ['demonter', 'nettoyer', 'poncer', 'nettoyer', 'goutte', 'peindre', 'poncer', 'peindre', 'attendre'], icone: '🖌️', titre: 'Poncer et repeindre un meuble en bois', theme: 'Rénovation', niveau: 'Intermédiaire', duree: 'Un week-end avec les séchages', budget: '30 à 60 €',
+    { id: 'f5', videos: [{ yt: 'mFvki5IWAZE', titre: 'Peindre un meuble', chaine: 'Jennifer, Atelier Mobilier', debuts: null }], pictos: ['demonter', 'nettoyer', 'poncer', 'nettoyer', 'goutte', 'peindre', 'poncer', 'peindre', 'attendre'], icone: '🖌️', titre: 'Poncer et repeindre un meuble en bois', theme: 'Rénovation', niveau: 'Intermédiaire', duree: 'Un week-end avec les séchages', budget: '30 à 60 €',
       resume: 'Redonner une seconde vie à une commode ou à une table : préparation du support, sous-couche et deux couches bien tendues.',
       outils: [{ nom: 'Ponceuse excentrique et cale à poncer', q: 'ponceuse' }, { nom: 'Pinceau à rechampir et petit rouleau laqueur', q: '' }, { nom: 'Tournevis, bâche de protection', q: '' }],
       materiaux: ['Abrasifs grains 120, 180 et 240', 'Dégraissant ou lessive, chiffons', 'Pâte à bois', 'Sous-couche adaptée (primaire d’accrochage pour un meuble mélaminé ou verni)', 'Peinture pour boiseries'],
       etapes: ['Démontez poignées, portes et tiroirs. Protégez le sol.', 'Lessivez, rincez et laissez sécher complètement.', 'Poncez au grain 120. Sur un vernis sain, il suffit de dépolir pour donner de l’accroche : inutile de mettre le bois à nu.', 'Dépoussiérez à l’aspirateur, puis au chiffon légèrement humide.', 'Rebouchez trous et éclats à la pâte à bois, laissez sécher, poncez au grain 180.', 'Appliquez la sous-couche et laissez sécher le temps indiqué.', 'Égrenez au grain 240 et dépoussiérez.', 'Passez deux couches fines de peinture dans le sens du fil du bois, en respectant le temps de séchage entre les couches.', 'Remontez la quincaillerie. Attendez plusieurs jours avant un usage intensif : la peinture durcit lentement.'],
       securite: ['Masque anti-poussière FFP2 et lunettes pendant le ponçage.', 'Les peintures des meubles anciens peuvent contenir du plomb : ne les poncez pas à sec, faites-les tester ou utilisez un décapant adapté.', 'Aérez la pièce pendant l’application et le séchage.'],
       astuce: 'Deux couches fines valent mieux qu’une couche épaisse : moins de coulures, un film plus dur.' },
-    { id: 'f6', pictos: ['batterie', 'nettoyer', 'goutte', 'trier', 'batterie', 'electricite', 'nettoyer', 'inventaire'], icone: '🔋', titre: 'Entretenir sa perceuse-visseuse et ses batteries', theme: 'Entretien', niveau: 'Débutant', duree: '15 min', budget: '0 €',
+    { id: 'f6', videos: [{ yt: 'Sc0PNG-kF_8', titre: 'Utiliser une visseuse en sécurité', chaine: 'grainedecopeaux', debuts: null }, { yt: 'Q-KfLy3znWw', titre: 'Utiliser et entretenir un perforateur', chaine: 'Brico Dépôt', debuts: null }], pictos: ['batterie', 'nettoyer', 'goutte', 'trier', 'batterie', 'electricite', 'nettoyer', 'inventaire'], icone: '🔋', titre: 'Entretenir sa perceuse-visseuse et ses batteries', theme: 'Entretien', niveau: 'Débutant', duree: '15 min', budget: '0 €',
       resume: 'Les gestes simples qui doublent la durée de vie d’un outil sans fil, et qui lui gardent sa valeur à la revente ou à la location.',
       outils: [{ nom: 'Pinceau sec ou soufflette', q: '' }, { nom: 'Chiffon propre', q: '' }, { nom: 'Huile fine', q: '' }],
       materiaux: [],
@@ -1295,7 +1324,7 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
     { id: 'o-demo-2', sens: 'recue', avec: 'm1', titre: 'Votre échelle télescopique 3,80 m', mode: 'location', prixAffiche: 5, montant: 4, statut: 'en attente', expire: '2026-12-31T20:00' },
   ];
 
-  const D = { PHOTOS, VIDEOS, CATEGORIES, MEMBRES, ANNONCES, RESERVATIONS, ARTICLES, CREDITS, METIERS, ARTISANS, DEMANDES, TYPES_ENSEIGNE, ENSEIGNES, LOTS, RDV_DEMO, OFFRES_DEMO, SERVICES, FICHES };
+  const D = { PHOTOS, VIDEOS, CATEGORIES, MEMBRES, ANNONCES, RESERVATIONS, ARTICLES, CREDITS, METIERS, ARTISANS, DEMANDES, TYPES_ENSEIGNE, ENSEIGNES, LOTS, RDV_DEMO, OFFRES_DEMO, SERVICES, FICHES, SITE_PUBLIC };
   if (typeof module !== 'undefined' && module.exports) module.exports = D;
   else racine.ZT_DONNEES = D;
 })(typeof window !== 'undefined' ? window : globalThis);
@@ -1403,7 +1432,8 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
           <p>Aucune clause des présentes ne limite les droits que la loi reconnaît au consommateur, ni la responsabilité de ZETools en cas de faute lourde, de dol ou de dommage corporel.</p>`],
         ['Article 21. Données personnelles', `<p>ZETools traite les données personnelles des membres dans les conditions décrites dans la politique de confidentialité.</p>`],
         ['Article 22. Propriété intellectuelle', `<p>La marque, le logo, la charte graphique et les logiciels de la plateforme appartiennent à ZETools. Le membre conserve ses droits sur ses photos et ses textes ; il accorde à ZETools une licence gratuite et non exclusive de reproduction et de représentation, pour le monde entier et pour la durée de publication de l’annonce, aux seules fins d’exploiter et de promouvoir la plateforme.</p>
-          <p>Les fiches techniques peuvent être téléchargées, imprimées et partagées gratuitement pour un usage personnel, sans modification et avec la mention de ZETools. Toute exploitation commerciale est soumise à autorisation.</p>`],
+          <p>Les fiches techniques peuvent être téléchargées, imprimées et partagées gratuitement pour un usage personnel, sans modification et avec la mention de ZETools. Toute exploitation commerciale est soumise à autorisation.</p>
+          <p>Les vidéos présentées avec les fiches proviennent de chaînes tierces citées sur chaque fiche. Elles sont intégrées depuis YouTube, jamais copiées ; elles restent la propriété de leurs auteurs, qui peuvent les retirer à tout moment, et n’engagent pas ZETools. Elles peuvent différer des étapes de la fiche, qui seule fait référence.</p>`],
         ['Article 23. Durée, résiliation, modification', `<p>Le contrat est conclu pour une durée indéterminée. Le membre peut clôturer son compte à tout moment, depuis son espace, sans frais ; les transactions en cours vont à leur terme.</p>
           <p>ZETools peut modifier les présentes conditions. Les membres en sont informés par courrier électronique au moins 15 jours avant l’entrée en vigueur. Le membre qui refuse la modification peut clôturer son compte.</p>`],
         ['Article 24. Réclamations et médiation', `<p>Toute réclamation est adressée à ${AC('adresse du service clients')}. ZETools y répond dans un délai de 30 jours.</p>
@@ -1502,7 +1532,9 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
           <tr><td>Strictement nécessaires</td><td>Connexion, panier, sécurité, mémorisation de vos choix</td><td>Non requis</td></tr>
           <tr><td>Mesure d’audience</td><td>Statistiques de fréquentation</td><td>Requis, sauf outil exempté configuré selon les recommandations de la CNIL</td></tr>
           <tr><td>Contenus tiers</td><td>Fonds de carte, vidéos d’illustration : votre adresse IP est transmise au fournisseur</td><td>Requis, ou hébergement des contenus par ZETools</td></tr>
+          <tr><td>Vidéos des fiches techniques</td><td>Lecteur YouTube, en mode de confidentialité renforcée (youtube-nocookie.com)</td><td>Rien n’est chargé avant votre clic sur « Lire la vidéo » ; ce clic vaut consentement aux cookies de YouTube pour cette vidéo</td></tr>
           <tr><td>Publicité</td><td>Aucun à ce jour</td><td>Requis le cas échéant</td></tr></table>
+          <p>Les vidéos des fiches techniques sont fournies par YouTube, service de Google Ireland Limited, dont la propre politique de confidentialité s’applique dès la lecture. Des données peuvent alors être transférées aux États-Unis : ${AC('base du transfert à confirmer, par exemple certification de Google LLC au Data Privacy Framework UE–États-Unis')}.</p>
           <p>Vous pouvez accepter ou refuser les traceurs, aussi simplement l’un que l’autre, et modifier votre choix à tout moment par le lien « Gérer mes cookies » en bas de page.</p>`],
         ['11. Modification', `<p>Cette politique peut évoluer. La date de mise à jour figure en tête de page ; les modifications importantes vous sont notifiées.</p>`],
       ] },
@@ -1568,6 +1600,146 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
   const ZT_JURIDIQUE = { SOCIETE, PAGES };
   if (typeof module !== 'undefined' && module.exports) module.exports = ZT_JURIDIQUE;
   else racine.ZT_JURIDIQUE = ZT_JURIDIQUE;
+})(typeof window !== 'undefined' ? window : globalThis);
+
+</script>
+  <script>
+/* ZETools · générateur de QR code sans dépendance (norme ISO/IEC 18004).
+   Mode octets, correction d'erreur niveau M (environ 15 % du code peut être abîmé), versions 1 à 6 :
+   jusqu'à 106 octets, assez pour l'adresse d'une fiche.
+   Renvoie une matrice de booléens (true = module noir), sans la marge blanche de 4 modules à prévoir autour.
+   Fonctionne dans le navigateur (window.ZT_QR) et sous Node (module.exports) pour les tests. */
+(function (racine) {
+  'use strict';
+
+  const ECC_PAR_BLOC = [10, 16, 26, 18, 24, 16];   // niveau M, versions 1 à 6
+  const NB_BLOCS = [1, 1, 1, 2, 2, 4];
+
+  function modulesDonnees(v) {                       // modules disponibles pour les données et la correction
+    let r = (16 * v + 128) * v + 64;
+    if (v >= 2) { const na = Math.floor(v / 7) + 2; r -= (25 * na - 10) * na - 55; }
+    return r;
+  }
+  const octetsDonnees = (v) => Math.floor(modulesDonnees(v) / 8) - ECC_PAR_BLOC[v - 1] * NB_BLOCS[v - 1];
+
+  // Reed-Solomon sur GF(256), polynôme 0x11D
+  function mul(x, y) { let z = 0; for (let i = 7; i >= 0; i--) { z = (z << 1) ^ ((z >>> 7) * 0x11d); z ^= ((y >>> i) & 1) * x; } return z & 0xff; }
+  function diviseur(deg) {
+    const r = new Array(deg).fill(0); r[deg - 1] = 1; let racineG = 1;
+    for (let i = 0; i < deg; i++) {
+      for (let j = 0; j < deg; j++) { r[j] = mul(r[j], racineG); if (j + 1 < deg) r[j] ^= r[j + 1]; }
+      racineG = mul(racineG, 2);
+    }
+    return r;
+  }
+  function reste(donnees, div) {
+    const r = new Array(div.length).fill(0);
+    for (const b of donnees) { const f = b ^ r.shift(); r.push(0); div.forEach((c, i) => { r[i] ^= mul(c, f); }); }
+    return r;
+  }
+
+  function encoder(texte) {
+    const octets = Array.from(new TextEncoder().encode(texte));
+    let v = 1;
+    while (v <= 6 && 4 + 8 + octets.length * 8 > octetsDonnees(v) * 8) v++;
+    if (v > 6) throw new Error('Texte trop long pour le QR code (106 octets au plus)');
+    const cap = octetsDonnees(v) * 8;
+    const bits = [];
+    const ajouter = (val, n) => { for (let i = n - 1; i >= 0; i--) bits.push((val >>> i) & 1); };
+    ajouter(4, 4); ajouter(octets.length, 8); octets.forEach((o) => ajouter(o, 8));
+    ajouter(0, Math.min(4, cap - bits.length));
+    ajouter(0, (8 - (bits.length % 8)) % 8);
+    for (let p = 0xec; bits.length < cap; p ^= 0xec ^ 0x11) ajouter(p, 8);
+    const donnees = [];
+    for (let i = 0; i < bits.length; i += 8) donnees.push(parseInt(bits.slice(i, i + 8).join(''), 2));
+
+    // blocs, correction d'erreur, entrelacement
+    const nb = NB_BLOCS[v - 1], ecc = ECC_PAR_BLOC[v - 1], brut = Math.floor(modulesDonnees(v) / 8);
+    const courts = nb - (brut % nb), longCourt = Math.floor(brut / nb), div = diviseur(ecc);
+    const blocs = []; let k = 0;
+    for (let i = 0; i < nb; i++) {
+      const d = donnees.slice(k, k + longCourt - ecc + (i < courts ? 0 : 1)); k += d.length;
+      const e = reste(d, div); if (i < courts) d.push(0);
+      blocs.push(d.concat(e));
+    }
+    const mots = [];
+    for (let i = 0; i < blocs[0].length; i++) blocs.forEach((b, j) => { if (i !== longCourt - ecc || j >= courts) mots.push(b[i]); });
+    return { v, mots };
+  }
+
+  function qrMatrice(texte) {
+    const { v, mots } = encoder(texte);
+    const n = v * 4 + 17;
+    const m = Array.from({ length: n }, () => new Array(n).fill(false));
+    const fonction = Array.from({ length: n }, () => new Array(n).fill(false));
+    const poser = (x, y, noir) => { m[y][x] = noir; fonction[y][x] = true; };
+
+    for (let i = 0; i < n; i++) { poser(6, i, i % 2 === 0); poser(i, 6, i % 2 === 0); }      // lignes de synchronisation
+    const reperes = (cx, cy) => { for (let dy = -4; dy <= 4; dy++) for (let dx = -4; dx <= 4; dx++) {
+      const x = cx + dx, y = cy + dy, d = Math.max(Math.abs(dx), Math.abs(dy));
+      if (x >= 0 && x < n && y >= 0 && y < n) poser(x, y, d !== 2 && d !== 4); } };
+    reperes(3, 3); reperes(n - 4, 3); reperes(3, n - 4);                                      // trois carrés de repérage
+    if (v >= 2) {                                                                             // motif d'alignement (un seul jusqu'à la version 6)
+      const c = n - 7;
+      for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) poser(c + dx, c + dy, Math.max(Math.abs(dx), Math.abs(dy)) !== 1);
+    }
+    const format = (masque) => {                                                              // niveau M (00) + masque, BCH(15,5)
+      const d = masque; let r = d;
+      for (let i = 0; i < 10; i++) r = (r << 1) ^ ((r >>> 9) * 0x537);
+      const b = ((d << 10) | r) ^ 0x5412; const bit = (i) => ((b >>> i) & 1) === 1;
+      for (let i = 0; i <= 5; i++) poser(8, i, bit(i));
+      poser(8, 7, bit(6)); poser(8, 8, bit(7)); poser(7, 8, bit(8));
+      for (let i = 9; i < 15; i++) poser(14 - i, 8, bit(i));
+      for (let i = 0; i < 8; i++) poser(n - 1 - i, 8, bit(i));
+      for (let i = 8; i < 15; i++) poser(8, n - 15 + i, bit(i));
+      poser(8, n - 8, true);                                                                  // module noir fixe
+    };
+    format(0);
+
+    // placement des mots en zigzag, de droite à gauche
+    let i = 0;
+    for (let droite = n - 1; droite >= 1; droite -= 2) {
+      if (droite === 6) droite = 5;
+      for (let vert = 0; vert < n; vert++) for (let j = 0; j < 2; j++) {
+        const x = droite - j, monte = ((droite + 1) & 2) === 0, y = monte ? n - 1 - vert : vert;
+        if (!fonction[y][x] && i < mots.length * 8) { m[y][x] = ((mots[i >>> 3] >>> (7 - (i & 7))) & 1) === 1; i++; }
+      }
+    }
+
+    const regle = [(x, y) => (x + y) % 2 === 0, (x, y) => y % 2 === 0, (x) => x % 3 === 0, (x, y) => (x + y) % 3 === 0,
+      (x, y) => (Math.floor(x / 3) + Math.floor(y / 2)) % 2 === 0, (x, y) => (x * y) % 2 + (x * y) % 3 === 0,
+      (x, y) => ((x * y) % 2 + (x * y) % 3) % 2 === 0, (x, y) => ((x + y) % 2 + (x * y) % 3) % 2 === 0];
+    const masquer = (k) => { for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) if (!fonction[y][x] && regle[k](x, y)) m[y][x] = !m[y][x]; };
+    const penalite = () => {                                                                  // règles 1, 2 et 4 de la norme
+      let p = 0;
+      for (let a = 0; a < n; a++) for (const ligne of [true, false]) {
+        let suite = 1;
+        for (let b = 1; b <= n; b++) {
+          const meme = b < n && (ligne ? m[a][b] === m[a][b - 1] : m[b][a] === m[b - 1][a]);
+          if (meme) suite++; else { if (suite >= 5) p += suite - 2; suite = 1; }
+        }
+      }
+      for (let y = 0; y < n - 1; y++) for (let x = 0; x < n - 1; x++) { const c = m[y][x]; if (c === m[y][x + 1] && c === m[y + 1][x] && c === m[y + 1][x + 1]) p += 3; }
+      let noirs = 0; m.forEach((l) => l.forEach((c) => { if (c) noirs++; }));
+      return p + Math.floor(Math.abs(noirs * 20 - n * n * 10) / (n * n)) * 10;
+    };
+    let meilleur = 0, min = Infinity;
+    for (let k = 0; k < 8; k++) { masquer(k); format(k); const p = penalite(); if (p < min) { min = p; meilleur = k; } masquer(k); }
+    masquer(meilleur); format(meilleur);
+    return m;
+  }
+
+  /** QR code en SVG, marge blanche comprise. */
+  function qrSvg(texte, taille) {
+    const m = qrMatrice(texte), n = m.length, t = n + 8;
+    let d = '';
+    m.forEach((l, y) => l.forEach((c, x) => { if (c) d += `M${x + 4} ${y + 4}h1v1h-1z`; }));
+    return `<svg class="qr" width="${taille || 120}" height="${taille || 120}" viewBox="0 0 ${t} ${t}" shape-rendering="crispEdges" role="img" aria-label="QR code"><rect width="${t}" height="${t}" fill="#fff"/><path d="${d}" fill="#000"/></svg>`;
+  }
+
+  const ZT_QR = { qrMatrice, qrSvg, octetsDonnees };
+  if (typeof module !== 'undefined' && module.exports) module.exports = ZT_QR;
+  racine.ZT_QR = ZT_QR;
 })(typeof window !== 'undefined' ? window : globalThis);
 
 </script>
@@ -1657,7 +1829,8 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
   }
 
   /** Construit le PDF d'une fiche technique. Retourne le fichier sous forme de chaîne ASCII. */
-  function fichePdf(f, societe) {
+  function fichePdf(f, societe, options) {
+    const opt = options || {};
     const soc = societe || { nom: 'ZETools', siege: '58 rue de Ponthieu, 75008 Paris' };
     const pages = []; let ops = []; let y = 0;
     const texte = (t, x, yy, taille, gras, rgb) => ops.push(`BT /${gras ? 'F2' : 'F1'} ${taille} Tf ${rgb || '0.11 0.13 0.15'} rg ${x.toFixed(1)} ${yy.toFixed(1)} Td ${chaine(t)} Tj ET`);
@@ -1714,6 +1887,25 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
     paragraphe(f.titre, 20, true); y -= 4;
     paragraphe(`Niveau : ${f.niveau}  |  Durée : ${f.duree}  |  Budget : ${f.budget}`, 10, false, 0, '0.35 0.38 0.42'); y -= 6;
     paragraphe(f.resume, 11, false); 
+    // encart vidéo : QR code vers la fiche en ligne, qui porte la vidéo
+    const QR = racine.ZT_QR || (typeof require === 'function' ? require('./qr.js') : null);
+    if (opt.url && QR) {
+      const m = QR.qrMatrice(opt.url), nq = m.length, cote = 74, s = cote / (nq + 8), hb = cote + 12;
+      place(hb + 14); y -= 4;
+      const haut = y + 8;
+      rect(MARGE, haut - hb, LARGEUR, hb, '1 0.96 0.84');
+      const x0 = MARGE + 6, y0 = haut - 6;
+      rect(x0, y0 - cote, cote, cote, '1 1 1');
+      const mods = [];
+      m.forEach((l, r) => l.forEach((c, k) => { if (c) mods.push(`${n(x0 + (k + 4) * s)} ${n(y0 - (r + 5) * s)} ${n(s)} ${n(s)} re`); }));
+      ops.push(`q 0 0 0 rg ${mods.join(' ')} f Q`);
+      const xt = x0 + cote + 14, lt = LARGEUR - cote - 32; let yt = haut - 22;
+      texte('La fiche en vidéo', xt, yt, 13, true); yt -= 17;
+      couper('Scannez ce code avec votre téléphone : la fiche s’ouvre sur ZETools avec sa vidéo pas à pas, à suivre pendant le travail.', 10, false, lt).forEach((l) => { texte(l, xt, yt, 10, false); yt -= 13; });
+      const v = (f.videos || [])[0];
+      if (v) couper(`Vidéo : « ${v.titre} », ${v.chaine}, sur YouTube.`, 8.5, false, lt).forEach((l) => { texte(l, xt, yt, 8.5, false, '0.35 0.38 0.42'); yt -= 11; });
+      y = haut - hb - 10;
+    }
     titreSection('Outils nécessaires'); liste(f.outils.map((o) => o.nom));
     if ((f.materiaux || []).length) { titreSection('Matériaux et fournitures'); liste(f.materiaux); }
     titreSection('Étapes'); etapes(f.etapes, f.pictos);
@@ -3104,10 +3296,33 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
   /* =====================================================================
      FICHES TECHNIQUES : guides pas à pas, téléchargeables en PDF
      ===================================================================== */
-  const { FICHES } = window.ZT_DONNEES;
+  const { FICHES, SITE_PUBLIC } = window.ZT_DONNEES;
+  const urlFiche = (f) => `${SITE_PUBLIC}#/fiche-technique/${f.id}`;
+  const minSec = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+  // façade : aucune requête vers YouTube avant le clic (pas de cookie déposé sans action du visiteur)
+  function facadeVideo(v) {
+    return `<div class="video-facade">
+      <button class="btn btn-cta btn-lire" data-lire="${esc(v.yt)}" aria-label="Lire la vidéo ${esc(v.titre)}">▶ Lire la vidéo</button>
+      <div class="video-titre">« ${esc(v.titre)} »<br><span>${esc(v.chaine)} · YouTube</span></div>
+      <p class="video-consentement">La vidéo est hébergée par YouTube (Google). Rien n’est chargé avant votre clic ; en la lançant, vous acceptez les cookies de YouTube. <a href="#/legal/confidentialite">En savoir plus</a></p>
+    </div>`;
+  }
+  function blocVideo(f) {
+    const vs = f.videos || []; if (!vs.length) return '';
+    const v = vs[0];
+    return `<section class="bloc-video" aria-labelledby="titre-video">
+      <div class="bloc-video-tete"><h3 id="titre-video">▶ La fiche en vidéo</h3><a class="discret" href="https://www.youtube.com/watch?v=${esc(v.yt)}" target="_blank" rel="noopener" data-lien-yt>Ouvrir sur YouTube ↗</a></div>
+      <div class="bloc-video-corps">
+        <div class="video-cadre" data-cadre>${facadeVideo(v)}</div>
+        <aside class="video-telephone">${window.ZT_QR.qrSvg(urlFiche(f), 112)}<b>Sur votre téléphone</b><span>Scannez pour suivre la fiche et sa vidéo pendant le travail.</span></aside>
+      </div>
+      ${vs.length > 1 ? `<div class="video-choix"><span class="discret">Autres vidéos :</span>${vs.map((x, i) => `<button class="puce${i ? '' : ' active'}" data-choix-video="${i}">${esc(x.chaine)}</button>`).join('')}</div>` : ''}
+      <p class="note-legale">${v.debuts ? 'Cliquez sur ▶ à côté d’une étape pour aller directement au bon moment de la vidéo.' : 'Vidéo choisie par ZETools sur une chaîne reconnue, mais non produite par ZETools : elle peut différer légèrement des étapes de la fiche. Bientôt, les <b>Tutos ZETOOLS</b> : une courte séquence filmée pour chaque étape.'}</p>
+    </section>`;
+  }
   function carteFiche(f) {
     return `<a class="carte carte-fiche" href="#/fiche-technique/${f.id}">
-      <div class="visuel visuel-fiche"><span>${f.icone}</span><div class="badges"><span class="badge badge-location">PDF gratuit</span></div></div>
+      <div class="visuel visuel-fiche"><span>${f.icone}</span><div class="badges"><span class="badge badge-location">PDF gratuit</span>${(f.videos || []).length ? '<span class="badge badge-echange">▶ Vidéo</span>' : ''}</div></div>
       <div class="infos"><span class="badge badge-etat" style="align-self:start">${esc(f.theme)} · ${esc(f.niveau)}</span>
         <h3>${esc(f.titre)}</h3><div class="meta"><span>⏱ ${esc(f.duree)}</span><span>${f.etapes.length} étapes</span></div></div></a>`;
   }
@@ -3115,7 +3330,7 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
     const f = FICHES.find((x) => x.id === id); if (!f) return;
     const P = window.ZT_PDF; const J = window.ZT_JURIDIQUE;
     const lien = document.createElement('a');
-    lien.href = URL.createObjectURL(new Blob([P.octets(P.fichePdf(f, J && J.SOCIETE))], { type: 'application/pdf' }));
+    lien.href = URL.createObjectURL(new Blob([P.octets(P.fichePdf(f, J && J.SOCIETE, { url: urlFiche(f) }))], { type: 'application/pdf' }));
     lien.download = P.nomFichier(f); document.body.appendChild(lien); lien.click(); lien.remove();
     toast('Fiche téléchargée en PDF.');
   }
@@ -3132,16 +3347,17 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
     const liste = (items, ord) => `<${ord ? 'ol' : 'ul'} class="liste-fiche">${items.map((x) => `<li>${x}</li>`).join('')}</${ord ? 'ol' : 'ul'}>`;
     return `<div class="page"><div class="conteneur" style="max-width:900px">
       <div class="fil"><a href="#/">Accueil</a> › <a href="#/fiches">Fiches techniques</a> › ${esc(f.titre)}</div>
-      <article class="panneau fiche-technique">
+      <article class="panneau fiche-technique" data-fiche="${f.id}">
         <div class="marque-fiche">${window.ZT_PDF.logoSvg(26)}<span><b class="marque-ze">ZE</b><b>TOOLS</b> · fiche technique</span></div>
         <div class="entete-fiche"><span class="icone-fiche">${f.icone}</span><div><div class="surtitre">Fiche technique · ${esc(f.theme)}</div><h1>${esc(f.titre)}</h1>
           <div class="puces"><span class="puce">Niveau : ${esc(f.niveau)}</span><span class="puce">⏱ ${esc(f.duree)}</span><span class="puce">Budget : ${esc(f.budget)}</span></div></div></div>
         <p class="resume-fiche">${esc(f.resume)}</p>
+        ${blocVideo(f)}
         <button class="btn btn-cta" data-pdf="${f.id}">📄 Télécharger la fiche en PDF</button>
         <h3>Outils nécessaires</h3>
         <ul class="liste-fiche">${f.outils.map((o) => `<li>${esc(o.nom)}${o.q ? ` · <a href="#/annonces?q=${encodeURIComponent(o.q)}">louer ou acheter d’occasion</a>` : ''}</li>`).join('')}</ul>
         ${f.materiaux.length ? `<h3>Matériaux et fournitures</h3>${liste(f.materiaux.map(esc))}` : ''}
-        <h3>Étapes</h3><ol class="etapes-picto">${f.etapes.map((e, i) => `<li><span class="case-picto">${window.ZT_PDF.pictoSvg((f.pictos || [])[i])}</span><span><b>${i + 1}.</b> ${esc(e)}</span></li>`).join('')}</ol>
+        <h3>Étapes</h3><ol class="etapes-picto">${f.etapes.map((e, i) => `<li><span class="case-picto">${window.ZT_PDF.pictoSvg((f.pictos || [])[i])}</span><span><b>${i + 1}.</b> ${esc(e)}${(f.videos || [])[0] && f.videos[0].debuts && f.videos[0].debuts[i] != null ? ` <button class="lien-etape" data-lire="${esc(f.videos[0].yt)}" data-debut="${f.videos[0].debuts[i]}">▶ ${minSec(f.videos[0].debuts[i])}</button>` : ''}</span></li>`).join('')}</ol>
         <h3>Sécurité</h3>${liste(f.securite.map(esc))}
         ${f.astuce ? `<div class="alerte alerte-info"><b>L’astuce du bricoleur.</b> ${esc(f.astuce)}</div>` : ''}
         <p class="note-legale">Fiche indicative rédigée par ZETools. Suivez toujours la notice du fabricant de vos outils et de vos fournitures. En cas de doute, faites appel à un professionnel.</p>
@@ -3150,6 +3366,22 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
   }
   function brancherFicheTechnique() {
     vue.querySelectorAll('[data-pdf]').forEach((b) => b.addEventListener('click', () => telechargerFiche(b.dataset.pdf)));
+    const art = vue.querySelector('[data-fiche]'); if (!art) return;
+    const f = FICHES.find((x) => x.id === art.dataset.fiche);
+    const cadre = art.querySelector('[data-cadre]'); if (!f || !cadre) return;
+    const lire = (yt, debut) => {
+      const v = f.videos.find((x) => x.yt === yt) || f.videos[0];
+      cadre.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(v.yt)}?rel=0&autoplay=1${debut ? `&start=${debut}` : ''}" title="${esc(v.titre)} · ${esc(v.chaine)}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
+      cadre.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    };
+    art.addEventListener('click', (e) => {   // l'article est recréé à chaque affichage : pas d'écouteur en double
+      const b = e.target.closest('[data-lire]'); if (b) { lire(b.dataset.lire, Number(b.dataset.debut) || 0); return; }
+      const c = e.target.closest('[data-choix-video]'); if (!c) return;
+      const v = f.videos[Number(c.dataset.choixVideo)];
+      cadre.innerHTML = facadeVideo(v);
+      const lien = art.querySelector('[data-lien-yt]'); if (lien) lien.href = `https://www.youtube.com/watch?v=${v.yt}`;
+      art.querySelectorAll('[data-choix-video]').forEach((x) => x.classList.toggle('active', x === c));
+    });
   }
 
   /* =====================================================================
