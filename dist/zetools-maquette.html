@@ -258,6 +258,26 @@ table.tableau { width: 100%; border-collapse: collapse; background: var(--carte)
 .form-reponse { display: grid; gap: 8px; margin-top: 10px; }
 .form-reponse textarea, .form-reponse input { padding: 9px 10px; border: 1px solid var(--bord); border-radius: 8px; font: inherit; }
 
+
+/* --- Vidéos réelles --- */
+.video-fond { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+.hero-video { overflow: hidden; }
+.hero-video::before { z-index: 1; }
+.hero-video .conteneur { z-index: 2; }
+.categorie-video { position: relative; overflow: hidden; padding: 0; aspect-ratio: 3 / 4; border: 0; background: var(--anthracite); display: block; }
+.categorie-video .video-fond { transition: transform .4s; }
+.categorie-video:hover .video-fond { transform: scale(1.06); }
+.categorie-video::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(25,28,31,0) 40%, rgba(25,28,31,.85) 100%); }
+.categorie-video .etiquette { position: absolute; left: 10px; right: 10px; bottom: 10px; z-index: 1; color: #fff; font-weight: 700; font-size: .88rem; line-height: 1.2; text-align: left; }
+.categorie-video .etiquette .ico { display: block; width: auto; height: auto; margin: 0 0 4px; background: none; border-radius: 0; font-size: 1.3rem; }
+.bandeau-video { position: relative; overflow: hidden; border-radius: 16px; min-height: 200px; margin: 6px 0 22px; background: var(--anthracite); color: #fff; display: flex; align-items: flex-end; }
+.bandeau-video::before { content: ""; position: absolute; inset: 0; z-index: 1; background: linear-gradient(100deg, rgba(25,28,31,.9) 0%, rgba(25,28,31,.4) 70%, rgba(25,28,31,.15) 100%); }
+.bandeau-video .texte { position: relative; z-index: 2; padding: 24px; }
+.bandeau-video .surtitre { color: var(--jaune); }
+.bandeau-video h2 { margin: 4px 0; }
+.bandeau-video p { margin: 0; color: #e7eaee; }
+@media (prefers-reduced-motion: reduce) { .categorie-video .video-fond { transition: none; } }
+
 /* --- Adaptation mobile --- */
 @media (max-width: 1000px) {
   .categories { grid-template-columns: repeat(4, 1fr); }
@@ -272,6 +292,7 @@ table.tableau { width: 100%; border-collapse: collapse; background: var(--carte)
   .moteur { grid-template-columns: 1fr; }
   .modes, .articles, .offres, .fiche, .mise-en-page, .bandeau-pro, .formulaire, .messagerie { grid-template-columns: 1fr; }
   .categories { grid-template-columns: repeat(2, 1fr); }
+  .categorie-video { aspect-ratio: 4 / 3; }
   .garanties, .etapes { grid-template-columns: 1fr; }
   .filtres { position: static; }
   .conversations { border-right: 0; border-bottom: 1px solid var(--bord); }
@@ -611,6 +632,27 @@ table.tableau { width: 100%; border-collapse: collapse; background: var(--carte)
     atelier: U('1774963711952-713bb7a52c4e', 1400),
   };
 
+  // Vidéos Mixkit (licence gratuite Mixkit : usage commercial autorisé, sans attribution obligatoire)
+  const MX = (id, titre) => ({ id, titre,
+    hd: `https://assets.mixkit.co/videos/${id}/${id}-720.mp4`,
+    sd: `https://assets.mixkit.co/videos/${id}/${id}-360.mp4`,
+    poster: `https://assets.mixkit.co/videos/${id}/${id}-thumb-720-0.jpg`,
+    page: `https://mixkit.co/free-stock-video/${id}/` });
+  const VIDEOS = {
+    accueil: MX(777, 'Perçage d’une planche à l’établi'),
+    artisans: MX(44861, 'Menuisier préparant son chantier'),
+    reparer: MX(41930, 'Réparation d’un moteur au garage'),
+    categories: {
+      electro: MX(44858, 'Assemblage d’un cadre à la visseuse sans fil'),
+      main: MX(775, 'Ciseaux à bois rangés à l’atelier'),
+      meca: MX(4716, 'Mécanicien réparant un moteur de voiture'),
+      jardin: MX(43697, 'Rempotage au jardin, gants et outils'),
+      chantier: MX(21021, 'Mortier sur un mur de briques en chantier'),
+      atelier: MX(29995, 'Établi d’atelier et outillage rangé'),
+      epi: MX(20910, 'Soudeur équipé de son masque de protection'),
+    },
+  };
+
   const CATEGORIES = [
     { id: 'electro', nom: 'Électroportatif', icone: '⚡' },
     { id: 'main', nom: 'Outillage à main', icone: '🔧' },
@@ -793,7 +835,7 @@ table.tableau { width: 100%; border-collapse: collapse; background: var(--carte)
 
   PHOTOS.artisans = U('1621905251918-48416bd8575a', 1400);
 
-  const D = { PHOTOS, CATEGORIES, MEMBRES, ANNONCES, RESERVATIONS, ARTICLES, CREDITS, METIERS, ARTISANS, DEMANDES };
+  const D = { PHOTOS, VIDEOS, CATEGORIES, MEMBRES, ANNONCES, RESERVATIONS, ARTICLES, CREDITS, METIERS, ARTISANS, DEMANDES };
   if (typeof module !== 'undefined' && module.exports) module.exports = D;
   else racine.ZT_DONNEES = D;
 })(typeof window !== 'undefined' ? window : globalThis);
@@ -803,7 +845,7 @@ table.tableau { width: 100%; border-collapse: collapse; background: var(--carte)
 /* ZETOOLS · application de la maquette (routeur par #, vues, état local). */
 (function () {
   'use strict';
-  const { PHOTOS, CATEGORIES, MEMBRES, ANNONCES, RESERVATIONS, ARTICLES, CREDITS } = window.ZT_DONNEES;
+  const { PHOTOS, VIDEOS, CATEGORIES, MEMBRES, ANNONCES, RESERVATIONS, ARTICLES, CREDITS } = window.ZT_DONNEES;
   const Z = window.ZT;
   const AUJOURDHUI = Z.versTexte(Z.versDate(new Date()));
   const vue = document.getElementById('vue');
@@ -877,10 +919,34 @@ table.tableau { width: 100%; border-collapse: collapse; background: var(--carte)
   });
 
   /* ---------- vues ---------- */
+
+  /* ---------- vidéos ---------- */
+  // Vidéo de fond : muette, en boucle, jamais bloquante (l'affiche reste visible si la vidéo ne charge pas)
+  function videoFond(v, qualite) {
+    if (!v) return '';
+    return `<video class="video-fond" data-auto muted loop playsinline preload="none" poster="${v.poster}" aria-hidden="true" tabindex="-1"><source src="${qualite === 'sd' ? v.sd : v.hd}" type="video/mp4"></video>`;
+  }
+  // Lance les vidéos visibles, met en pause les autres ; rien ne bouge si l'utilisateur limite les animations
+  let observateurVideos = null;
+  function activerVideos() {
+    const videos = document.querySelectorAll('video[data-auto]');
+    if (!videos.length) return;
+    const calme = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (calme) return;
+    const lire = (v) => { const p = v.play(); if (p && p.catch) p.catch(() => {}); };
+    if (!('IntersectionObserver' in window)) { videos.forEach(lire); return; }
+    if (observateurVideos) observateurVideos.disconnect();
+    observateurVideos = new IntersectionObserver((entrees) => {
+      entrees.forEach((e) => { if (e.isIntersecting) lire(e.target); else e.target.pause(); });
+    }, { threshold: 0.25 });
+    videos.forEach((v) => observateurVideos.observe(v));
+  }
+
   function vueAccueil() {
     const une = toutesAnnonces().slice(0, 8);
     return `
-    <section class="hero" style="background-image:url('${PHOTOS.hero}')">
+    <section class="hero hero-video" style="background-image:url('${PHOTOS.hero}')">
+      ${videoFond(VIDEOS.accueil)}
       <div class="conteneur">
         <h1>Vos outils méritent <em>une seconde vie</em>. Les vôtres aussi.</h1>
         <p class="sous">Achetez à prix réduit, louez à deux rues de chez vous ou troquez ce qui dort au garage. Paiement sécurisé, caution protégée, profils vérifiés.</p>
@@ -908,7 +974,7 @@ table.tableau { width: 100%; border-collapse: collapse; background: var(--carte)
 
     <section class="bloc" style="padding-top:0"><div class="conteneur">
       <div class="titre-section"><div><div class="surtitre">Catégories</div><h2>Trouvez le bon matériel</h2></div></div>
-      <div class="categories">${CATEGORIES.map((c) => `<a class="categorie" href="#/annonces?cat=${c.id}"><div class="ico">${c.icone}</div><span>${c.nom}</span></a>`).join('')}</div>
+      <div class="categories categories-video">${CATEGORIES.map((c) => `<a class="categorie categorie-video" href="#/annonces?cat=${c.id}" title="${esc(VIDEOS.categories[c.id] ? VIDEOS.categories[c.id].titre : c.nom)}">${videoFond(VIDEOS.categories[c.id], 'sd')}<span class="etiquette"><span class="ico">${c.icone}</span>${c.nom}</span></a>`).join('')}</div>
     </div></section>
 
     <section class="bloc" style="padding-top:0"><div class="conteneur">
@@ -970,6 +1036,7 @@ table.tableau { width: 100%; border-collapse: collapse; background: var(--carte)
     const titre = f.mode === 'vente' ? 'Outils à vendre' : f.mode === 'location' ? 'Outils à louer' : f.mode === 'echange' ? 'Outils à échanger' : 'Toutes les annonces';
     return `<div class="page"><div class="conteneur">
       <div class="fil"><a href="#/">Accueil</a> › ${titre}</div>
+      ${f.categorie && VIDEOS.categories[f.categorie] ? (() => { const c = CATEGORIES.find((x) => x.id === f.categorie); const v = VIDEOS.categories[f.categorie]; return `<div class="bandeau-video">${videoFond(v)}<div class="texte"><div class="surtitre">${c.icone} Catégorie</div><h2>${esc(c.nom)}</h2><p>${esc(v.titre)}</p></div></div>`; })() : ''}
       <div class="mise-en-page">
         <form class="filtres" id="filtres">
           <label>Recherche<input name="q" value="${esc(f.q)}" placeholder="Outil, marque…"></label>
@@ -1280,9 +1347,12 @@ table.tableau { width: 100%; border-collapse: collapse; background: var(--carte)
   }
 
   function vueCredits() {
-    return `<div class="page"><div class="conteneur" style="max-width:820px"><div class="panneau"><h2>Crédits photos</h2>
+    return `<div class="page"><div class="conteneur" style="max-width:820px"><div class="panneau"><h2>Crédits photos et vidéos</h2>
       <p>Photographies issues d’<a href="https://unsplash.com/license" target="_blank" rel="noopener">Unsplash</a>, sous licence Unsplash : utilisation gratuite, y compris commerciale, sans attribution obligatoire. Nous créditons tout de même les auteurs.</p>
       ${CREDITS.map(([sujet, auteur, id]) => `<div class="ligne"><span>${esc(sujet)}</span><span>${esc(auteur)} · <a href="https://images.unsplash.com/photo-${id}" target="_blank" rel="noopener">source</a></span></div>`).join('')}
+      <h3 style="margin-top:28px">Vidéos</h3>
+      <p>Vidéos issues de <a href="https://mixkit.co/license/#videoFree" target="_blank" rel="noopener">Mixkit</a>, sous licence gratuite Mixkit : usage commercial autorisé, sans attribution obligatoire. Elles sont lues sans son et s’arrêtent si vous avez demandé à limiter les animations.</p>
+      ${[VIDEOS.accueil, VIDEOS.artisans, VIDEOS.reparer, ...Object.values(VIDEOS.categories)].map((v) => `<div class="ligne"><span>${esc(v.titre)}</span><span>Mixkit n° ${v.id} · <a href="${v.page}" target="_blank" rel="noopener">source</a></span></div>`).join('')}
     </div></div></div>`;
   }
 
@@ -1358,7 +1428,7 @@ table.tableau { width: 100%; border-collapse: collapse; background: var(--carte)
   let filtreTravaux = { rayon: 10, metier: '', vise: '' };
   function vueTravaux() {
     const res = posClient ? Z.artisansProches(posClient, artisansAbonnes(), { rayonKm: filtreTravaux.rayon, metier: filtreTravaux.metier }) : [];
-    return `<section class="hero hero-court" style="background-image:url('${PHOTOS.artisans}')"><div class="conteneur">
+    return `<section class="hero hero-court hero-video" style="background-image:url('${PHOTOS.artisans}')">${videoFond(VIDEOS.artisans)}<div class="conteneur">
         <div class="surtitre" style="color:var(--jaune)">Petits, moyens et gros travaux</div>
         <h1>Un artisan vérifié <em>près de chez vous</em>, avec ses outils.</h1>
         <p class="sous">Décrivez vos travaux : les artisans abonnés de votre secteur reçoivent votre demande et vous envoient leur devis. Gratuit et sans engagement pour vous.</p>
@@ -1548,7 +1618,7 @@ table.tableau { width: 100%; border-collapse: collapse; background: var(--carte)
   function vueReparer() {
     const aReparer = toutesAnnonces().filter((a) => a.etat === 'À réparer');
     const reparateurs = artisansAbonnes().filter((a) => a.metiers.includes('reparation'));
-    return `<section class="hero hero-court" style="background-image:url('${PHOTOS.atelier}')"><div class="conteneur">
+    return `<section class="hero hero-court hero-video" style="background-image:url('${PHOTOS.atelier}')">${videoFond(VIDEOS.reparer)}<div class="conteneur">
         <div class="surtitre" style="color:var(--jaune)">Outils à réparer</div>
         <h1>Un outil en panne n’est pas <em>un déchet</em>.</h1>
         <p class="sous">Faites-le réparer par un réparateur près de chez vous, vendez-le pour pièces, ou offrez-lui une seconde vie entre les mains d’un bricoleur.</p>
@@ -1599,6 +1669,7 @@ table.tableau { width: 100%; border-collapse: collapse; background: var(--carte)
     }
     vue.innerHTML = html;
     if (apres) apres();
+    activerVideos();
     document.getElementById('bulle-msg').textContent = etat.conversations.length;
     if (!seg[0] || seg[0] !== 'favoris') window.scrollTo(0, 0);
   }
