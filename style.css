@@ -537,3 +537,11 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
 .hero-cadeau::before, .hero-urgence::before { display: none; }
 .hero.hero-cadeau p.sous { color: var(--anthracite); }
 .hero.hero-urgence p.sous { color: #ffe3de; }
+
+/* ---------- en-tête : la recherche garde toujours sa place ---------- */
+.entete .recherche-entete { flex: 1 1 320px; min-width: 300px; }
+.entete .actions-entete { flex: 0 1 auto; min-width: 0; }
+@media (max-width: 1800px) { .entete .lien-secondaire { display: none; } }
+@media (max-width: 1560px) { .entete .lien-niveau2 { display: none; } }
+@media (max-width: 1320px) { .entete .lien-niveau3 { display: none; } }
+@media (max-width: 760px) { .entete .recherche-entete { min-width: 0; } }
