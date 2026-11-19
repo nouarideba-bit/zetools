@@ -83,6 +83,10 @@ L’échange est un contrat par lequel les membres se donnent un outil pour un a
 
 Le client publie gratuitement une demande de travaux ou de réparation. Les artisans abonnés y répondent par un devis. Le contrat de travaux ou de réparation est conclu directement entre le client et l’artisan, qui en est seul responsable : conformité, délais, garanties légales, assurance de responsabilité civile et, pour les ouvrages qui en relèvent, assurance décennale (article 1792 du Code civil).
 
+**Services proposés par les membres.** Un membre peut publier une offre de service, à l’heure ou au forfait. Le client réserve un jour et une heure et paie en ligne ; le prix est conservé par le prestataire de paiement et versé au prestataire une fois le service rendu. Le contrat de prestation de services est conclu directement entre le client et le prestataire.
+
+Un particulier ne peut proposer que de petits services occasionnels : petit bricolage, montage, jardinage courant, cours. Les activités soumises à qualification professionnelle, notamment l’électricité, la plomberie, le gaz et la maçonnerie, sont réservées aux professionnels qualifiés et immatriculés (article L. 121-1 du Code de l’artisanat). Le prestataire particulier déclare ses revenus ; une activité habituelle impose un statut professionnel.
+
 ZETools vérifie à l’inscription le numéro SIRET et, pour les gros travaux, l’attestation d’assurance décennale, sur la base des documents fournis. Cette vérification ne vaut pas garantie de la qualité des travaux.
 
 ## Article 12. Déstockage des enseignes
@@ -109,6 +113,12 @@ Les produits proposés en déstockage sont vendus par des professionnels identif
 | Location, côté propriétaire | Commission de 15 %, puis 12 % à partir de 5 locations, puis 10 % à partir de 20 locations |
 
 | Échange | 2,9 € par partie |
+
+| Service réservé en ligne, côté client | Frais de service de 8 % du prix |
+
+| Service réservé en ligne, côté prestataire | Commission de 12 % du prix ; aucune commission pour les artisans abonnés |
+
+| Fiches techniques en PDF | Gratuit |
 
 | Garantie casse et vol, optionnelle | 7 % du loyer, avec un minimum de 3 € |
 
@@ -152,6 +162,8 @@ ZETools peut retirer une annonce, restreindre sa visibilité, suspendre ou clôt
 
 ZETools répond de l’exécution de ses propres services. Elle ne répond pas de l’exécution des contrats conclus entre les membres, de l’état des outils, de la qualité des travaux ni des dommages causés par l’usage d’un outil.
 
+Les fiches techniques et les articles de L’Atelier sont fournis à titre d’information générale. Ils ne remplacent ni la notice du fabricant, ni l’avis d’un professionnel. L’utilisateur reste seul juge de sa capacité à réaliser les travaux et de la conformité de son installation.
+
 En qualité d’hébergeur, ZETools n’est responsable des contenus publiés par les membres que si, ayant eu connaissance de leur caractère illicite, elle n’a pas agi promptement pour les retirer.
 
 Aucune clause des présentes ne limite les droits que la loi reconnaît au consommateur, ni la responsabilité de ZETools en cas de faute lourde, de dol ou de dommage corporel.
@@ -163,6 +175,8 @@ ZETools traite les données personnelles des membres dans les conditions décrit
 ## Article 22. Propriété intellectuelle
 
 La marque, le logo, la charte graphique et les logiciels de la plateforme appartiennent à ZETools. Le membre conserve ses droits sur ses photos et ses textes ; il accorde à ZETools une licence gratuite et non exclusive de reproduction et de représentation, pour le monde entier et pour la durée de publication de l’annonce, aux seules fins d’exploiter et de promouvoir la plateforme.
+
+Les fiches techniques peuvent être téléchargées, imprimées et partagées gratuitement pour un usage personnel, sans modification et avec la mention de ZETools. Toute exploitation commerciale est soumise à autorisation.
 
 ## Article 23. Durée, résiliation, modification
 
