@@ -149,5 +149,124 @@ test('hors zone → refusé', () => assert.match(Z.peutRepondre(Object.assign({}
 test('pas de double réponse', () => assert.match(Z.peutRepondre(Object.assign({}, ART, { decennale: true }), Object.assign({}, GROS, { reponses: [{ artisanId: 'x' }] }), J).raison, /déjà/));
 test('chaque artisan a des métiers connus', () => { for (const a of D.ARTISANS) assert.ok(a.metiers.every((m) => D.METIERS.some((x) => x.id === m)), a.id); });
 
+console.log('Prix plafonnés');
+test('plafond selon l’état : 70 / 50 / 40 / 30 / 15 %', () => {
+  assert.deepStrictEqual(['Neuf', 'Très bon état', 'Bon état', 'État correct', 'À réparer'].map((e) => Z.plafondPrix(200, e).venteMax), [140, 100, 80, 60, 30]);
+});
+test('loyer ≤ 4 % du neuf, minimum 2 €', () => { assert.strictEqual(Z.plafondPrix(200, 'Bon état').jourMax, 8); assert.strictEqual(Z.plafondPrix(30, 'Bon état').jourMax, 2); });
+test('prix conseillé = 80 % du plafond', () => assert.strictEqual(Z.plafondPrix(200, 'Très bon état').venteConseillee, 80));
+test('sans prix neuf : refus', () => { assert.strictEqual(Z.plafondPrix(0, 'Neuf'), null); assert.strictEqual(Z.verifierPrix({ modes: ['vente'], prixVente: 10, etat: 'Neuf' }).ok, false); });
+test('vente trop chère refusée, au plafond acceptée', () => {
+  assert.match(Z.verifierPrix({ prixNeuf: 200, etat: 'Bon état', modes: ['vente'], prixVente: 81 }).erreurs[0], /trop élevé/);
+  assert.ok(Z.verifierPrix({ prixNeuf: 200, etat: 'Bon état', modes: ['vente'], prixVente: 80 }).ok);
+});
+test('loyer et caution trop élevés refusés', () => {
+  const v = Z.verifierPrix({ prixNeuf: 200, etat: 'Bon état', modes: ['location'], prixJour: 9, caution: 120 });
+  assert.strictEqual(v.erreurs.length, 2);
+});
+test('même neuf, un outil reste sous le prix magasin', () => assert.strictEqual(Z.verifierPrix({ prixNeuf: 100, etat: 'Neuf', modes: ['vente'], prixVente: 100 }).ok, false));
+test('remise sur le neuf', () => { assert.strictEqual(Z.remiseSurNeuf(89, 220), 60); assert.strictEqual(Z.remiseSurNeuf(220, 220), 0); assert.strictEqual(Z.remiseSurNeuf(10, 0), 0); });
+test('toutes les annonces de la maquette respectent les plafonds', () => { for (const a of D.ANNONCES) { const v = Z.verifierPrix(a); assert.ok(v.ok, a.id + ' ' + v.erreurs.join(' ')); } });
+
+console.log('Déstockage enseignes');
+const LOT = D.LOTS[0];
+test('tous les lots de la maquette sont valides et à −40 % au moins', () => { for (const l of D.LOTS) { assert.ok(Z.verifierLot(l, J).ok, l.id); assert.ok(Z.remiseSurNeuf(l.prixDestockage, l.prixReference) >= 40, l.id); assert.ok(D.ENSEIGNES.some((e) => e.id === l.enseigne)); } });
+test('prix de déstockage ≥ prix de référence : refusé', () => assert.match(Z.verifierLot(Object.assign({}, LOT, { prixDestockage: LOT.prixReference }), J).erreurs[0], /inférieur/));
+test('lot sans stock ou expiré : refusé', () => {
+  assert.strictEqual(Z.verifierLot(Object.assign({}, LOT, { magasins: [] }), J).ok, false);
+  assert.match(Z.verifierLot(Object.assign({}, LOT, { fin: '2026-11-01' }), J).erreurs[0], /passée/);
+});
+test('devis : limite par client, commission 8 %', () => {
+  const d = Z.devisLot(LOT, 5);
+  assert.strictEqual(d.quantite, Z.REGLES.maxParClient); assert.strictEqual(d.total, 138); assert.strictEqual(d.commission, 11.04); assert.strictEqual(d.versementEnseigne, 126.96); assert.strictEqual(d.economie, 160);
+});
+test('retrait du stock dans le magasin choisi, sans toucher à l’original', () => {
+  const r = Z.retirerDuStock(LOT, '94000', 2);
+  assert.ok(r.ok); assert.strictEqual(r.magasins.find((m) => m.cp === '94000').stock, 7); assert.strictEqual(LOT.magasins.find((m) => m.cp === '94000').stock, 9);
+});
+test('stock insuffisant : refus', () => assert.strictEqual(Z.retirerDuStock({ magasins: [{ nom: 'x', cp: '1', stock: 1 }] }, '1', 2).ok, false));
+
+console.log('Agenda et rendez-vous');
+const M = '2026-11-19T15:10';
+test('créneaux de 8 h à 19 h, toutes les heures', () => { const c = Z.creneauxJour('2026-11-20'); assert.strictEqual(c.length, 12); assert.strictEqual(c[0].heure, '08:00'); assert.strictEqual(c[11].heure, '19:00'); });
+test('pas de créneau le dimanche', () => assert.strictEqual(Z.creneauxJour('2026-11-22').length, 0));
+test('le jour même : seulement 2 h après maintenant', () => assert.deepStrictEqual(Z.creneauxJour('2026-11-19', { maintenant: M }).map((c) => c.heure), ['18:00', '19:00']));
+test('créneau déjà pris marqué non libre', () => assert.strictEqual(Z.creneauxJour('2026-11-20', { pris: ['2026-11-20T10:00'] }).find((c) => c.heure === '10:00').libre, false));
+test('avancer passe minuit et le changement d’année', () => assert.strictEqual(Z.avancer('2026-12-31T23:00', 2), '2027-01-01T01:00'));
+const RDV = { id: 'r1', type: 'echange', objet: 'Ponceuse, test', creneaux: ['2026-11-21T10:00', '2026-11-23T18:00'], dureeHeures: 2, statut: 'proposé' };
+test('proposition valide', () => assert.ok(Z.verifierProposition(RDV, M).ok));
+test('proposition refusée : aucun créneau, plus de 3, doublon, passé, dimanche, type inconnu', () => {
+  assert.strictEqual(Z.verifierProposition(Object.assign({}, RDV, { creneaux: [] }), M).ok, false);
+  assert.strictEqual(Z.verifierProposition(Object.assign({}, RDV, { creneaux: ['2026-11-21T08:00', '2026-11-21T09:00', '2026-11-21T10:00', '2026-11-21T11:00'] }), M).ok, false);
+  assert.strictEqual(Z.verifierProposition(Object.assign({}, RDV, { creneaux: ['2026-11-21T08:00', '2026-11-21T08:00'] }), M).ok, false);
+  assert.strictEqual(Z.verifierProposition(Object.assign({}, RDV, { creneaux: ['2026-11-19T16:00'] }), M).ok, false);
+  assert.strictEqual(Z.verifierProposition(Object.assign({}, RDV, { creneaux: ['2026-11-22T10:00'] }), M).ok, false);
+  assert.strictEqual(Z.verifierProposition(Object.assign({}, RDV, { type: 'autre' }), M).ok, false);
+});
+test('accepter un créneau confirme le rendez-vous', () => { const r = Z.confirmerRdv(RDV, '2026-11-21T10:00'); assert.strictEqual(r.rdv.statut, 'confirmé'); assert.strictEqual(r.rdv.creneau, '2026-11-21T10:00'); });
+test('créneau hors proposition refusé', () => assert.strictEqual(Z.confirmerRdv(RDV, '2026-11-21T12:00').ok, false));
+test('conflit avec un rendez-vous confirmé qui chevauche', () => {
+  const autre = { id: 'r2', statut: 'confirmé', creneau: '2026-11-21T11:00', dureeHeures: 1 };
+  assert.match(Z.confirmerRdv(RDV, '2026-11-21T10:00', [autre]).raison, /déjà/);
+  assert.ok(Z.confirmerRdv(RDV, '2026-11-21T10:00', [Object.assign({}, autre, { creneau: '2026-11-21T12:00' })]).ok);
+});
+test('annulation gratuite jusqu’à 24 h avant', () => {
+  const c = { statut: 'confirmé', creneau: '2026-11-21T10:00' };
+  assert.strictEqual(Z.annulationGratuite(c, '2026-11-20T10:00'), true); assert.strictEqual(Z.annulationGratuite(c, '2026-11-20T10:01'), false);
+  assert.strictEqual(Z.annulationGratuite({ statut: 'proposé' }, '2026-11-21T09:59'), true);
+});
+test('export calendrier .ics : début, fin, virgule échappée', () => {
+  const ics = Z.versIcs(Object.assign({}, RDV, { creneau: '2026-11-21T10:00' }));
+  assert.match(ics, /DTSTART;TZID=Europe\/Paris:20261121T100000/); assert.match(ics, /DTEND;TZID=Europe\/Paris:20261121T120000/); assert.match(ics, /Ponceuse\\, test/); assert.ok(ics.startsWith('BEGIN:VCALENDAR') && ics.endsWith('END:VCALENDAR'));
+});
+test('le rendez-vous de démonstration est une proposition valide', () => { for (const r of D.RDV_DEMO) assert.ok(Z.verifierProposition(r, M).ok, r.id); });
+
+console.log('Offres de prix');
+const AN = { id: 'z', titre: 'Test', membre: 'm1', modes: ['vente', 'location'], prixVente: 80, prixJour: 5 };
+test('offre valide entre 50 % et le prix affiché', () => { assert.ok(Z.verifierOffre(AN, 'vente', 60).ok); assert.ok(Z.verifierOffre(AN, 'vente', 40).ok); assert.ok(Z.verifierOffre(AN, 'location', 2.5).ok); });
+test('offre refusée : trop basse, au prix affiché, nulle, mode absent, quota', () => {
+  assert.match(Z.verifierOffre(AN, 'vente', 39).raison, /trop basse/); assert.match(Z.verifierOffre(AN, 'vente', 80).raison, /inférieure/);
+  assert.strictEqual(Z.verifierOffre(AN, 'vente', 0).ok, false); assert.strictEqual(Z.verifierOffre(AN, 'echange', 10).ok, false);
+  assert.match(Z.verifierOffre(AN, 'vente', 60, 3).raison, /maximum/);
+});
+const OF = Z.creerOffre(AN, 'vente', 60, M);
+test('offre créée : en attente, valable 48 h', () => { assert.strictEqual(OF.statut, 'en attente'); assert.strictEqual(OF.expire, '2026-11-21T15:10'); assert.strictEqual(OF.prixAffiche, 80); });
+test('accepter : prix convenu = montant de l’offre', () => assert.strictEqual(Z.repondreOffre(OF, 'accepter', M).offre.prixFinal, 60));
+test('contre-proposition bornée entre l’offre et le prix affiché', () => {
+  assert.strictEqual(Z.repondreOffre(OF, 'contre', M, 60).ok, false); assert.strictEqual(Z.repondreOffre(OF, 'contre', M, 80).ok, false);
+  const c = Z.repondreOffre(OF, 'contre', M, 70).offre; assert.strictEqual(c.statut, 'contre-offre');
+  assert.strictEqual(Z.repondreOffre(c, 'accepter', M).offre.prixFinal, 70); assert.strictEqual(Z.repondreOffre(c, 'contre', M, 75).ok, false);
+});
+test('offre expirée ou déjà traitée : plus de réponse possible', () => {
+  assert.match(Z.repondreOffre(OF, 'accepter', '2026-11-21T15:11').raison, /expiré/);
+  assert.match(Z.repondreOffre(Z.repondreOffre(OF, 'refuser', M).offre, 'accepter', M).raison, /déjà/);
+});
+test('démo vendeur : accepte dès 80 % du prix, sinon contre-propose à mi-chemin', () => {
+  assert.strictEqual(Z.reponseVendeurDemo(Z.creerOffre(AN, 'vente', 64, M), M).offre.statut, 'acceptée');
+  assert.strictEqual(Z.reponseVendeurDemo(Z.creerOffre(AN, 'vente', 50, M), M).offre.contre, 65);
+  assert.strictEqual(Z.reponseVendeurDemo(Z.creerOffre(AN, 'location', 3, M), M).offre.contre, 4);
+});
+test('le prix négocié s’applique à l’annonce tant que l’accord est valable', () => {
+  const acc = Z.repondreOffre(OF, 'accepter', M).offre;
+  const a = Z.appliquerOffres(AN, [acc], M); assert.strictEqual(a.prixVente, 60); assert.strictEqual(a.prixVenteAffiche, 80); assert.strictEqual(a.prixJour, 5); assert.strictEqual(AN.prixVente, 80);
+  assert.strictEqual(Z.appliquerOffres(AN, [acc], '2026-11-22T00:00').prixVente, 80);
+  assert.strictEqual(Z.devisVente(a).commission, 4.8);
+});
+test('les offres de démonstration sont cohérentes', () => { for (const o of D.OFFRES_DEMO) assert.ok(o.montant < o.prixAffiche && o.montant >= o.prixAffiche * Z.REGLES.offres.plancher, o.id); });
+
+console.log('Textes juridiques');
+const JUR = require('../juridique.js');
+test('les six documents existent et sont complets', () => {
+  assert.deepStrictEqual(JUR.PAGES.map((p) => p.id), ['cgu', 'pros', 'mentions', 'confidentialite', 'securite', 'prix']);
+  for (const p of JUR.PAGES) { assert.ok(p.sections.length >= 5, p.id); const t = p.sections.map((s) => s[1]).join(''); assert.ok(!/undefined|NaN|\$\{/.test(t), p.id); }
+});
+test('société : ZETools SAS, 58 rue de Ponthieu, 75008 Paris', () => { assert.strictEqual(JUR.SOCIETE.siege, '58 rue de Ponthieu, 75008 Paris'); assert.match(JUR.PAGES.find((p) => p.id === 'mentions').sections[0][1], /ZETools<\/b>, société par actions simplifiée/); });
+test('les tarifs des conditions suivent les règles de la plateforme', () => {
+  const cgu = JUR.PAGES.find((p) => p.id === 'cgu').sections.map((s) => s[1]).join('');
+  assert.match(cgu, /Commission de 8 % du prix/); assert.match(cgu, /2,9 € par partie/); assert.match(cgu, /15 %, puis 12 % à partir de 5 locations, puis 10 % à partir de 20 locations/);
+  const pros = JUR.PAGES.find((p) => p.id === 'pros').sections.map((s) => s[1]).join('');
+  assert.match(pros, /39 € hors taxes par mois/); assert.match(pros, /390 € hors taxes par an/);
+});
+
 console.log(`\n${ok} réussis, ${ko} échoués`);
 process.exit(ko ? 1 : 0);
