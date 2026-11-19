@@ -482,5 +482,105 @@ test('onglet Offre : route, lien d’en-tête et tarifs issus des règles', () =
   assert.ok(!app.includes('méritent <em>une seconde vie</em>'), 'ancien slogan retiré');
 });
 
+// ---------- Passeport outil ----------
+const PJ = '2026-11-19';
+const passeportSain = { misEnService: '2025-06', heures: 40, controles: [{ date: '2026-11-01', type: 'video', resultat: 'ok' }], reparations: [] };
+test('passeport : un outil récent et contrôlé est « Excellent »', () => { const s = Z.scoreSante(passeportSain, PJ); assert.ok(s.score >= 90, s.score); assert.strictEqual(s.niveau, 'Excellent'); });
+test('passeport : chaque point retiré est expliqué', () => {
+  const s = Z.scoreSante({ misEnService: '2018-01', heures: 400, batterie: { capacite: 50, cycles: 500 }, controles: [{ date: '2026-10-01', type: 'video', resultat: 'echec' }], reparations: [] }, PJ);
+  assert.strictEqual(100 + s.facteurs.reduce((t, f) => t + f.points, 0), s.score);
+  assert.ok(s.facteurs.length >= 4); assert.ok(s.score < 40);
+});
+test('passeport : sans contrôle, 15 points en moins', () => { const s = Z.scoreSante({ misEnService: '2026-11', heures: 0, controles: [], reparations: [] }, PJ); assert.strictEqual(s.score, 85); });
+test('garantie : vente, score ≥ 80 et contrôle réussi de moins de 90 jours', () => {
+  const vente = { modes: ['vente'] }, loc = { modes: ['location'] };
+  assert.ok(Z.garantiePasseport(passeportSain, vente, PJ).ok);
+  assert.strictEqual(Z.garantiePasseport(passeportSain, loc, PJ).ok, false);
+  const vieux = Object.assign({}, passeportSain, { controles: [{ date: '2026-06-01', type: 'video', resultat: 'ok' }] });
+  assert.strictEqual(Z.garantiePasseport(vieux, vente, PJ).ok, false);
+});
+test('garantie : un contrôle ajouté rend la garantie à un outil', () => {
+  const p = { misEnService: '2025-06', heures: 40, controles: [{ date: '2026-05-01', type: 'video', resultat: 'ok' }], reparations: [] };
+  assert.strictEqual(Z.garantiePasseport(p, { modes: ['vente'] }, PJ).ok, false);
+  assert.ok(Z.garantiePasseport(Z.ajouterControle(p, { date: PJ, type: 'acoustique', resultat: 'ok' }), { modes: ['vente'] }, PJ).ok);
+  assert.throws(() => Z.ajouterControle(p, { date: PJ, resultat: 'peut-être' }));
+});
+test('passeports de la maquette : tous rattachés à une annonce, scores entre 0 et 100', () => {
+  Object.entries(D.PASSEPORTS).forEach(([id, p]) => { assert.ok(D.ANNONCES.some((a) => a.id === id), id); const s = Z.scoreSante(p, PJ); assert.ok(s.score >= 0 && s.score <= 100); });
+  assert.ok(Z.scoreSante(D.PASSEPORTS.a11, PJ).score < 40, 'la visseuse à batterie HS doit être « Fatiguée »');
+});
+test('batterie estimée : date gravée + charges, jamais au-dessus de 100 ni dans le futur', () => {
+  assert.strictEqual(Z.estimerBatterie('2026-11', 0, PJ).capacite, 100);
+  assert.ok(Z.estimerBatterie('2020-01', 600, PJ).capacite < 70);
+  assert.strictEqual(Z.estimerBatterie('2027-01', 0, PJ), null);
+  assert.strictEqual(Z.estimerBatterie('', 10, PJ), null);
+});
+test('test acoustique : sain, réserve, échec', () => {
+  assert.strictEqual(Z.analyseAcoustique({ regularite: 0.95, aigus: 0.1, chocs: 0 }).resultat, 'ok');
+  assert.strictEqual(Z.analyseAcoustique({ regularite: 0.95, aigus: 0.5, chocs: 0 }).resultat, 'reserve');
+  assert.strictEqual(Z.analyseAcoustique({ regularite: 0.6, aigus: 0.5, chocs: 4 }).resultat, 'echec');
+});
+
+// ---------- Location-achat ----------
+test('« Je le garde » : le loyer hors frais est déduit du prix de vente', () => {
+  const a = D.ANNONCES.find((x) => x.id === 'a13'); // 6 €/j, vente 85 €
+  const g = Z.prixSiJeLeGarde(a, { debut: '2026-11-18', fin: '2026-11-19', statut: 'confirmée' }, PJ);
+  assert.ok(g.ok); assert.strictEqual(g.deduit, 12); assert.strictEqual(g.reste, 73);
+});
+test('« Je le garde » : refusé hors délai, outil non vendu ou location annulée', () => {
+  const a = D.ANNONCES.find((x) => x.id === 'a13');
+  assert.strictEqual(Z.prixSiJeLeGarde(a, { debut: '2026-11-10', fin: '2026-11-12', statut: 'confirmée' }, PJ).ok, false);
+  assert.strictEqual(Z.prixSiJeLeGarde(D.ANNONCES.find((x) => x.id === 'a2'), { debut: '2026-11-18', fin: '2026-11-19', statut: 'confirmée' }, PJ).ok, false);
+  assert.strictEqual(Z.prixSiJeLeGarde(a, { debut: '2026-11-18', fin: '2026-11-19', statut: 'annulée' }, PJ).ok, false);
+});
+
+// ---------- Mode Projet ----------
+const optsProjet = (o) => Object.assign({ quantite: 3, cp: '94300', debut: '2026-11-28', fin: '2026-11-29', annonces: D.ANNONCES, reservations: D.RESERVATIONS, aujourdHui: PJ }, o);
+test('projet : consommables arrondis au conditionnement, fixes une fois par projet', () => {
+  const c = Z.consommablesProjet(D.PROJETS.find((p) => p.id === 'etageres'), 7);
+  assert.deepStrictEqual(c.map((x) => x.paquets), [2, 2, 1]);
+});
+test('projet : un outil réservé n’est pas proposé ; on loue un autre outil libre', () => {
+  const r = Z.composerProjet(D.PROJETS.find((p) => p.id === 'etageres'), optsProjet({ rayonKm: 20 }));
+  assert.ok(r.ok); assert.ok(!r.outils.some((c) => c.annonce.id === 'a1' && c.mode === 'location'));
+  assert.ok(r.outils.every((c) => c.mode === 'location'));
+});
+test('projet : un même outil couvre deux étapes sans être payé deux fois', () => {
+  const r = Z.composerProjet(D.PROJETS.find((p) => p.id === 'roues'), optsProjet({ quantite: 4 }));
+  assert.ok(r.lignes.some((l) => l.partage)); assert.strictEqual(r.outils.length, new Set(r.outils.map((c) => c.annonce.id)).size);
+});
+test('projet : achat au choix, sans caution, et total cohérent', () => {
+  const r = Z.composerProjet(D.PROJETS.find((p) => p.id === 'etageres'), optsProjet({ rayonKm: 20, achats: ['a1'] }));
+  const a1 = r.outils.find((c) => c.annonce.id === 'a1');
+  assert.strictEqual(a1.mode, 'achat'); assert.strictEqual(a1.prix, 89);
+  assert.strictEqual(r.total, Math.round((r.totalOutils + r.totalConsommables) * 100) / 100);
+  assert.strictEqual(r.cautions, r.outils.filter((c) => c.mode === 'location').reduce((t, c) => t + c.annonce.caution, 0));
+});
+test('projet : le rayon exclut les outils trop loin et le signale', () => {
+  const r = Z.composerProjet(D.PROJETS.find((p) => p.id === 'haie'), optsProjet({ quantite: 15, rayonKm: 5 }));
+  assert.ok(r.manquants.length >= 1); assert.ok(r.outils.every((c) => c.km <= 5));
+});
+test('projet : dates passées refusées', () => { assert.strictEqual(Z.composerProjet(D.PROJETS[0], optsProjet({ debut: '2026-11-01', fin: '2026-11-02' })).ok, false); });
+test('projets de la maquette : outils, fiches et services existants', () => {
+  D.PROJETS.forEach((p) => {
+    p.besoins.forEach((b) => b.outils.forEach((id) => assert.ok(D.ANNONCES.some((a) => a.id === id), p.id + ' ' + id)));
+    if (p.fiche) assert.ok(D.FICHES.some((f) => f.id === p.fiche), p.fiche);
+    if (p.service) assert.ok(D.SERVICES.some((x) => x.id === p.service), p.service);
+  });
+});
+test('CGU : passeport, location-achat et Mode Projet', () => {
+  const J = require('../juridique.js'); const cgu = J.PAGES.find((x) => x.id === 'cgu').sections.map((x) => x[0]).join('|');
+  ['22-3', '22-4', '22-5'].forEach((n) => assert.ok(cgu.includes('Article ' + n), n));
+});
+
+test('charte : aucun émoji dans l’en-tête et le pied de page, filtre actif sur les vues', () => {
+  const fs = require('fs'); const path = require('path');
+  const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8').replace(/<script[\s\S]*?<\/script>/g, '');
+  const reste = (html.match(/\p{Extended_Pictographic}/gu) || []).filter((c) => !'★©®™'.includes(c));
+  assert.deepStrictEqual(reste, []);
+  const app = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8');
+  assert.ok(app.includes('vue.innerHTML = sansPictos(html)')); assert.ok(app.includes("t.textContent = sansPictos(texte)"));
+});
+
 console.log(`\n${ok} réussis, ${ko} échoués`);
 process.exit(ko ? 1 : 0);
