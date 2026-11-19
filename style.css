@@ -389,3 +389,15 @@ button.puce.active { background: var(--anthracite); color: #fff; }
 ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
 .entete .btn-cta { white-space: nowrap; }
 @media (max-width: 1400px) { .entete .btn-deposer-texte { display: none; } }
+
+/* ---------- logo : l'écrou ZE ---------- */
+.logo-zt { width: 34px; height: 34px; flex-shrink: 0; display: block; }
+
+/* ---------- fiches : étapes illustrées ---------- */
+.etapes-picto { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+.etapes-picto li { display: flex; gap: 14px; align-items: flex-start; }
+.etapes-picto li b { color: var(--vert); }
+.case-picto { flex-shrink: 0; width: 46px; height: 46px; border-radius: 10px; background: #fff3cf; color: var(--anthracite); display: grid; place-items: center; }
+.marque-fiche { display: flex; align-items: center; gap: 8px; font-size: .85rem; color: var(--texte-doux); margin-bottom: 14px; }
+.marque-fiche .marque-ze { color: var(--jaune-fonce); }
+.marque-fiche b { color: var(--anthracite); letter-spacing: .5px; }

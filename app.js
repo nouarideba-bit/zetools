@@ -1369,6 +1369,7 @@
     return `<div class="page"><div class="conteneur" style="max-width:900px">
       <div class="fil"><a href="#/">Accueil</a> › <a href="#/fiches">Fiches techniques</a> › ${esc(f.titre)}</div>
       <article class="panneau fiche-technique">
+        <div class="marque-fiche">${window.ZT_PDF.logoSvg(26)}<span><b class="marque-ze">ZE</b><b>TOOLS</b> · fiche technique</span></div>
         <div class="entete-fiche"><span class="icone-fiche">${f.icone}</span><div><div class="surtitre">Fiche technique · ${esc(f.theme)}</div><h1>${esc(f.titre)}</h1>
           <div class="puces"><span class="puce">Niveau : ${esc(f.niveau)}</span><span class="puce">⏱ ${esc(f.duree)}</span><span class="puce">Budget : ${esc(f.budget)}</span></div></div></div>
         <p class="resume-fiche">${esc(f.resume)}</p>
@@ -1376,7 +1377,7 @@
         <h3>Outils nécessaires</h3>
         <ul class="liste-fiche">${f.outils.map((o) => `<li>${esc(o.nom)}${o.q ? ` · <a href="#/annonces?q=${encodeURIComponent(o.q)}">louer ou acheter d’occasion</a>` : ''}</li>`).join('')}</ul>
         ${f.materiaux.length ? `<h3>Matériaux et fournitures</h3>${liste(f.materiaux.map(esc))}` : ''}
-        <h3>Étapes</h3>${liste(f.etapes.map(esc), true)}
+        <h3>Étapes</h3><ol class="etapes-picto">${f.etapes.map((e, i) => `<li><span class="case-picto">${window.ZT_PDF.pictoSvg((f.pictos || [])[i])}</span><span><b>${i + 1}.</b> ${esc(e)}</span></li>`).join('')}</ol>
         <h3>Sécurité</h3>${liste(f.securite.map(esc))}
         ${f.astuce ? `<div class="alerte alerte-info"><b>L’astuce du bricoleur.</b> ${esc(f.astuce)}</div>` : ''}
         <p class="note-legale">Fiche indicative rédigée par ZETools. Suivez toujours la notice du fabricant de vos outils et de vos fournitures. En cas de doute, faites appel à un professionnel.</p>
