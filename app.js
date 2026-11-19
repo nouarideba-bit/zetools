@@ -1340,10 +1340,33 @@
   /* =====================================================================
      FICHES TECHNIQUES : guides pas à pas, téléchargeables en PDF
      ===================================================================== */
-  const { FICHES } = window.ZT_DONNEES;
+  const { FICHES, SITE_PUBLIC } = window.ZT_DONNEES;
+  const urlFiche = (f) => `${SITE_PUBLIC}#/fiche-technique/${f.id}`;
+  const minSec = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+  // façade : aucune requête vers YouTube avant le clic (pas de cookie déposé sans action du visiteur)
+  function facadeVideo(v) {
+    return `<div class="video-facade">
+      <button class="btn btn-cta btn-lire" data-lire="${esc(v.yt)}" aria-label="Lire la vidéo ${esc(v.titre)}">▶ Lire la vidéo</button>
+      <div class="video-titre">« ${esc(v.titre)} »<br><span>${esc(v.chaine)} · YouTube</span></div>
+      <p class="video-consentement">La vidéo est hébergée par YouTube (Google). Rien n’est chargé avant votre clic ; en la lançant, vous acceptez les cookies de YouTube. <a href="#/legal/confidentialite">En savoir plus</a></p>
+    </div>`;
+  }
+  function blocVideo(f) {
+    const vs = f.videos || []; if (!vs.length) return '';
+    const v = vs[0];
+    return `<section class="bloc-video" aria-labelledby="titre-video">
+      <div class="bloc-video-tete"><h3 id="titre-video">▶ La fiche en vidéo</h3><a class="discret" href="https://www.youtube.com/watch?v=${esc(v.yt)}" target="_blank" rel="noopener" data-lien-yt>Ouvrir sur YouTube ↗</a></div>
+      <div class="bloc-video-corps">
+        <div class="video-cadre" data-cadre>${facadeVideo(v)}</div>
+        <aside class="video-telephone">${window.ZT_QR.qrSvg(urlFiche(f), 112)}<b>Sur votre téléphone</b><span>Scannez pour suivre la fiche et sa vidéo pendant le travail.</span></aside>
+      </div>
+      ${vs.length > 1 ? `<div class="video-choix"><span class="discret">Autres vidéos :</span>${vs.map((x, i) => `<button class="puce${i ? '' : ' active'}" data-choix-video="${i}">${esc(x.chaine)}</button>`).join('')}</div>` : ''}
+      <p class="note-legale">${v.debuts ? 'Cliquez sur ▶ à côté d’une étape pour aller directement au bon moment de la vidéo.' : 'Vidéo choisie par ZETools sur une chaîne reconnue, mais non produite par ZETools : elle peut différer légèrement des étapes de la fiche. Bientôt, les <b>Tutos ZETOOLS</b> : une courte séquence filmée pour chaque étape.'}</p>
+    </section>`;
+  }
   function carteFiche(f) {
     return `<a class="carte carte-fiche" href="#/fiche-technique/${f.id}">
-      <div class="visuel visuel-fiche"><span>${f.icone}</span><div class="badges"><span class="badge badge-location">PDF gratuit</span></div></div>
+      <div class="visuel visuel-fiche"><span>${f.icone}</span><div class="badges"><span class="badge badge-location">PDF gratuit</span>${(f.videos || []).length ? '<span class="badge badge-echange">▶ Vidéo</span>' : ''}</div></div>
       <div class="infos"><span class="badge badge-etat" style="align-self:start">${esc(f.theme)} · ${esc(f.niveau)}</span>
         <h3>${esc(f.titre)}</h3><div class="meta"><span>⏱ ${esc(f.duree)}</span><span>${f.etapes.length} étapes</span></div></div></a>`;
   }
@@ -1351,7 +1374,7 @@
     const f = FICHES.find((x) => x.id === id); if (!f) return;
     const P = window.ZT_PDF; const J = window.ZT_JURIDIQUE;
     const lien = document.createElement('a');
-    lien.href = URL.createObjectURL(new Blob([P.octets(P.fichePdf(f, J && J.SOCIETE))], { type: 'application/pdf' }));
+    lien.href = URL.createObjectURL(new Blob([P.octets(P.fichePdf(f, J && J.SOCIETE, { url: urlFiche(f) }))], { type: 'application/pdf' }));
     lien.download = P.nomFichier(f); document.body.appendChild(lien); lien.click(); lien.remove();
     toast('Fiche téléchargée en PDF.');
   }
@@ -1368,16 +1391,17 @@
     const liste = (items, ord) => `<${ord ? 'ol' : 'ul'} class="liste-fiche">${items.map((x) => `<li>${x}</li>`).join('')}</${ord ? 'ol' : 'ul'}>`;
     return `<div class="page"><div class="conteneur" style="max-width:900px">
       <div class="fil"><a href="#/">Accueil</a> › <a href="#/fiches">Fiches techniques</a> › ${esc(f.titre)}</div>
-      <article class="panneau fiche-technique">
+      <article class="panneau fiche-technique" data-fiche="${f.id}">
         <div class="marque-fiche">${window.ZT_PDF.logoSvg(26)}<span><b class="marque-ze">ZE</b><b>TOOLS</b> · fiche technique</span></div>
         <div class="entete-fiche"><span class="icone-fiche">${f.icone}</span><div><div class="surtitre">Fiche technique · ${esc(f.theme)}</div><h1>${esc(f.titre)}</h1>
           <div class="puces"><span class="puce">Niveau : ${esc(f.niveau)}</span><span class="puce">⏱ ${esc(f.duree)}</span><span class="puce">Budget : ${esc(f.budget)}</span></div></div></div>
         <p class="resume-fiche">${esc(f.resume)}</p>
+        ${blocVideo(f)}
         <button class="btn btn-cta" data-pdf="${f.id}">📄 Télécharger la fiche en PDF</button>
         <h3>Outils nécessaires</h3>
         <ul class="liste-fiche">${f.outils.map((o) => `<li>${esc(o.nom)}${o.q ? ` · <a href="#/annonces?q=${encodeURIComponent(o.q)}">louer ou acheter d’occasion</a>` : ''}</li>`).join('')}</ul>
         ${f.materiaux.length ? `<h3>Matériaux et fournitures</h3>${liste(f.materiaux.map(esc))}` : ''}
-        <h3>Étapes</h3><ol class="etapes-picto">${f.etapes.map((e, i) => `<li><span class="case-picto">${window.ZT_PDF.pictoSvg((f.pictos || [])[i])}</span><span><b>${i + 1}.</b> ${esc(e)}</span></li>`).join('')}</ol>
+        <h3>Étapes</h3><ol class="etapes-picto">${f.etapes.map((e, i) => `<li><span class="case-picto">${window.ZT_PDF.pictoSvg((f.pictos || [])[i])}</span><span><b>${i + 1}.</b> ${esc(e)}${(f.videos || [])[0] && f.videos[0].debuts && f.videos[0].debuts[i] != null ? ` <button class="lien-etape" data-lire="${esc(f.videos[0].yt)}" data-debut="${f.videos[0].debuts[i]}">▶ ${minSec(f.videos[0].debuts[i])}</button>` : ''}</span></li>`).join('')}</ol>
         <h3>Sécurité</h3>${liste(f.securite.map(esc))}
         ${f.astuce ? `<div class="alerte alerte-info"><b>L’astuce du bricoleur.</b> ${esc(f.astuce)}</div>` : ''}
         <p class="note-legale">Fiche indicative rédigée par ZETools. Suivez toujours la notice du fabricant de vos outils et de vos fournitures. En cas de doute, faites appel à un professionnel.</p>
@@ -1386,6 +1410,22 @@
   }
   function brancherFicheTechnique() {
     vue.querySelectorAll('[data-pdf]').forEach((b) => b.addEventListener('click', () => telechargerFiche(b.dataset.pdf)));
+    const art = vue.querySelector('[data-fiche]'); if (!art) return;
+    const f = FICHES.find((x) => x.id === art.dataset.fiche);
+    const cadre = art.querySelector('[data-cadre]'); if (!f || !cadre) return;
+    const lire = (yt, debut) => {
+      const v = f.videos.find((x) => x.yt === yt) || f.videos[0];
+      cadre.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(v.yt)}?rel=0&autoplay=1${debut ? `&start=${debut}` : ''}" title="${esc(v.titre)} · ${esc(v.chaine)}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
+      cadre.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    };
+    art.addEventListener('click', (e) => {   // l'article est recréé à chaque affichage : pas d'écouteur en double
+      const b = e.target.closest('[data-lire]'); if (b) { lire(b.dataset.lire, Number(b.dataset.debut) || 0); return; }
+      const c = e.target.closest('[data-choix-video]'); if (!c) return;
+      const v = f.videos[Number(c.dataset.choixVideo)];
+      cadre.innerHTML = facadeVideo(v);
+      const lien = art.querySelector('[data-lien-yt]'); if (lien) lien.href = `https://www.youtube.com/watch?v=${v.yt}`;
+      art.querySelectorAll('[data-choix-video]').forEach((x) => x.classList.toggle('active', x === c));
+    });
   }
 
   /* =====================================================================

@@ -99,7 +99,8 @@
           <p>Aucune clause des présentes ne limite les droits que la loi reconnaît au consommateur, ni la responsabilité de ZETools en cas de faute lourde, de dol ou de dommage corporel.</p>`],
         ['Article 21. Données personnelles', `<p>ZETools traite les données personnelles des membres dans les conditions décrites dans la politique de confidentialité.</p>`],
         ['Article 22. Propriété intellectuelle', `<p>La marque, le logo, la charte graphique et les logiciels de la plateforme appartiennent à ZETools. Le membre conserve ses droits sur ses photos et ses textes ; il accorde à ZETools une licence gratuite et non exclusive de reproduction et de représentation, pour le monde entier et pour la durée de publication de l’annonce, aux seules fins d’exploiter et de promouvoir la plateforme.</p>
-          <p>Les fiches techniques peuvent être téléchargées, imprimées et partagées gratuitement pour un usage personnel, sans modification et avec la mention de ZETools. Toute exploitation commerciale est soumise à autorisation.</p>`],
+          <p>Les fiches techniques peuvent être téléchargées, imprimées et partagées gratuitement pour un usage personnel, sans modification et avec la mention de ZETools. Toute exploitation commerciale est soumise à autorisation.</p>
+          <p>Les vidéos présentées avec les fiches proviennent de chaînes tierces citées sur chaque fiche. Elles sont intégrées depuis YouTube, jamais copiées ; elles restent la propriété de leurs auteurs, qui peuvent les retirer à tout moment, et n’engagent pas ZETools. Elles peuvent différer des étapes de la fiche, qui seule fait référence.</p>`],
         ['Article 23. Durée, résiliation, modification', `<p>Le contrat est conclu pour une durée indéterminée. Le membre peut clôturer son compte à tout moment, depuis son espace, sans frais ; les transactions en cours vont à leur terme.</p>
           <p>ZETools peut modifier les présentes conditions. Les membres en sont informés par courrier électronique au moins 15 jours avant l’entrée en vigueur. Le membre qui refuse la modification peut clôturer son compte.</p>`],
         ['Article 24. Réclamations et médiation', `<p>Toute réclamation est adressée à ${AC('adresse du service clients')}. ZETools y répond dans un délai de 30 jours.</p>
@@ -198,7 +199,9 @@
           <tr><td>Strictement nécessaires</td><td>Connexion, panier, sécurité, mémorisation de vos choix</td><td>Non requis</td></tr>
           <tr><td>Mesure d’audience</td><td>Statistiques de fréquentation</td><td>Requis, sauf outil exempté configuré selon les recommandations de la CNIL</td></tr>
           <tr><td>Contenus tiers</td><td>Fonds de carte, vidéos d’illustration : votre adresse IP est transmise au fournisseur</td><td>Requis, ou hébergement des contenus par ZETools</td></tr>
+          <tr><td>Vidéos des fiches techniques</td><td>Lecteur YouTube, en mode de confidentialité renforcée (youtube-nocookie.com)</td><td>Rien n’est chargé avant votre clic sur « Lire la vidéo » ; ce clic vaut consentement aux cookies de YouTube pour cette vidéo</td></tr>
           <tr><td>Publicité</td><td>Aucun à ce jour</td><td>Requis le cas échéant</td></tr></table>
+          <p>Les vidéos des fiches techniques sont fournies par YouTube, service de Google Ireland Limited, dont la propre politique de confidentialité s’applique dès la lecture. Des données peuvent alors être transférées aux États-Unis : ${AC('base du transfert à confirmer, par exemple certification de Google LLC au Data Privacy Framework UE–États-Unis')}.</p>
           <p>Vous pouvez accepter ou refuser les traceurs, aussi simplement l’un que l’autre, et modifier votre choix à tout moment par le lien « Gérer mes cookies » en bas de page.</p>`],
         ['11. Modification', `<p>Cette politique peut évoluer. La date de mise à jour figure en tête de page ; les modifications importantes vous sont notifiées.</p>`],
       ] },

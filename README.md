@@ -9,7 +9,7 @@ Plateforme communautaire et sécurisée pour **acheter, louer ou échanger des o
 - **Un seul fichier, à envoyer ou ouvrir n’importe où :** `dist/zetools-maquette.html`
 - **Version de travail :** `index.html`, ouvert dans un navigateur.
 - **Assembler à nouveau la version en un fichier :** `./assembler.sh`
-- **Tests de la logique (138 tests) :** `node tests/tester.js`
+- **Tests de la logique (141 tests) :** `node tests/tester.js`
 
 ## Ce que la maquette montre
 

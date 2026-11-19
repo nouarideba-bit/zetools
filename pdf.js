@@ -83,7 +83,8 @@
   }
 
   /** Construit le PDF d'une fiche technique. Retourne le fichier sous forme de chaîne ASCII. */
-  function fichePdf(f, societe) {
+  function fichePdf(f, societe, options) {
+    const opt = options || {};
     const soc = societe || { nom: 'ZETools', siege: '58 rue de Ponthieu, 75008 Paris' };
     const pages = []; let ops = []; let y = 0;
     const texte = (t, x, yy, taille, gras, rgb) => ops.push(`BT /${gras ? 'F2' : 'F1'} ${taille} Tf ${rgb || '0.11 0.13 0.15'} rg ${x.toFixed(1)} ${yy.toFixed(1)} Td ${chaine(t)} Tj ET`);
@@ -140,6 +141,25 @@
     paragraphe(f.titre, 20, true); y -= 4;
     paragraphe(`Niveau : ${f.niveau}  |  Durée : ${f.duree}  |  Budget : ${f.budget}`, 10, false, 0, '0.35 0.38 0.42'); y -= 6;
     paragraphe(f.resume, 11, false); 
+    // encart vidéo : QR code vers la fiche en ligne, qui porte la vidéo
+    const QR = racine.ZT_QR || (typeof require === 'function' ? require('./qr.js') : null);
+    if (opt.url && QR) {
+      const m = QR.qrMatrice(opt.url), nq = m.length, cote = 74, s = cote / (nq + 8), hb = cote + 12;
+      place(hb + 14); y -= 4;
+      const haut = y + 8;
+      rect(MARGE, haut - hb, LARGEUR, hb, '1 0.96 0.84');
+      const x0 = MARGE + 6, y0 = haut - 6;
+      rect(x0, y0 - cote, cote, cote, '1 1 1');
+      const mods = [];
+      m.forEach((l, r) => l.forEach((c, k) => { if (c) mods.push(`${n(x0 + (k + 4) * s)} ${n(y0 - (r + 5) * s)} ${n(s)} ${n(s)} re`); }));
+      ops.push(`q 0 0 0 rg ${mods.join(' ')} f Q`);
+      const xt = x0 + cote + 14, lt = LARGEUR - cote - 32; let yt = haut - 22;
+      texte('La fiche en vidéo', xt, yt, 13, true); yt -= 17;
+      couper('Scannez ce code avec votre téléphone : la fiche s’ouvre sur ZETools avec sa vidéo pas à pas, à suivre pendant le travail.', 10, false, lt).forEach((l) => { texte(l, xt, yt, 10, false); yt -= 13; });
+      const v = (f.videos || [])[0];
+      if (v) couper(`Vidéo : « ${v.titre} », ${v.chaine}, sur YouTube.`, 8.5, false, lt).forEach((l) => { texte(l, xt, yt, 8.5, false, '0.35 0.38 0.42'); yt -= 11; });
+      y = haut - hb - 10;
+    }
     titreSection('Outils nécessaires'); liste(f.outils.map((o) => o.nom));
     if ((f.materiaux || []).length) { titreSection('Matériaux et fournitures'); liste(f.materiaux); }
     titreSection('Étapes'); etapes(f.etapes, f.pictos);
