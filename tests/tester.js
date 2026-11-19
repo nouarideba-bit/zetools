@@ -268,14 +268,15 @@ test('service refusé : sans titre, sans tarif, unité ou code postal invalides'
 });
 test('devis à l’heure : frais client 8 %, commission 12 %', () => {
   const d = Z.devisService(SV, 3);
-  assert.deepStrictEqual([d.heures, d.base, d.fraisService, d.total, d.commission, d.versementPrestataire], [3, 66, 5.28, 71.28, 7.92, 58.08]);
+  assert.deepStrictEqual([d.heures, d.base, d.fraisService, d.total, d.commission], [3, 66, 5.28, 71.28, 7.92]);
+  assert.strictEqual(Z.devisService(Object.assign({}, SV, { assurePlateforme: false }), 3).versementPrestataire, 58.08);
 });
 test('devis : durée minimum du prestataire et 8 h au plus', () => {
   const x = Object.assign({}, SV, { dureeMin: 2 });
   assert.strictEqual(Z.devisService(x, 1).heures, 2); assert.strictEqual(Z.devisService(x, 20).heures, 8); assert.strictEqual(Z.devisService(x).heures, 2);
 });
 test('devis au forfait : prix fixe quelle que soit la durée demandée', () => { const f = D.SERVICES.find((x) => x.unite === 'forfait'); const d = Z.devisService(f, 5); assert.strictEqual(d.base, f.tarif); assert.strictEqual(d.heures, f.dureeForfait); assert.strictEqual(d.forfait, true); });
-test('artisan abonné : aucune commission', () => { const d = Z.devisService(SV, 2, { abonne: true }); assert.strictEqual(d.commission, 0); assert.strictEqual(d.versementPrestataire, 44); });
+test('artisan abonné : aucune commission', () => { const d = Z.devisService(Object.assign({}, SV, { assurePlateforme: false }), 2, { abonne: true }); assert.strictEqual(d.commission, 0); assert.strictEqual(d.versementPrestataire, 44); });
 test('recherche de services par métier, mot et lieu', () => {
   assert.ok(Z.filtrerServices(D.SERVICES, { metier: 'jardin' }).every((x) => x.metier === 'jardin')); assert.strictEqual(Z.filtrerServices(D.SERVICES, { q: 'meubles' })[0].id, 's1');
   assert.strictEqual(Z.filtrerServices(D.SERVICES, { lieu: '94' }).length, D.SERVICES.filter((x) => x.cp.startsWith('94')).length); assert.strictEqual(Z.filtrerServices(D.SERVICES, { q: 'zzz' }).length, 0);
@@ -289,6 +290,21 @@ test('une prestation réservée est un rendez-vous de type « service »', () =>
   const r = { id: 'rs', type: 'service', objet: SV.titre, creneaux: ['2026-11-21T10:00'], dureeHeures: 2 };
   assert.ok(Z.verifierProposition(r, M).ok); assert.strictEqual(Z.confirmerRdv(r, '2026-11-21T10:00').rdv.statut, 'confirmé'); assert.match(Z.versIcs(Object.assign({}, r, { creneau: '2026-11-21T10:00' })), /Prestation de service/);
 });
+
+console.log('Assurance des services');
+const PART = D.SERVICES.find((x) => !x.siret && !x.assurePlateforme), PRO = D.SERVICES.find((x) => x.siret), ASSURE = D.SERVICES.find((x) => x.assurePlateforme);
+test('sans case cochée : aucune assurance facturée', () => { const d = Z.devisService(PART, 2); assert.strictEqual(d.assurance, 0); assert.strictEqual(d.total, Z.devisService(PART, 2, { assurance: false }).total); });
+test('« Je prends l’assurance » : 6 % du prix, 2 € minimum, ajoutés au total', () => {
+  const d = Z.devisService(PRO, 3, { assurance: true }); assert.strictEqual(d.assurance, 8.1); assert.strictEqual(d.total, 153.9);
+  assert.strictEqual(Z.devisService(PART, 1, { assurance: true }).assurance, 2.1); assert.strictEqual(Z.devisService(Object.assign({}, PART, { tarif: 20 }), 1, { assurance: true }).assurance, 2);
+});
+test('particulier sans assurance : le client est averti', () => { const c = Z.devisService(PART, 1).couverture; assert.strictEqual(c.assure, false); assert.match(c.message, /non assurée/); });
+test('particulier + assurance du client : prestation couverte', () => { const c = Z.devisService(PART, 1, { assurance: true }).couverture; assert.strictEqual(c.assure, true); assert.match(c.message, /votre assurance dommages/); });
+test('professionnel : couvert par sa responsabilité civile professionnelle', () => assert.match(Z.devisService(PRO, 2).couverture.message, /professionnelle/));
+test('prestataire assuré par ZETools : 4 % déduits de son versement, rien de plus pour le client', () => {
+  const d = Z.devisService(ASSURE, 3); assert.strictEqual(d.cotisationPrestataire, 2.64); assert.strictEqual(d.versementPrestataire, 55.44); assert.strictEqual(d.total, 71.28); assert.strictEqual(d.couverture.assure, true);
+});
+test('l’assurance du client ne change pas le versement du prestataire', () => assert.strictEqual(Z.devisService(PART, 2, { assurance: true }).versementPrestataire, Z.devisService(PART, 2).versementPrestataire));
 
 console.log('Fiches techniques et PDF');
 const PDF = require('../pdf.js');
