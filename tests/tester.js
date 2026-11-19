@@ -348,5 +348,25 @@ test('les tarifs des conditions suivent les règles de la plateforme', () => {
   assert.match(pros, /39 € hors taxes par mois/); assert.match(pros, /390 € hors taxes par an/);
 });
 
+const PDFM = require('../pdf.js'); const DM = require('../donnees.js');
+test('chaque étape de chaque fiche a un pictogramme connu', () => {
+  for (const f of DM.FICHES) { assert.strictEqual(f.pictos.length, f.etapes.length, f.id); for (const k of f.pictos) assert.ok(PDFM.PICTOS[k], k); }
+});
+test('PDF : marque ZETOOLS et logo sur chaque page, pictogrammes dessinés', () => {
+  for (const f of DM.FICHES) {
+    const pdf = PDFM.fichePdf(f); const pages = pdf.split('/Type /Page ').length - 1;
+    assert.ok(pages >= 1, f.id);
+    const flux = pdf.split('stream').filter((_, i) => i % 2 === 1);
+    const contenus = flux.filter((c) => /BT/.test(c));
+    assert.strictEqual(contenus.length, pages, f.id);
+    for (const c of contenus) { assert.match(c, /\(TOOLS\) Tj/); assert.strictEqual((c.match(/0\.96 0\.72 0 RG/g) || []).length, 2, f.id + ' : logo en tête et en pied'); }
+    assert.ok(!/The Tools/i.test(pdf), f.id);
+  }
+});
+test('logo et pictogrammes SVG valides', () => {
+  assert.match(PDFM.logoSvg(), /^<svg[^>]+viewBox="0 0 100 100".*<\/svg>$/);
+  for (const k of Object.keys(PDFM.PICTOS)) assert.match(PDFM.pictoSvg(k), /^<svg class="picto".*<\/svg>$/);
+});
+
 console.log(`\n${ok} réussis, ${ko} échoués`);
 process.exit(ko ? 1 : 0);
