@@ -462,5 +462,25 @@ test('vidéothèque : identifiants YouTube valides, sans doublon, thèmes connus
   D.VIDEOS_TUTOS.filter((v) => v.urgence).forEach((v) => assert.ok(D.TYPES_URGENCE.some((t) => t.id === v.urgence)));
 });
 
+test('mécanique auto / moto : au moins 10 annonces, thermique et électrique', () => {
+  const m = D.ANNONCES.filter((a) => a.categorie === 'meca');
+  assert.ok(m.length >= 10, m.length + ' annonces');
+  assert.ok(m.some((a) => /électrique|VE|Type 2/.test(a.titre + a.description)));
+  assert.ok(m.some((a) => /moto/i.test(a.titre + a.description)));
+  assert.ok(!m.some((a) => a.photo.includes('1540104539488')), 'la photo de perceuse ne doit plus illustrer la mécanique');
+});
+test('chaque photo d’annonce mécanique est créditée', () => {
+  const ids = D.CREDITS.map((c) => c[2]);
+  D.ANNONCES.filter((a) => a.categorie === 'meca').forEach((a) => assert.ok(ids.some((i) => a.photo.includes(i)), a.id));
+});
+test('onglet Offre : route, lien d’en-tête et tarifs issus des règles', () => {
+  const fs = require('fs'), path = require('path');
+  const app = fs.readFileSync(path.join(__dirname, '../app.js'), 'utf8'), idx = fs.readFileSync(path.join(__dirname, '../index.html'), 'utf8');
+  assert.ok(app.includes("case 'offre': html = vueOffre()"));
+  assert.ok(idx.includes('href="#/offre"'));
+  assert.ok(app.includes('R.fraisServiceLocataire') && app.includes('R.commissionVente'));
+  assert.ok(!app.includes('méritent <em>une seconde vie</em>'), 'ancien slogan retiré');
+});
+
 console.log(`\n${ok} réussis, ${ko} échoués`);
 process.exit(ko ? 1 : 0);
