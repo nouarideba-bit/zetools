@@ -377,3 +377,125 @@ CREATE TABLE journal_audit (                     -- actions sensibles : admin, p
 -- JOIN artisan_metiers am ON am.artisan_id = a.utilisateur_id AND am.metier_id = :metier
 -- WHERE ST_DWithin(a.base, :client, LEAST(a.rayon_km, :rayon_client) * 1000)
 -- ORDER BY km;
+
+-- =====================================================================
+-- Compléments du 19/11/2026 : prix plafonnés, offres de prix, déstockage
+-- des enseignes, agenda de rendez-vous. Même convention : montants en centimes.
+-- =====================================================================
+
+-- ---------- Prix plafonnés (occasion, et neuf entre particuliers) ----------
+-- Le plafond dépend de l'état de l'outil : neuf 70 %, très bon 50 %, bon 40 %, correct 30 %, pour pièces 15 %.
+-- Loyer journalier ≤ 4 % du prix neuf. Le contrôle fin (selon l'état) se fait dans l'API ; la base garde le garde-fou.
+ALTER TABLE annonces ADD COLUMN prix_neuf_reference integer CHECK (prix_neuf_reference > 0);
+ALTER TABLE annonces ADD CONSTRAINT vente_sous_le_neuf   CHECK (prix_vente IS NULL OR prix_neuf_reference IS NULL OR prix_vente * 10 <= prix_neuf_reference * 7);
+ALTER TABLE annonces ADD CONSTRAINT loyer_sous_le_plafond CHECK (prix_jour  IS NULL OR prix_neuf_reference IS NULL OR prix_jour * 100 <= GREATEST(prix_neuf_reference * 4, 20000));
+
+-- ---------- Offres de prix (négociation) ----------
+CREATE TYPE statut_offre AS ENUM ('en_attente', 'contre_offre', 'acceptee', 'refusee', 'expiree', 'payee');
+CREATE TABLE offres_prix (
+  id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  annonce_id    uuid NOT NULL REFERENCES annonces(id),
+  auteur_id     uuid NOT NULL REFERENCES utilisateurs(id),       -- acheteur ou locataire
+  mode          type_transaction NOT NULL CHECK (mode IN ('vente', 'location')),
+  prix_affiche  integer NOT NULL,                                -- figé au moment de l'offre
+  montant       integer NOT NULL CHECK (montant > 0 AND montant < prix_affiche AND montant * 2 >= prix_affiche),
+  contre_offre  integer CHECK (contre_offre > montant AND contre_offre < prix_affiche),
+  prix_convenu  integer,
+  statut        statut_offre NOT NULL DEFAULT 'en_attente',
+  expire_le     timestamptz NOT NULL,                            -- 48 h, renouvelées à chaque réponse
+  transaction_id uuid REFERENCES transactions(id),               -- renseignée au paiement
+  cree_le       timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX ON offres_prix (annonce_id, statut);
+CREATE INDEX ON offres_prix (auteur_id, cree_le DESC);
+-- 3 offres au plus par auteur et par annonce : à contrôler dans l'API.
+
+-- ---------- Déstockage des enseignes (produits neufs ou reconditionnés) ----------
+CREATE TYPE type_enseigne AS ENUM ('gsb', 'negoce', 'fabricant', 'loueur', 'quincaillerie');
+CREATE TABLE enseignes (
+  utilisateur_id  uuid PRIMARY KEY REFERENCES utilisateurs(id),   -- compte professionnel vérifié (profils_pro)
+  type            type_enseigne NOT NULL,
+  nom_commercial  text NOT NULL,
+  contrat_signe_le date,                                          -- contrat-cadre ZETools
+  taux_commission numeric(4,3) NOT NULL DEFAULT 0.080
+);
+CREATE TABLE magasins (
+  id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  enseigne_id uuid NOT NULL REFERENCES enseignes(utilisateur_id),
+  nom         text NOT NULL,
+  adresse     text NOT NULL,
+  code_postal text NOT NULL,
+  position    geography(Point, 4326) NOT NULL
+);
+CREATE INDEX ON magasins USING gist (position);
+CREATE TABLE lots_destockage (
+  id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  enseigne_id     uuid NOT NULL REFERENCES enseignes(utilisateur_id),
+  categorie_id    integer REFERENCES categories(id),
+  titre           text NOT NULL,
+  ean             text,
+  reconditionne   boolean NOT NULL DEFAULT false,
+  motif           text NOT NULL,                                  -- fin de série, surstock, emballage abîmé…
+  prix_reference  integer NOT NULL,                               -- plus bas prix des 30 jours précédents (art. L.112-1-1 C. conso)
+  prix_reference_atteste_le timestamptz NOT NULL,                 -- attestation de l'enseigne, preuve conservée
+  prix_destockage integer NOT NULL CHECK (prix_destockage > 0 AND prix_destockage < prix_reference),
+  max_par_client  smallint NOT NULL DEFAULT 2,
+  debut           date NOT NULL DEFAULT current_date,
+  fin             date NOT NULL CHECK (fin >= debut),
+  statut          statut_annonce NOT NULL DEFAULT 'en_moderation'
+);
+CREATE TABLE lot_stocks (
+  lot_id     uuid NOT NULL REFERENCES lots_destockage(id) ON DELETE CASCADE,
+  magasin_id uuid NOT NULL REFERENCES magasins(id),
+  stock      integer NOT NULL CHECK (stock >= 0),                 -- décrémenté dans la même transaction SQL que la commande
+  PRIMARY KEY (lot_id, magasin_id)
+);
+CREATE TABLE commandes_lots (
+  id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  lot_id       uuid NOT NULL REFERENCES lots_destockage(id),
+  magasin_id   uuid NOT NULL REFERENCES magasins(id),
+  client_id    uuid NOT NULL REFERENCES utilisateurs(id),
+  quantite     smallint NOT NULL CHECK (quantite > 0),
+  total        integer NOT NULL,
+  commission   integer NOT NULL,
+  code_retrait text UNIQUE NOT NULL,
+  retrait_avant date NOT NULL,                                    -- 7 jours
+  retire_le    timestamptz,
+  retracte_le  timestamptz,                                       -- droit de rétractation de 14 jours
+  paiement_ref text,
+  cree_le      timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX ON commandes_lots (client_id, lot_id);
+
+-- ---------- Agenda : rendez-vous pour travaux, échanges, réparations, remises ----------
+CREATE TYPE type_rdv   AS ENUM ('travaux', 'echange', 'reparation', 'remise');
+CREATE TYPE statut_rdv AS ENUM ('propose', 'contre_propose', 'confirme', 'refuse', 'annule', 'honore', 'absence');
+CREATE TABLE rendez_vous (
+  id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  type          type_rdv NOT NULL,
+  auteur_id     uuid NOT NULL REFERENCES utilisateurs(id),
+  invite_id     uuid NOT NULL REFERENCES utilisateurs(id),
+  annonce_id    uuid REFERENCES annonces(id),
+  demande_id    uuid REFERENCES demandes_travaux(id),
+  transaction_id uuid REFERENCES transactions(id),
+  objet         text NOT NULL,
+  lieu          text NOT NULL,                                    -- adresse exacte dévoilée après confirmation
+  duree         interval NOT NULL DEFAULT '1 hour',
+  creneau       tstzrange,                                        -- renseigné à la confirmation
+  statut        statut_rdv NOT NULL DEFAULT 'propose',
+  remplace_id   uuid REFERENCES rendez_vous(id),                  -- contre-proposition
+  annule_par    uuid REFERENCES utilisateurs(id),
+  annule_tardif boolean NOT NULL DEFAULT false,                   -- moins de 24 h avant : mentionné sur le profil
+  cree_le       timestamptz NOT NULL DEFAULT now(),
+  CHECK (auteur_id <> invite_id),
+  CHECK (statut <> 'confirme' OR creneau IS NOT NULL)
+);
+CREATE TABLE rdv_creneaux (                                       -- 1 à 3 créneaux proposés
+  rdv_id uuid NOT NULL REFERENCES rendez_vous(id) ON DELETE CASCADE,
+  debut  timestamptz NOT NULL,
+  PRIMARY KEY (rdv_id, debut)
+);
+-- Un membre ne peut pas avoir deux rendez-vous confirmés qui se chevauchent.
+-- À faire respecter pour l'auteur et pour l'invité (ici : l'auteur ; même contrainte côté invité via un déclencheur).
+ALTER TABLE rendez_vous ADD CONSTRAINT rdv_auteur_sans_chevauchement
+  EXCLUDE USING gist (auteur_id WITH =, creneau WITH &&) WHERE (statut = 'confirme');

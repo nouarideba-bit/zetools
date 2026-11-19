@@ -55,51 +55,51 @@
   // modes : 'vente' | 'location' | 'echange' (une annonce peut en cumuler plusieurs)
   const ANNONCES = [
     { id: 'a1', titre: 'Perceuse-visseuse 18 V + 2 batteries', marque: 'DeWalt', categorie: 'electro', etat: 'Très bon état',
-      modes: ['location', 'vente'], prixJour: 9, prixVente: 145, caution: 120, ville: 'Montreuil', cp: '93100', membre: 'm1',
+      modes: ['location', 'vente'], prixNeuf: 220, prixJour: 6, prixVente: 89, caution: 90, ville: 'Montreuil', cp: '93100', membre: 'm1',
       photo: U('1572981779307-38b8cabb2407'), description: 'Perceuse-visseuse sans fil, mandrin 13 mm, 2 batteries 2 Ah et chargeur rapide. Idéale montage de meubles, fixations murales, perçage bois et métal.',
       indispo: [] },
     { id: 'a2', titre: 'Perforateur SDS+ 800 W avec coffret de forets', marque: 'Bosch', categorie: 'electro', etat: 'Bon état',
-      modes: ['location'], prixJour: 14, prixVente: null, caution: 200, ville: 'Vincennes', cp: '94300', membre: 'm2',
+      modes: ['location'], prixNeuf: 180, prixJour: 6, prixVente: null, caution: 70, ville: 'Vincennes', cp: '94300', membre: 'm2',
       photo: U('1585201731775-0597e1be4bfb'), description: 'Perforateur burineur pour béton et parpaing. Livré avec 6 forets SDS+ et burin plat. Parfait pour un week-end de travaux.',
       indispo: [{ debut: '2026-12-24', fin: '2026-12-26' }] },
     { id: 'a3', titre: 'Visseuse à chocs 18 V compacte', marque: 'Milwaukee', categorie: 'electro', etat: 'Très bon état',
-      modes: ['location', 'echange'], prixJour: 8, prixVente: null, caution: 110, ville: 'Boulogne-Billancourt', cp: '92100', membre: 'm3',
+      modes: ['location', 'echange'], prixNeuf: 150, prixJour: 5, prixVente: null, caution: 60, ville: 'Boulogne-Billancourt', cp: '92100', membre: 'm3',
       photo: U('1623161551706-318825cd18ef'), description: 'Visseuse à chocs pour vis longues et terrasses bois. Recherche en échange : ponceuse excentrique.',
       echangeContre: 'Ponceuse excentrique', indispo: [] },
     { id: 'a4', titre: 'Sécateur de précision + gants', marque: 'Felco', categorie: 'jardin', etat: 'Neuf',
-      modes: ['vente', 'echange'], prixJour: null, prixVente: 38, caution: 0, ville: 'Nogent-sur-Marne', cp: '94130', membre: 'm5',
+      modes: ['vente', 'echange'], prixNeuf: 45, prixJour: null, prixVente: 29, caution: 0, ville: 'Nogent-sur-Marne', cp: '94130', membre: 'm5',
       photo: U('1523301551780-cd17359a95d0'), description: 'Sécateur à lame forgée, jamais utilisé, avec gants de jardinage taille 9.',
       echangeContre: 'Cisaille à haies manuelle', indispo: [] },
     { id: 'a5', titre: 'Brouette renforcée 100 L', marque: 'Haemmerlin', categorie: 'chantier', etat: 'Bon état',
-      modes: ['location', 'vente'], prixJour: 5, prixVente: 45, caution: 40, ville: 'Saint-Maur-des-Fossés', cp: '94100', membre: 'm4',
+      modes: ['location', 'vente'], prixNeuf: 75, prixJour: 3, prixVente: 25, caution: 25, ville: 'Saint-Maur-des-Fossés', cp: '94100', membre: 'm4',
       photo: U('1621272156506-cdbdb6a47243'), description: 'Brouette de chantier, roue gonflée neuve. Pratique pour un déménagement de terre ou un petit chantier de maçonnerie.',
       indispo: [] },
     { id: 'a6', titre: 'Lot de 4 outils de jardin à main', marque: 'Fiskars', categorie: 'jardin', etat: 'Très bon état',
-      modes: ['vente'], prixJour: null, prixVente: 25, caution: 0, ville: 'Montreuil', cp: '93100', membre: 'm1',
+      modes: ['vente'], prixNeuf: 40, prixJour: null, prixVente: 15, caution: 0, ville: 'Montreuil', cp: '93100', membre: 'm1',
       photo: U('1526381805515-3fec2d69e7cc'), description: 'Transplantoir, griffe, binette et serfouette. Manches bois, rangement mural inclus.',
       indispo: [] },
     { id: 'a7', titre: 'Pelles et bêches de terrassement (×3)', marque: 'Leborgne', categorie: 'chantier', etat: 'Bon état',
-      modes: ['location'], prixJour: 6, prixVente: null, caution: 50, ville: 'Nogent-sur-Marne', cp: '94130', membre: 'm5',
+      modes: ['location'], prixNeuf: 90, prixJour: 3, prixVente: null, caution: 30, ville: 'Nogent-sur-Marne', cp: '94130', membre: 'm5',
       photo: U('1537877853655-34bdcda5e833'), description: 'Une pelle ronde, une pelle carrée et une bêche. Pour une plantation de haie ou une tranchée.',
       indispo: [] },
     { id: 'a8', titre: 'Coffret d’outils d’ébéniste anciens', marque: 'Peugeot Frères', categorie: 'main', etat: 'Bon état',
-      modes: ['echange', 'vente'], prixJour: null, prixVente: 90, caution: 0, ville: 'Vincennes', cp: '94300', membre: 'm2',
+      modes: ['echange', 'vente'], prixNeuf: 200, prixJour: null, prixVente: 60, caution: 0, ville: 'Vincennes', cp: '94300', membre: 'm2',
       photo: U('1774963711952-713bb7a52c4e'), description: 'Rabots, ciseaux à bois et vilebrequin restaurés. Échange possible contre une scie sur table.',
       echangeContre: 'Scie sur table', indispo: [] },
     { id: 'a9', titre: 'Taille-haie / élagage : kit de taille', marque: 'Wolf-Garten', categorie: 'jardin', etat: 'Très bon état',
-      modes: ['location'], prixJour: 7, prixVente: null, caution: 60, ville: 'Boulogne-Billancourt', cp: '92100', membre: 'm3',
+      modes: ['location'], prixNeuf: 160, prixJour: 5, prixVente: null, caution: 60, ville: 'Boulogne-Billancourt', cp: '92100', membre: 'm3',
       photo: U('1617576683096-00fc8eecb3af'), description: 'Cisaille à haies, sécateur de force et gants. La bonne trousse pour la taille d’automne.',
       indispo: [] },
     { id: 'a10', titre: 'Servante d’atelier garnie 120 pièces', marque: 'Facom', categorie: 'meca', etat: 'Bon état',
-      modes: ['vente', 'location'], prixJour: 12, prixVente: 390, caution: 300, ville: 'Saint-Maur-des-Fossés', cp: '94100', membre: 'm4',
+      modes: ['vente', 'location'], prixNeuf: 650, prixJour: 10, prixVente: 229, caution: 200, ville: 'Saint-Maur-des-Fossés', cp: '94100', membre: 'm4',
       photo: U('1540104539488-92a51bbc0410'), description: 'Servante 6 tiroirs : douilles, clés mixtes, tournevis, pinces. Pour une révision moto ou une vidange.',
       indispo: [] },
     { id: 'a11', titre: 'Visseuse 18 V : batterie HS, pour bricoleur', marque: 'Makita', categorie: 'electro', etat: 'À réparer',
-      modes: ['vente', 'echange'], prixJour: null, prixVente: 25, caution: 0, ville: 'Vincennes', cp: '94300', membre: 'm2',
+      modes: ['vente', 'echange'], prixNeuf: 120, prixJour: null, prixVente: 15, caution: 0, ville: 'Vincennes', cp: '94300', membre: 'm2',
       photo: U('1623161551727-54c918bdcec1'), description: 'Moteur et mandrin OK, la batterie ne tient plus la charge. Idéal pour qui a déjà des batteries Makita 18 V.',
       panne: 'Batterie à remplacer', echangeContre: 'Batterie 18 V', indispo: [] },
     { id: 'a12', titre: 'Lot d’outils anciens à restaurer', marque: 'Divers', categorie: 'main', etat: 'À réparer',
-      modes: ['vente'], prixJour: null, prixVente: 15, caution: 0, ville: 'Nogent-sur-Marne', cp: '94130', membre: 'm5',
+      modes: ['vente'], prixNeuf: 100, prixJour: null, prixVente: 10, caution: 0, ville: 'Nogent-sur-Marne', cp: '94130', membre: 'm5',
       photo: U('1774365294150-5d6051b6c53a'), description: 'Râteaux et outils de jardin anciens : manches à changer, métal sain. Pour amateur de restauration.',
       panne: 'Manches cassés, rouille de surface', indispo: [] },
   ];
@@ -216,7 +216,51 @@
 
   PHOTOS.artisans = U('1621905251918-48416bd8575a', 1400);
 
-  const D = { PHOTOS, VIDEOS, CATEGORIES, MEMBRES, ANNONCES, RESERVATIONS, ARTICLES, CREDITS, METIERS, ARTISANS, DEMANDES };
+
+  // Déstockage enseignes : noms d'enseignes FICTIFS (maquette publique, aucune marque réelle de distributeur).
+  // Types d'acteurs visés : grandes surfaces de bricolage, négoces de matériaux, fabricants, loueurs, quincailleries.
+  const TYPES_ENSEIGNE = { gsb: 'Grande surface de bricolage', negoce: 'Négoce de matériaux', fabricant: 'Fabricant', loueur: 'Loueur de matériel', quincaillerie: 'Quincaillerie' };
+  const ENSEIGNES = [
+    { id: 'e1', nom: 'Brico Horizon', type: 'gsb', siret: true, magasins: 6, logo: '🏬' },
+    { id: 'e2', nom: 'Matériaux du Val', type: 'negoce', siret: true, magasins: 3, logo: '🧱' },
+    { id: 'e3', nom: 'Forgeval Outillage', type: 'fabricant', siret: true, magasins: 1, logo: '🏭' },
+    { id: 'e4', nom: 'Location Chantier Plus', type: 'loueur', siret: true, magasins: 4, logo: '🚚' },
+  ];
+  const LOTS = [
+    { id: 'l1', enseigne: 'e1', titre: 'Perceuse-visseuse 18 V, 2 batteries, coffret', categorie: 'electro', photo: U('1572981779307-38b8cabb2407'),
+      prixReference: 149, prixDestockage: 69, motif: 'Fin de série', fin: '2026-12-20',
+      magasins: [{ nom: 'Brico Horizon Montreuil', cp: '93100', stock: 14 }, { nom: 'Brico Horizon Créteil', cp: '94000', stock: 9 }] },
+    { id: 'l2', enseigne: 'e1', titre: 'Taille-haie électrique 600 W, lame 55 cm', categorie: 'jardin', photo: U('1617576683096-00fc8eecb3af'),
+      prixReference: 99, prixDestockage: 45, motif: 'Fin de saison', fin: '2026-12-31',
+      magasins: [{ nom: 'Brico Horizon Nanterre', cp: '92000', stock: 22 }] },
+    { id: 'l3', enseigne: 'e2', titre: 'Brouette de chantier 100 L, roue gonflée', categorie: 'chantier', photo: U('1621272156506-cdbdb6a47243'),
+      prixReference: 89, prixDestockage: 39, motif: 'Surstock', fin: '2027-01-15',
+      magasins: [{ nom: 'Matériaux du Val Vitry', cp: '94400', stock: 40 }, { nom: 'Matériaux du Val Ivry', cp: '94200', stock: 18 }] },
+    { id: 'l4', enseigne: 'e3', titre: 'Servante d’atelier 7 tiroirs garnie 150 pièces', categorie: 'meca', photo: U('1540104539488-92a51bbc0410'),
+      prixReference: 699, prixDestockage: 349, motif: 'Emballage abîmé, produit neuf', fin: '2026-12-15',
+      magasins: [{ nom: 'Forgeval, dépôt usine Gennevilliers', cp: '92230', stock: 6 }] },
+    { id: 'l5', enseigne: 'e4', titre: 'Perforateur SDS+ 800 W, sorti du parc de location, révisé', categorie: 'electro', photo: U('1585201731775-0597e1be4bfb'),
+      prixReference: 189, prixDestockage: 79, motif: 'Renouvellement du parc', fin: '2027-01-31', reconditionne: true,
+      magasins: [{ nom: 'Location Chantier Plus Saint-Denis', cp: '93200', stock: 11 }] },
+    { id: 'l6', enseigne: 'e2', titre: 'Lot de 3 pelles et bêches de terrassement', categorie: 'chantier', photo: U('1537877853655-34bdcda5e833'),
+      prixReference: 75, prixDestockage: 29, motif: 'Changement de référence', fin: '2026-12-31',
+      magasins: [{ nom: 'Matériaux du Val Vitry', cp: '94400', stock: 25 }] },
+  ];
+
+  // Rendez-vous reçus en démonstration (proposés par d'autres membres)
+  const RDV_DEMO = [
+    { id: 'r-demo-1', type: 'echange', sens: 'recu', avec: 'm3', objet: 'Échange ponceuse contre visseuse à chocs', annonceId: 'a3',
+      creneaux: ['2026-11-28T10:00', '2026-11-28T14:00', '2026-11-30T18:00'], dureeHeures: 1, lieu: 'Lieu public proche (parvis de la mairie conseillé)', statut: 'proposé',
+      message: 'Je peux samedi matin ou lundi soir, dites-moi ce qui vous arrange.' },
+  ];
+
+  // Offres de prix reçues en démonstration (sur des annonces fictives du compte de démonstration)
+  const OFFRES_DEMO = [
+    { id: 'o-demo-1', sens: 'recue', avec: 'm2', titre: 'Votre scie sauteuse 650 W', mode: 'vente', prixAffiche: 45, montant: 32, statut: 'en attente', expire: '2026-12-31T20:00' },
+    { id: 'o-demo-2', sens: 'recue', avec: 'm1', titre: 'Votre échelle télescopique 3,80 m', mode: 'location', prixAffiche: 5, montant: 4, statut: 'en attente', expire: '2026-12-31T20:00' },
+  ];
+
+  const D = { PHOTOS, VIDEOS, CATEGORIES, MEMBRES, ANNONCES, RESERVATIONS, ARTICLES, CREDITS, METIERS, ARTISANS, DEMANDES, TYPES_ENSEIGNE, ENSEIGNES, LOTS, RDV_DEMO, OFFRES_DEMO };
   if (typeof module !== 'undefined' && module.exports) module.exports = D;
   else racine.ZT_DONNEES = D;
 })(typeof window !== 'undefined' ? window : globalThis);

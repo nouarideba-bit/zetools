@@ -12,6 +12,9 @@
     reservations: [],
     favoris: [],
     annonces: [],
+    lots: [], stocks: {}, retraits: [], enseigne: null,
+    rdv: window.ZT_DONNEES.RDV_DEMO.map((r) => Object.assign({}, r)),
+    offres: window.ZT_DONNEES.OFFRES_DEMO.map((o) => Object.assign({}, o)),
     conversations: [
       { id: 'c1', annonceId: 'a2', avec: 'm2', confirmee: false, messages: [
         { de: 'moi', texte: 'Bonjour, le perforateur est-il disponible le week-end du 13 décembre ?' },
@@ -54,6 +57,12 @@
     if (a.modes.includes('vente')) return Z.euros(a.prixVente);
     return '<small>Troc · contre</small> ' + esc(a.echangeContre || 'à proposer');
   }
+  // « −60 % vs neuf » : l'occasion reste toujours bien en dessous du prix magasin
+  function ligneNeuf(a) {
+    if (!a.prixNeuf) return '';
+    const r = a.modes.includes('vente') ? Z.remiseSurNeuf(a.prixVente, a.prixNeuf) : 0;
+    return `<div class="neuf">${r ? `<span class="remise">−${r} %</span> ` : ''}Neuf : <s>${Z.euros(a.prixNeuf)}</s></div>`;
+  }
   function carte(a) {
     const m = membre(a.membre); const fav = etat.favoris.includes(a.id);
     return `<a class="carte" href="#/annonce/${a.id}">
@@ -61,7 +70,7 @@
         <div class="badges">${badges(a)}</div>
         <button class="coeur" data-fav="${a.id}" aria-label="Ajouter aux favoris">${fav ? '❤️' : '♡'}</button></div>
       <div class="infos"><span class="badge badge-etat" style="align-self:start">${esc(a.etat)}</span>
-        <h3>${esc(a.titre)}</h3><div class="prix">${prixPrincipal(a)}</div>
+        <h3>${esc(a.titre)}</h3><div class="prix">${prixPrincipal(a)}</div>${ligneNeuf(a)}
         <div class="meta"><span>📍 ${esc(a.ville)}</span><span>★ ${m.note.toFixed(1)} (${m.avis})</span></div></div></a>`;
   }
   document.addEventListener('click', (e) => {
@@ -139,6 +148,11 @@
     </div></section>
 
     <section class="bloc" style="padding-top:0"><div class="conteneur">
+      <div class="titre-section"><div><div class="surtitre">Déstockage des enseignes</div><h2>Du neuf à prix cassés, retiré en magasin</h2><p>Fins de série et surstocks des grandes surfaces de bricolage, négoces, fabricants et loueurs.</p></div><a class="btn btn-contour" href="#/destockage">Voir tout le déstockage</a></div>
+      <div class="grille">${lotsActifs().slice(0, 4).map(carteLot).join('')}</div>
+    </div></section>
+
+    <section class="bloc" style="padding-top:0"><div class="conteneur">
       <div class="titre-section"><div><div class="surtitre">Travaux et réparation</div><h2>Vous avez l’outil, il vous manque la main ?</h2><p>Des artisans géolocalisés près de chez vous, et des réparateurs pour les outils en panne.</p></div></div>
       <div class="modes">
         <div class="mode"><img src="${PHOTOS.artisans}" alt="Artisan au travail"><div class="corps"><h3>📍 Trouver un artisan</h3><p>Petits, moyens ou gros travaux : publiez votre demande gratuitement, les artisans abonnés de votre secteur vous répondent, classés par distance.</p><a class="lien" href="#/travaux">Voir les artisans autour de moi →</a></div></div>
@@ -212,7 +226,7 @@
   /* --- fiche outil : réservation, achat, échange --- */
   let selection = { debut: null, fin: null, mois: null, onglet: null, assurance: true };
   function vueFiche(id) {
-    const a = annonce(id);
+    const a = Z.appliquerOffres(annonce(id), etat.offres, maintenant());
     if (!a) return '<div class="page"><div class="conteneur vide">Annonce introuvable. <a href="#/annonces">Retour aux annonces</a></div></div>';
     const m = membre(a.membre);
     if (selection.id !== id) selection = { id, debut: null, fin: null, mois: AUJOURDHUI.slice(0, 7), onglet: a.modes[0], assurance: true };
@@ -225,6 +239,7 @@
             <h2 style="margin-top:0">Description</h2><p>${esc(a.description)}</p>
             <div class="ligne"><span>Marque</span><b>${esc(a.marque)}</b></div>
             <div class="ligne"><span>État</span><b>${esc(a.etat)}</b></div>
+            ${a.prixNeuf ? `<div class="ligne"><span>Prix neuf de référence</span><b>${Z.euros(a.prixNeuf)}${a.modes.includes('vente') && Z.remiseSurNeuf(a.prixVente, a.prixNeuf) ? ` · vente à −${Z.remiseSurNeuf(a.prixVente, a.prixNeuf)} %` : ''}</b></div>` : ''}
             <div class="ligne"><span>Catégorie</span><b>${catNom(a.categorie)}</b></div>
             ${a.echangeContre ? `<div class="ligne"><span>Échange recherché</span><b>${esc(a.echangeContre)}</b></div>` : ''}
             <div class="ligne"><span>Remise</span><b>📍 ${esc(a.ville)} (${esc(a.cp)}) · adresse exacte après paiement</b></div>
@@ -243,6 +258,20 @@
       </div></div></div>`;
   }
 
+  // « Proposer mon prix » : offre en attente, contre-offre, prix négocié ou formulaire
+  function blocOffre(a, mode) {
+    const unite = mode === 'location' ? ' / jour' : '';
+    const affiche = mode === 'vente' ? a.prixVenteAffiche : a.prixJourAffiche;
+    if (affiche) return `<div class="alerte alerte-ok">🤝 Prix négocié accepté : <b>${Z.euros(mode === 'vente' ? a.prixVente : a.prixJour)}${unite}</b> au lieu de ${Z.euros(affiche)}. Offre valable 48 h.</div>`;
+    const mes = etat.offres.filter((x) => x.sens === 'envoyee' && x.annonceId === a.id && x.mode === mode);
+    const enCours = mes.find((x) => ['en attente', 'contre-offre'].includes(x.statut) && !Z.offreExpiree(x, maintenant()));
+    if (enCours) return `<div class="alerte alerte-info">🤝 ${enCours.statut === 'contre-offre' ? `Le propriétaire vous propose <b>${Z.euros(enCours.contre)}${unite}</b>.` : `Votre offre de <b>${Z.euros(enCours.montant)}${unite}</b> attend la réponse du propriétaire.`} <a href="#/offres">Voir mes offres</a></div>`;
+    const mini = Math.ceil((mode === 'vente' ? a.prixVente : a.prixJour) * Z.REGLES.offres.plancher * 2) / 2;
+    if (mes.length >= Z.REGLES.offres.maxParAnnonce) return '<div class="alerte alerte-info">Vous avez atteint le nombre maximum d’offres pour cette annonce.</div>';
+    return `<div class="bloc-offre"><b>🤝 Proposer mon prix</b>
+      <div class="offre-saisie"><input type="number" id="montant-offre" min="${mini}" step="0.5" placeholder="Votre prix${unite} (min. ${Z.euros(mini)})" aria-label="Votre prix"><button class="btn btn-contour" data-action="offrir" data-mode="${mode}">Envoyer l’offre</button></div>
+      <span class="discret">Le propriétaire a 48 h pour accepter, refuser ou vous faire une contre-proposition. Rien n’est débité avant son accord.</span></div>`;
+  }
   function zoneTransaction(a) {
     const o = selection.onglet;
     if (o === 'vente') {
@@ -251,13 +280,15 @@
         <div class="ligne discret"><span>Protection acheteur (séquestre)</span><span>incluse</span></div>
         <div class="ligne total"><span>Vous payez</span><span>${Z.euros(d.prix)}</span></div>
         <div class="alerte alerte-info">Le vendeur reçoit ${Z.euros(d.versementVendeur)} une fois la remise confirmée (commission ZETOOLS ${Z.euros(d.commission)}).</div>
-        <button class="btn btn-cta" style="width:100%" data-action="acheter">Acheter avec paiement sécurisé</button>`;
+        <button class="btn btn-cta" style="width:100%" data-action="acheter">Acheter avec paiement sécurisé</button>
+        ${blocOffre(a, 'vente')}`;
     }
     if (o === 'echange') {
       return `<p>Le propriétaire cherche : <b>${esc(a.echangeContre || 'à discuter')}</b>.</p>
         <label style="display:flex;flex-direction:column;gap:6px;font-weight:600">Votre proposition<textarea id="proposition" rows="3" style="border:1px solid var(--bord);border-radius:8px;padding:10px" placeholder="Ex. : ponceuse excentrique Makita, très bon état, avec 20 disques"></textarea></label>
         <div class="ligne discret"><span>Frais de mise en relation, par partie</span><span>${Z.euros(Z.REGLES.fraisEchange)}</span></div>
-        <button class="btn btn-vert" style="width:100%;margin-top:10px" data-action="echanger">Proposer l’échange</button>`;
+        <button class="btn btn-vert" style="width:100%;margin-top:10px" data-action="echanger">Proposer l’échange</button>
+        <a class="btn btn-contour" style="width:100%;margin-top:8px" href="#/rendez-vous?type=echange&annonce=${a.id}">📅 Proposer des dates et heures d’échange</a>`;
     }
     // location
     let detail = '';
@@ -280,7 +311,7 @@
     }
     return `<div class="ligne"><span>Tarif</span><b>${Z.euros(a.prixJour)} / jour</b></div>
       <div class="ligne discret"><span>-10 % dès 3 jours · -20 % dès 7 jours</span><span></span></div>
-      ${calendrier(a)}${detail}`;
+      ${calendrier(a)}${detail}${blocOffre(a, 'location')}`;
   }
 
   function calendrier(a) {
@@ -341,6 +372,13 @@
         sauver();
         toast(`Réservation confirmée (simulation) : ${Z.euros(d.totalLocataire)} payés, caution de ${Z.euros(d.caution)} bloquée.`);
         selection.debut = selection.fin = null; aller('#/mon-espace');
+      } else if (act.dataset.action === 'offrir') {
+        const mode = act.dataset.mode; const montant = Number(document.getElementById('montant-offre').value);
+        const base = annonce(a.id);
+        const v = Z.verifierOffre(base, mode, montant, etat.offres.filter((x) => x.sens === 'envoyee' && x.annonceId === a.id && x.mode === mode).length);
+        if (!v.ok) return toast(v.raison);
+        etat.offres.push(Z.creerOffre(base, mode, montant, maintenant())); sauver();
+        toast(`Offre de ${Z.euros(montant)} envoyée. Réponse sous 48 h.`); aller('#/offres');
       } else if (act.dataset.action === 'acheter') {
         deverrouillerConversation(a.id); sauver();
         toast(`Paiement de ${Z.euros(a.prixVente)} placé en séquestre (simulation). Le vendeur est prévenu.`);
@@ -416,6 +454,12 @@
       <div class="titre-section"><div><h2>Mon espace</h2><p>Compte de démonstration · profil vérifié</p></div><a class="btn btn-cta" href="#/deposer">＋ Déposer une annonce</a></div>
       <h3>Mon calendrier de location</h3>
       ${mesRes.length ? `<table class="tableau"><thead><tr><th>Outil</th><th>Du</th><th>Au</th><th>Total payé</th><th>Caution bloquée</th><th>Statut</th></tr></thead><tbody>${mesRes.sort((x, y) => x.debut.localeCompare(y.debut)).map((r) => { const a = annonce(r.outilId); return `<tr><td><a href="#/annonce/${a.id}">${esc(a.titre)}</a></td><td>${Z.formatDate(r.debut)}</td><td>${Z.formatDate(r.fin)}</td><td>${r.total ? Z.euros(r.total) : '—'}</td><td>${Z.euros(r.caution ?? a.caution)}</td><td><span class="statut">${esc(r.statut)}</span></td></tr>`; }).join('')}</tbody></table>` : '<div class="vide">Aucune location pour l’instant.</div>'}
+      <h3 style="margin-top:32px">Mes offres de prix</h3>
+      <div class="panneau bandeau-action"><div>${etat.offres.filter((o) => o.sens === 'recue' && o.statut === 'en attente').length} offre(s) reçue(s) à traiter · ${etat.offres.filter((o) => o.sens === 'envoyee').length} envoyée(s).</div><a class="btn btn-contour" href="#/offres">🤝 Voir les offres</a></div>
+      <h3 style="margin-top:32px">Mes rendez-vous</h3>
+      <div class="panneau bandeau-action"><div>${etat.rdv.filter((r) => r.statut === 'confirmé').length} confirmé(s) · ${etat.rdv.filter((r) => r.statut === 'proposé').length} en attente. Travaux, échanges, réparations et remises d’outils.</div><a class="btn btn-contour" href="#/agenda">📅 Ouvrir mon agenda</a></div>
+      <h3 style="margin-top:32px">Mes retraits en magasin (déstockage)</h3>
+      ${etat.retraits.length ? etat.retraits.map((r) => `<div class="panneau"><div class="ligne"><span><b>Code ${esc(r.code)}</b> · ${r.quantite} × ${esc(r.titre)}<br><span class="discret">À retirer sous 7 jours : ${esc(r.magasin)}</span></span><b>${Z.euros(r.total)}</b></div></div>`).join('') : '<div class="vide">Aucun retrait en cours. <a href="#/destockage">Voir le déstockage des enseignes</a>.</div>'}
       <h3 style="margin-top:32px">Mes demandes de travaux</h3>
       ${blocMesDemandes()}
       <h3 style="margin-top:32px">Mes annonces</h3>
@@ -434,10 +478,12 @@
         <label class="large">Titre<input name="titre" required maxlength="80" placeholder="Ex. : Ponceuse excentrique 125 mm + 20 disques"></label>
         <label>Marque<input name="marque" placeholder="Makita, Bosch…"></label>
         <label>Catégorie<select name="categorie" required>${CATEGORIES.map((c) => `<option value="${c.id}">${c.nom}</option>`).join('')}</select></label>
-        <label>État<select name="etat"><option>Neuf</option><option ${enPanne ? '' : 'selected'}>Très bon état</option><option>Bon état</option><option ${enPanne ? 'selected' : ''}>À réparer</option></select></label>
+        <label>État<select name="etat"><option>Neuf</option><option ${enPanne ? '' : 'selected'}>Très bon état</option><option>Bon état</option><option>État correct</option><option ${enPanne ? 'selected' : ''}>À réparer</option></select></label>
         <label class="large">Panne constatée (si à réparer)<input name="panne" placeholder="Ex. : batterie qui ne tient plus la charge"></label>
         <label>Code postal<input name="cp" required pattern="\\d{5}" placeholder="94300"></label>
         <div class="large"><b>Je propose</b><div class="cases" style="margin-top:6px"><label><input type="checkbox" name="modes" value="location" checked> la location</label><label><input type="checkbox" name="modes" value="vente"> la vente</label><label><input type="checkbox" name="modes" value="echange"> l’échange</label></div></div>
+        <label>Prix neuf de référence (€)<input name="prixNeuf" type="number" min="1" step="1" required placeholder="Prix en magasin aujourd’hui"></label>
+        <div class="large alerte alerte-info" id="aide-prix">Indiquez le prix neuf : ZETools calcule le prix conseillé et le plafond. Sur ZETools, un outil se vend toujours <b>bien en dessous du neuf</b> (70 % au plus pour un outil neuf, 50 % en très bon état, 40 % en bon état, 30 % en état correct, 15 % à réparer).</div>
         <label>Prix par jour (€)<input name="prixJour" type="number" min="1" step="0.5" placeholder="10"></label>
         <label>Prix de vente (€)<input name="prixVente" type="number" min="1" step="1" placeholder="120"></label>
         <label>Caution demandée (€)<input name="caution" type="number" min="0" step="10" placeholder="150"></label>
@@ -448,7 +494,16 @@
       </form></div></div>`;
   }
   function brancherDeposer() {
-    document.getElementById('form-depot').addEventListener('submit', (e) => {
+    const form = document.getElementById('form-depot');
+    const aide = document.getElementById('aide-prix');
+    const majAide = () => {
+      const p = Z.plafondPrix(Number(form.prixNeuf.value), form.etat.value);
+      if (!p) return;
+      aide.innerHTML = `Pour un outil « ${esc(form.etat.value)} » vendu ${Z.euros(Number(form.prixNeuf.value))} neuf : <b>vente conseillée ${Z.euros(p.venteConseillee)}</b> (maximum ${Z.euros(p.venteMax)}) · <b>location conseillée ${Z.euros(p.jourConseille)} / jour</b> (maximum ${Z.euros(p.jourMax)}) · caution ${Z.euros(p.cautionMax)} au plus.`;
+      form.prixVente.placeholder = p.venteConseillee; form.prixJour.placeholder = p.jourConseille; form.caution.placeholder = Math.min(p.cautionMax, p.venteConseillee);
+    };
+    form.prixNeuf.addEventListener('input', majAide); form.etat.addEventListener('change', majAide);
+    form.addEventListener('submit', (e) => {
       e.preventDefault();
       const fd = new FormData(e.target);
       const modes = fd.getAll('modes');
@@ -456,10 +511,12 @@
       if (!modes.length) return toast('Choisissez au moins : location, vente ou échange.');
       if (modes.includes('location') && !nb('prixJour')) return toast('Indiquez un prix par jour pour la location.');
       if (modes.includes('vente') && !nb('prixVente')) return toast('Indiquez un prix de vente.');
+      const controle = Z.verifierPrix({ prixNeuf: nb('prixNeuf'), etat: String(fd.get('etat')), modes, prixJour: nb('prixJour'), prixVente: nb('prixVente'), caution: nb('caution') || 0 });
+      if (!controle.ok) return toast(controle.erreurs[0]);
       const cp = String(fd.get('cp'));
       const a = {
         id: 'u' + Date.now(), titre: String(fd.get('titre')), marque: String(fd.get('marque') || '—'), categorie: String(fd.get('categorie')),
-        etat: String(fd.get('etat')), modes, prixJour: nb('prixJour'), prixVente: nb('prixVente'), caution: nb('caution') || 0,
+        etat: String(fd.get('etat')), modes, prixNeuf: nb('prixNeuf'), prixJour: nb('prixJour'), prixVente: nb('prixVente'), caution: nb('caution') || 0,
         ville: cp.startsWith('75') ? 'Paris' : 'Île-de-France', cp, membre: 'moi', photo: PHOTOS.atelier,
         description: Z.masquerCoordonnees(String(fd.get('description') || ''), false).texte,
         echangeContre: String(fd.get('echangeContre') || ''), indispo: [],
@@ -477,7 +534,9 @@
         <div class="offre phare"><h3>Artisan abonné</h3><div class="tarif">39 € <small style="font-size:1rem">/ mois</small></div><ul><li>Toutes les demandes de travaux de votre zone : petits, moyens et gros</li><li>0 % de commission, 0 € par contact</li><li>Carte des chantiers autour de vous</li><li>390 € / an (2 mois offerts) · 30 jours d’essai</li></ul><a class="btn btn-cta" href="#/espace-artisan">Ouvrir mon espace artisan</a></div>
         <div class="offre"><h3>Pro Solo</h3><div class="tarif">19 € <small style="font-size:1rem">/ mois</small></div><ul><li>Badge PRO et SIRET vérifié</li><li>Calendrier de disponibilités multi-outils</li><li>Mise en avant locale</li><li>Factures automatiques</li></ul><a class="btn btn-cta" href="#/messages">Rejoindre la phase pilote</a></div>
         <div class="offre"><h3>Pro Business</h3><div class="tarif">dès 49 € <small style="font-size:1rem">/ mois</small></div><ul><li>Parc illimité, plusieurs comptes</li><li>Statistiques et export comptable</li><li>Interlocuteur dédié</li></ul></div>
+        <div class="offre"><h3>Enseigne · déstockage</h3><div class="tarif">${Math.round(Z.REGLES.commissionDestockage * 100)} % <small style="font-size:1rem">par vente</small></div><ul><li>Grandes surfaces de bricolage, négoces, fabricants, loueurs</li><li>Espace privé, stock par magasin, retrait en magasin</li><li>0 € d’abonnement pendant le pilote</li></ul><a class="btn btn-cta" href="#/espace-enseigne">Espace enseigne</a></div>
       </div>
+      <p class="note-legale">Prix hors taxes pour les professionnels. Détail : <a href="#/legal/pros">conditions particulières professionnels, artisans et enseignes</a> · <a href="#/legal/cgu">conditions générales</a> · <a href="#/legal/prix">règles de prix</a>.</p>
       ${blocReassurance().replace('class="bloc reassurance"', 'class="bloc reassurance" style="margin-top:40px;border-radius:16px"')}
     </div></div>`;
   }
@@ -492,14 +551,24 @@
       ['Pourquoi ne puis-je pas donner mon numéro ?', 'Tant que rien n’est payé sur ZETOOLS, nous ne pouvons ni garantir la caution ni vous rembourser. Les coordonnées s’affichent automatiquement après paiement.'],
       ['Quand le propriétaire est-il payé ?', 'Le loyer est versé 24 h après le retour de l’outil, si aucun litige n’est ouvert. Pour une vente, après confirmation de la remise par l’acheteur.'],
       ['Un échange est-il protégé ?', 'Oui : chacun règle des frais de mise en relation et une caution croisée peut être demandée pour les outils de valeur différente.'],
+      ['Puis-je négocier le prix ?', 'Oui. Sur chaque annonce de vente ou de location, « Proposer mon prix » envoie votre offre au propriétaire. Il a 48 h pour accepter, refuser ou vous faire une contre-proposition. Rien n’est débité avant l’accord, et le paiement reste sécurisé.'],
+      ['Pourquoi les prix sont-ils plafonnés ?', 'ZETools est une place de marché d’outils à petit prix. Un outil d’occasion se vend au plus à 50 % du neuf en très bon état, 40 % en bon état, 30 % en état correct. Même un outil neuf, jamais servi, reste sous le prix du magasin (70 % au plus). Le prix neuf de référence et la remise sont affichés sur chaque annonce.'],
+      ['Comment fixer un rendez-vous pour des travaux ou un échange ?', 'Depuis la fiche d’un artisan ou d’une annonce, cliquez sur « Proposer un rendez-vous » : choisissez jusqu’à 3 créneaux dans le calendrier. L’autre partie en accepte un, et le rendez-vous s’inscrit dans votre agenda. Annulation gratuite jusqu’à 24 h avant.'],
+      ['Qu’est-ce que le déstockage des enseignes ?', 'Des professionnels (grandes surfaces de bricolage, négoces, fabricants, loueurs) y écoulent leurs fins de série et surstocks : des produits neufs, à prix cassés, payés en ligne et retirés en magasin, avec les garanties légales du vendeur.'],
       ['Faut-il être professionnel pour louer souvent ?', 'Au-delà d’un usage occasionnel, un numéro SIRET est demandé. Les revenus sont déclarés aux impôts conformément à la directive DAC7.'],
     ];
     return `<div class="page"><div class="conteneur" style="max-width:820px"><div class="titre-section"><div><h2>Questions fréquentes</h2></div></div>${q.map(([t, r]) => `<details class="panneau"><summary style="font-weight:700;cursor:pointer">${t}</summary><p>${r}</p></details>`).join('')}</div></div>`;
   }
 
-  function vueLegal() {
-    return `<div class="page"><div class="conteneur" style="max-width:820px"><div class="panneau"><h2>Conditions générales et mentions légales</h2>
-      <p><b>À rédiger avec un avocat avant tout lancement.</b> Points à couvrir : statut d’intermédiaire de la plateforme, CGU et CGV distinctes particuliers/professionnels, prestataire de paiement agréé (aucun fonds ne transite par ZETOOLS), obligations DAC7, assurance, médiation de la consommation, RGPD.</p></div></div></div>`;
+  function vueLegal(id) {
+    const J = window.ZT_JURIDIQUE; const p = J.PAGES.find((x) => x.id === id) || J.PAGES[0];
+    return `<div class="page"><div class="conteneur"><div class="juridique">
+      <nav aria-label="Documents juridiques">${J.PAGES.map((x) => `<a href="#/legal/${x.id}" class="${x.id === p.id ? 'actif' : ''}">${x.court}</a>`).join('')}<a href="#/pros">Offres professionnelles</a></nav>
+      <article class="panneau"><div class="surtitre">${J.SOCIETE.nom} SAS · ${J.SOCIETE.siege}</div><h2 style="margin:4px 0">${p.titre}</h2>
+        <p class="discret">${J.SOCIETE.version} · document de travail, à faire valider par un avocat avant mise en ligne. Les mentions surlignées restent à compléter.</p>
+        <p>${p.intro}</p>
+        ${p.sections.map(([t, h]) => `<h3>${t}</h3>${h}`).join('')}
+      </article></div></div></div>${p.id === 'securite' ? blocReassurance() : ''}`;
   }
 
   function vueCredits() {
@@ -577,6 +646,7 @@
       <div class="puces">${a.metiers.map((m) => `<span class="puce">${metierIco(m)} ${esc(metierNom(m))}</span>`).join('')}</div>
       <div class="ligne discret"><span>Dès ${Z.euros(a.tarifHoraire)} / h · intervient ${esc(a.delai)}</span><span>${a.outils ? 'Vient avec ses outils' : 'Outils à fournir ou à louer'}</span></div>
       ${avecBouton ? `<button class="btn btn-cta" data-devis="${a.id}" style="width:100%;margin-top:6px">Demander un devis gratuit</button>` : ''}
+      <a class="btn btn-contour" href="#/rendez-vous?type=${a.metiers.includes('reparation') ? 'reparation' : 'travaux'}&avec=${a.id}" style="width:100%;margin-top:6px">📅 Proposer un rendez-vous</a>
     </div>`;
   }
 
@@ -798,6 +868,326 @@
     </div></div>`;
   }
 
+  /* =====================================================================
+     DÉSTOCKAGE ENSEIGNES : produits neufs, prix barrés conformes (art. L.112-1-1 C. conso)
+     ===================================================================== */
+  const { TYPES_ENSEIGNE, ENSEIGNES, LOTS, RDV_DEMO } = window.ZT_DONNEES;
+  const enseigne = (id) => ENSEIGNES.find((e) => e.id === id) || { id, nom: 'Enseigne', type: 'gsb', logo: '🏬' };
+  const lotCourant = (l) => (etat.stocks[l.id] ? Object.assign({}, l, { magasins: etat.stocks[l.id] }) : l);
+  const tousLots = () => LOTS.concat(etat.lots).map(lotCourant);
+  const lotsActifs = () => tousLots().filter((l) => l.fin >= AUJOURDHUI && Z.stockLot(l) > 0);
+  const NOTE_REFERENCE = 'Prix de référence : prix le plus bas pratiqué par l’enseigne au cours des 30 jours précédant la réduction (art. L.112-1-1 du Code de la consommation). Produits neufs, garanties légales de l’enseigne.';
+
+  function carteLot(l) {
+    const e = enseigne(l.enseigne); const r = Z.remiseSurNeuf(l.prixDestockage, l.prixReference); const st = Z.stockLot(l);
+    return `<a class="carte carte-lot" href="#/lot/${l.id}">
+      <div class="visuel">${l.photo ? `<img loading="lazy" src="${l.photo}" alt="${esc(l.titre)}">` : ''}
+        <div class="badges"><span class="badge badge-destock">Déstockage</span><span class="remise">−${r} %</span></div></div>
+      <div class="infos"><span class="enseigne-nom">${e.logo} ${esc(e.nom)} · ${esc(TYPES_ENSEIGNE[e.type] || '')}</span>
+        <h3>${esc(l.titre)}</h3>
+        <div class="prix">${Z.euros(l.prixDestockage)} <s class="barre">${Z.euros(l.prixReference)}</s></div>
+        <div class="meta"><span>${l.reconditionne ? '♻️ Reconditionné' : '✨ Neuf'} · ${esc(l.motif)}</span></div>
+        <div class="meta"><span>📦 ${st} en stock · ${l.magasins.length} magasin${l.magasins.length > 1 ? 's' : ''}</span><span>⏳ jusqu’au ${Z.formatDate(l.fin)}</span></div></div></a>`;
+  }
+  let filtreLots = { cat: '', type: '' };
+  function vueDestockage() {
+    const lots = lotsActifs().filter((l) => (!filtreLots.cat || l.categorie === filtreLots.cat) && (!filtreLots.type || enseigne(l.enseigne).type === filtreLots.type));
+    const puce = (k, v, lib) => `<button class="puce ${filtreLots[k] === v ? 'active' : ''}" data-filtre-lot="${k}" data-valeur="${v}">${lib}</button>`;
+    return `<section class="hero hero-court hero-destock"><div class="conteneur">
+        <div class="surtitre" style="color:var(--jaune)">Déstockage des enseignes · produits neufs</div>
+        <h1>Les fins de série des pros, <em>à prix imbattables</em>.</h1>
+        <p class="sous">Grandes surfaces de bricolage, négoces de matériaux, fabricants et loueurs écoulent ici leurs surstocks. Vous payez en ligne et retirez en magasin.</p>
+      </div></section>
+      <div class="page"><div class="conteneur">
+        <div class="puces" style="margin-bottom:10px">${puce('cat', '', 'Toutes catégories')}${CATEGORIES.map((c) => puce('cat', c.id, `${c.icone} ${c.nom}`)).join('')}</div>
+        <div class="puces" style="margin-bottom:20px">${puce('type', '', 'Tous les acteurs')}${Object.entries(TYPES_ENSEIGNE).map(([k, v]) => puce('type', k, v)).join('')}</div>
+        <div class="grille">${lots.map(carteLot).join('') || '<div class="vide">Aucun lot pour ces critères. Revenez bientôt : les enseignes publient chaque semaine.</div>'}</div>
+        <p class="note-legale">${NOTE_REFERENCE} Limite de ${Z.REGLES.maxParClient} unités par client et par lot.</p>
+        <div class="panneau bandeau-action"><div><b>Vous êtes une enseigne, un négoce, un fabricant ou un loueur ?</b><br>Écoulez vos fins de série et surstocks auprès des bricoleurs de votre zone de chalandise, sans brader votre image : espace privé, retrait en magasin, 0 € d’abonnement pendant le pilote.</div><a class="btn btn-cta" href="#/espace-enseigne">Accéder à l’espace enseigne</a></div>
+      </div></div>`;
+  }
+  function brancherDestockage() {
+    vue.querySelectorAll('[data-filtre-lot]').forEach((b) => b.addEventListener('click', () => { filtreLots[b.dataset.filtreLot] = b.dataset.valeur; router(); }));
+  }
+  function vueLot(id) {
+    const l = tousLots().find((x) => x.id === id);
+    if (!l) return '<div class="page"><div class="conteneur vide">Lot introuvable. <a href="#/destockage">Retour au déstockage</a></div></div>';
+    const e = enseigne(l.enseigne); const d = Z.devisLot(l, 1);
+    const fini = l.fin < AUJOURDHUI || Z.stockLot(l) === 0;
+    return `<div class="page"><div class="conteneur">
+      <div class="fil"><a href="#/">Accueil</a> › <a href="#/destockage">Déstockage</a> › ${esc(l.titre)}</div>
+      <div class="fiche"><div><div class="photo-principale">${l.photo ? `<img src="${l.photo.replace('w=900', 'w=1400')}" alt="${esc(l.titre)}">` : ''}</div>
+          <div class="panneau" style="margin-top:16px"><h2 style="margin-top:0">Détails du lot</h2>
+            <div class="ligne"><span>Vendu par</span><b>${e.logo} ${esc(e.nom)} · ${esc(TYPES_ENSEIGNE[e.type])} ${e.siret ? '· ✔ SIRET vérifié' : ''}</b></div>
+            <div class="ligne"><span>Produit</span><b>${l.reconditionne ? 'Reconditionné, révisé par le loueur' : 'Neuf'}</b></div>
+            <div class="ligne"><span>Raison du déstockage</span><b>${esc(l.motif)}</b></div>
+            <div class="ligne"><span>Offre valable jusqu’au</span><b>${Z.formatDate(l.fin)} ou épuisement du stock</b></div>
+            <h3>Stock par magasin</h3>${l.magasins.map((m) => `<div class="ligne"><span>📍 ${esc(m.nom)} (${esc(m.cp)})</span><b>${m.stock} disponible${m.stock > 1 ? 's' : ''}</b></div>`).join('')}
+            <p class="note-legale">${NOTE_REFERENCE} Achat à distance auprès d’un professionnel : droit de rétractation de 14 jours et garantie légale de conformité de 2 ans (${l.reconditionne ? '1 an au moins pour un bien reconditionné, selon l’enseigne' : 'produit neuf'}).</p></div></div>
+        <div><div class="panneau"><div class="badges" style="display:flex;gap:6px"><span class="badge badge-destock">Déstockage</span><span class="remise">−${d.remise} %</span></div>
+          <h1>${esc(l.titre)}</h1>
+          <div class="prix-lot">${Z.euros(l.prixDestockage)} <s class="barre">${Z.euros(l.prixReference)}</s></div>
+          ${fini ? '<div class="alerte alerte-info">Cette offre est terminée.</div>' : `<form id="form-lot" class="formulaire" style="grid-template-columns:1fr 1fr">
+            <label>Quantité<select name="quantite">${Array.from({ length: Math.min(Z.REGLES.maxParClient, Z.stockLot(l)) }, (_, i) => `<option>${i + 1}</option>`).join('')}</select></label>
+            <label>Magasin de retrait<select name="cp">${l.magasins.filter((m) => m.stock > 0).map((m) => `<option value="${esc(m.cp)}">${esc(m.nom)}</option>`).join('')}</select></label>
+            <div class="large" id="devis-lot"></div>
+            <div class="large"><button class="btn btn-cta" style="width:100%">Payer et réserver en click & collect</button></div></form>`}
+          <p style="color:var(--texte-doux);font-size:.9rem">Paiement sécurisé par le prestataire agréé de ZETools. L’enseigne prépare votre commande ; vous la retirez avec votre code sous 7 jours.</p></div></div>
+      </div></div></div>`;
+  }
+  function brancherLot(id) {
+    const f = document.getElementById('form-lot'); if (!f) return;
+    const l = tousLots().find((x) => x.id === id);
+    const maj = () => { const d = Z.devisLot(l, Number(f.quantite.value)); document.getElementById('devis-lot').innerHTML = `<div class="ligne total"><span>Total</span><span>${Z.euros(d.total)}</span></div><div class="ligne discret"><span>Votre économie</span><span>${Z.euros(d.economie)}</span></div>`; };
+    f.quantite.addEventListener('change', maj); maj();
+    f.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const d = Z.devisLot(l, Number(f.quantite.value));
+      const r = Z.retirerDuStock(l, f.cp.value, d.quantite);
+      if (!r.ok) return toast(r.raison);
+      etat.stocks[l.id] = r.magasins;
+      const code = 'ZT-' + Math.random().toString(36).slice(2, 6).toUpperCase();
+      etat.retraits.push({ code, lotId: l.id, enseigne: l.enseigne, titre: l.titre, magasin: r.magasin, quantite: d.quantite, total: d.total, commission: d.commission, date: AUJOURDHUI });
+      sauver(); toast(`Réservé. Code de retrait ${code} à présenter en magasin.`); aller('#/mon-espace');
+    });
+  }
+
+  /* --- espace privé enseigne --- */
+  function vueEspaceEnseigne() {
+    if (!etat.enseigne) {
+      return `<div class="page"><div class="conteneur" style="max-width:760px"><div class="panneau">
+        <div class="surtitre">Espace privé · accès sur invitation</div><h2 style="margin-top:4px">Espace enseigne ZETools</h2>
+        <p>Réservé aux distributeurs et fabricants d’outillage : grandes surfaces de bricolage, négoces de matériaux, fabricants, loueurs, quincailleries. Chaque compte est vérifié avant ouverture (SIRET, extrait Kbis, signataire habilité, coordonnées bancaires auprès du prestataire de paiement).</p>
+        <ul class="liste-avantages"><li>Publiez vos fins de série, surstocks, retours et produits à l’emballage abîmé, magasin par magasin.</li><li>Vente en ligne, retrait en magasin : du trafic en point de vente, sans logistique supplémentaire.</li><li>Commission de ${Math.round(Z.REGLES.commissionDestockage * 100)} % sur les ventes réalisées, 0 € d’abonnement pendant le pilote.</li><li>Prix barrés contrôlés : vous attestez le prix de référence sur 30 jours, ZETools l’affiche conformément au Code de la consommation.</li></ul>
+        <form id="connexion-enseigne" class="formulaire" style="grid-template-columns:1fr">
+          <label>Démonstration, se connecter en tant que<select name="enseigne">${ENSEIGNES.map((e) => `<option value="${e.id}">${e.logo} ${esc(e.nom)} · ${esc(TYPES_ENSEIGNE[e.type])}</option>`).join('')}</select></label>
+          <button class="btn btn-cta">Entrer dans l’espace enseigne</button></form>
+        <p style="font-size:.88rem;color:var(--texte-doux)">Noms d’enseignes fictifs pour la maquette. Conditions : <a href="#/legal/pros">conditions particulières professionnels et enseignes</a>.</p></div></div></div>`;
+    }
+    const e = enseigne(etat.enseigne);
+    const mesLots = tousLots().filter((l) => l.enseigne === e.id);
+    const mesRetraits = etat.retraits.filter((r) => r.enseigne === e.id);
+    const ca = mesRetraits.reduce((t, r) => t + r.total, 0), com = mesRetraits.reduce((t, r) => t + r.commission, 0);
+    return `<div class="page"><div class="conteneur">
+      <div class="titre-section"><div><div class="surtitre">Espace enseigne · privé</div><h2>${e.logo} ${esc(e.nom)}</h2><p>${esc(TYPES_ENSEIGNE[e.type])} · ${e.magasins} point${e.magasins > 1 ? 's' : ''} de vente</p></div><button class="btn btn-contour" id="deconnexion-enseigne">Se déconnecter</button></div>
+      <div class="kpis"><div class="kpi"><b>${mesLots.filter((l) => l.fin >= AUJOURDHUI && Z.stockLot(l) > 0).length}</b><span>lots en ligne</span></div><div class="kpi"><b>${mesLots.reduce((t, l) => t + Z.stockLot(l), 0)}</b><span>unités en stock</span></div><div class="kpi"><b>${mesRetraits.reduce((t, r) => t + r.quantite, 0)}</b><span>unités vendues</span></div><div class="kpi"><b>${Z.euros(ca)}</b><span>chiffre d’affaires</span></div><div class="kpi"><b>${Z.euros(ca - com)}</b><span>versé après commission</span></div></div>
+      <div class="panneau"><h3 style="margin-top:0">Mes lots</h3><div class="tableau-defile"><table class="tableau"><thead><tr><th>Produit</th><th>Réf. 30 j</th><th>Déstockage</th><th>Remise</th><th>Stock</th><th>Fin</th></tr></thead><tbody>
+        ${mesLots.map((l) => `<tr><td><a href="#/lot/${l.id}">${esc(l.titre)}</a></td><td>${Z.euros(l.prixReference)}</td><td><b>${Z.euros(l.prixDestockage)}</b></td><td>−${Z.remiseSurNeuf(l.prixDestockage, l.prixReference)} %</td><td>${Z.stockLot(l)}</td><td>${Z.formatDate(l.fin)}</td></tr>`).join('') || '<tr><td colspan="6">Aucun lot publié.</td></tr>'}</tbody></table></div></div>
+      <div class="panneau"><h3 style="margin-top:0">Retraits à préparer</h3>${mesRetraits.map((r) => `<div class="ligne"><span><b>${esc(r.code)}</b> · ${r.quantite} × ${esc(r.titre)} · ${esc(r.magasin)}</span><b>${Z.euros(r.total)}</b></div>`).join('') || '<p style="color:var(--texte-doux)">Aucune commande pour le moment.</p>'}</div>
+      <form class="panneau formulaire" id="form-lot-enseigne"><h3 class="large" style="margin:0">Publier un lot</h3>
+        <label class="large">Désignation<input name="titre" required maxlength="90" placeholder="Ex. : Scie circulaire 1 400 W, lame 190 mm"></label>
+        <label>Catégorie<select name="categorie">${CATEGORIES.map((c) => `<option value="${c.id}">${c.nom}</option>`).join('')}</select></label>
+        <label>Raison du déstockage<select name="motif"><option>Fin de série</option><option>Surstock</option><option>Fin de saison</option><option>Emballage abîmé, produit neuf</option><option>Changement de référence</option><option>Renouvellement du parc</option></select></label>
+        <label>Prix de référence (€)<input name="prixReference" type="number" min="1" step="0.01" required placeholder="Le plus bas sur 30 jours"></label>
+        <label>Prix de déstockage (€)<input name="prixDestockage" type="number" min="1" step="0.01" required></label>
+        <label>Magasin<input name="magasin" required placeholder="${esc(e.nom)} Vitry"></label>
+        <label>Code postal<input name="cp" required pattern="\\d{5}" placeholder="94400"></label>
+        <label>Quantité disponible<input name="stock" type="number" min="1" step="1" required></label>
+        <label>Fin de l’opération<input name="fin" type="date" required min="${AUJOURDHUI}"></label>
+        <label class="large case"><input type="checkbox" name="atteste" required> J’atteste que le prix de référence est le prix le plus bas pratiqué dans ce magasin au cours des 30 jours précédant la réduction.</label>
+        <div class="large alerte alerte-info">Phase 2 : import du catalogue par fichier CSV ou flux EDI, et mise à jour automatique des stocks depuis votre logiciel de caisse.</div>
+        <div class="large"><button class="btn btn-cta">Publier le lot</button></div></form>
+    </div></div>`;
+  }
+  function brancherEspaceEnseigne() {
+    const c = document.getElementById('connexion-enseigne');
+    if (c) c.addEventListener('submit', (e) => { e.preventDefault(); etat.enseigne = c.enseigne.value; sauver(); router(); });
+    const d = document.getElementById('deconnexion-enseigne');
+    if (d) d.addEventListener('click', () => { etat.enseigne = null; sauver(); router(); });
+    const f = document.getElementById('form-lot-enseigne'); if (!f) return;
+    f.addEventListener('submit', (e) => {
+      e.preventDefault(); const fd = new FormData(f);
+      const lot = { id: 'l' + Date.now(), enseigne: etat.enseigne, titre: String(fd.get('titre')), categorie: String(fd.get('categorie')), motif: String(fd.get('motif')),
+        prixReference: Number(fd.get('prixReference')), prixDestockage: Number(fd.get('prixDestockage')), fin: String(fd.get('fin')), photo: PHOTOS.atelier,
+        magasins: [{ nom: String(fd.get('magasin')), cp: String(fd.get('cp')), stock: Number(fd.get('stock')) }] };
+      const v = Z.verifierLot(lot, AUJOURDHUI);
+      if (!v.ok) return toast(v.erreurs[0]);
+      etat.lots.push(lot); sauver(); toast('Lot publié dans le déstockage.'); router();
+    });
+  }
+
+  /* =====================================================================
+     AGENDA : proposer et réserver des dates et heures (travaux, échanges, réparations, remises)
+     ===================================================================== */
+  const maintenant = () => { const d = new Date(); const p = (n) => String(n).padStart(2, '0'); return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`; };
+  const quand = (c) => { const d = new Date(c.slice(0, 10) + 'T12:00:00Z'); return `${d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' })} à ${c.slice(11, 13)} h ${c.slice(14, 16) === '00' ? '' : c.slice(14, 16)}`.trim(); };
+  function nomContact(id) {
+    if (!id) return 'à choisir';
+    if (MEMBRES[id]) return MEMBRES[id].nom;
+    const a = ARTISANS.find((x) => x.id === id); return a ? a.nom : 'membre ZETools';
+  }
+  const rdvConfirmes = () => etat.rdv.filter((r) => r.statut === 'confirmé');
+  let selRdv = null;
+  function initSelRdv(params) {
+    const cle = params.toString();
+    if (selRdv && selRdv.cle === cle) return;
+    const a = params.get('annonce') ? annonce(params.get('annonce')) : null;
+    const art = params.get('avec') ? ARTISANS.find((x) => x.id === params.get('avec')) : null;
+    const type = params.get('type') || 'travaux';
+    selRdv = { cle, type, avec: params.get('avec') || (a ? a.membre : ''), annonceId: a ? a.id : '', reponseA: params.get('reponse') || '',
+      objet: params.get('objet') || (a ? `${Z.REGLES.typesRdv[type] || ''} · ${a.titre}` : art ? `${Z.REGLES.typesRdv[type]} avec ${art.nom}` : ''),
+      mois: AUJOURDHUI.slice(0, 7), jour: '', creneaux: [], dureeHeures: type === 'travaux' ? 2 : 1 };
+  }
+  function calendrierRdv() {
+    const [an, mo] = selRdv.mois.split('-').map(Number);
+    const premier = new Date(Date.UTC(an, mo - 1, 1)); const nb = new Date(Date.UTC(an, mo, 0)).getUTCDate();
+    const nomMois = premier.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+    let cases = ['L', 'M', 'M', 'J', 'V', 'S', 'D'].map((j) => `<span>${j}</span>`).join('') + '<span></span>'.repeat((premier.getUTCDay() + 6) % 7);
+    for (let j = 1; j <= nb; j++) {
+      const t = `${an}-${String(mo).padStart(2, '0')}-${String(j).padStart(2, '0')}`;
+      const dim = new Date(t + 'T00:00:00Z').getUTCDay() === 0;
+      const dis = t < AUJOURDHUI || dim || !Z.creneauxJour(t, { maintenant: maintenant() }).length;
+      const cls = [dis ? 'passe' : '', t === selRdv.jour ? 'choisi' : '', selRdv.creneaux.some((c) => c.startsWith(t)) ? 'marque' : ''].join(' ');
+      cases += `<button type="button" data-jour-rdv="${t}" class="${cls}" ${dis ? 'disabled' : ''}>${j}</button>`;
+    }
+    const pris = rdvConfirmes().map((r) => r.creneau);
+    const slots = selRdv.jour ? Z.creneauxJour(selRdv.jour, { maintenant: maintenant(), pris }) : [];
+    const max = Z.REGLES.rdv.maxCreneaux;
+    return `<div class="rdv-grille"><div class="calendrier"><div class="tete"><button type="button" data-mois-rdv="-1" aria-label="Mois précédent">‹</button><span>${nomMois}</span><button type="button" data-mois-rdv="1" aria-label="Mois suivant">›</button></div><div class="jours">${cases}</div></div>
+      <div><b>${selRdv.jour ? quand(selRdv.jour + 'T00:00').replace(/ à .*/, '') : 'Choisissez un jour'}</b>
+        <div class="creneaux">${slots.map((s) => `<button type="button" data-creneau="${s.debut}" class="${selRdv.creneaux.includes(s.debut) ? 'choisi' : ''}" ${s.libre ? '' : 'disabled title="Déjà pris dans votre agenda"'}>${s.heure}</button>`).join('') || (selRdv.jour ? '<span class="discret">Plus de créneau ce jour-là.</span>' : '')}</div>
+        <div class="choisis"><b>Vos propositions (${selRdv.creneaux.length}/${max})</b>${selRdv.creneaux.map((c) => `<span class="puce">${quand(c)} <button type="button" data-retirer="${c}" aria-label="Retirer">×</button></span>`).join('') || '<p class="discret">Proposez jusqu’à 3 créneaux : l’autre partie en choisit un.</p>'}</div></div></div>`;
+  }
+  function vueRendezVous(params) {
+    initSelRdv(params);
+    const s = selRdv;
+    return `<div class="page"><div class="conteneur" style="max-width:980px">
+      <div class="titre-section"><div><div class="surtitre">Agenda ZETools</div><h2>${s.reponseA ? 'Proposer d’autres dates' : 'Proposer un rendez-vous'}</h2><p>Choisissez des jours et des heures : votre interlocuteur accepte un créneau, et le rendez-vous s’ajoute à vos deux agendas.</p></div><a class="btn btn-contour" href="#/agenda">📅 Mon agenda</a></div>
+      <form class="panneau formulaire" id="form-rdv">
+        <label>Type<select name="type">${Object.entries(Z.REGLES.typesRdv).map(([k, v]) => `<option value="${k}" ${k === s.type ? 'selected' : ''}>${v}</option>`).join('')}</select></label>
+        <label>Avec<input value="${esc(nomContact(s.avec))}" disabled></label>
+        <label class="large">Objet<input name="objet" required maxlength="100" value="${esc(s.objet)}" placeholder="Ex. : pose d’une porte intérieure, échange ponceuse contre visseuse"></label>
+        <label>Durée<select name="duree">${[1, 2, 4, 8].map((h) => `<option value="${h}" ${h === s.dureeHeures ? 'selected' : ''}>${h === 4 ? 'Demi-journée' : h === 8 ? 'Journée' : h + ' h'}</option>`).join('')}</select></label>
+        <label>Lieu<select name="lieu"><option>Lieu public proche (conseillé pour un échange)</option><option ${s.type === 'travaux' ? 'selected' : ''}>À mon domicile (adresse transmise après confirmation)</option><option ${s.type === 'reparation' ? 'selected' : ''}>À l’atelier du professionnel</option><option>Visioconférence (premier contact, devis)</option></select></label>
+        <div class="large" id="zone-calendrier">${calendrierRdv()}</div>
+        <label class="large">Message<textarea name="message" rows="2" placeholder="Précisions utiles (accès, matériel à prévoir…). Vos coordonnées restent masquées."></textarea></label>
+        <div class="large alerte alerte-info">Annulation gratuite jusqu’à ${Z.REGLES.rdv.annulationGratuiteHeures} h avant le rendez-vous. Au-delà, l’annulation est signalée sur votre profil.</div>
+        <div class="large"><button class="btn btn-cta">Envoyer la proposition</button></div>
+      </form></div></div>`;
+  }
+  function brancherRendezVous() {
+    const f = document.getElementById('form-rdv');
+    const zone = document.getElementById('zone-calendrier');
+    const redessiner = () => { zone.innerHTML = calendrierRdv(); };
+    zone.addEventListener('click', (e) => {
+      const b = e.target.closest('button'); if (!b) return;
+      if (b.dataset.moisRdv) { const [a, m] = selRdv.mois.split('-').map(Number); const d = new Date(Date.UTC(a, m - 1 + Number(b.dataset.moisRdv), 1)); selRdv.mois = d.toISOString().slice(0, 7); }
+      else if (b.dataset.jourRdv) selRdv.jour = b.dataset.jourRdv;
+      else if (b.dataset.retirer) selRdv.creneaux = selRdv.creneaux.filter((c) => c !== b.dataset.retirer);
+      else if (b.dataset.creneau) {
+        const c = b.dataset.creneau;
+        if (selRdv.creneaux.includes(c)) selRdv.creneaux = selRdv.creneaux.filter((x) => x !== c);
+        else if (selRdv.creneaux.length >= Z.REGLES.rdv.maxCreneaux) return toast(`${Z.REGLES.rdv.maxCreneaux} créneaux au maximum : retirez-en un.`);
+        else selRdv.creneaux = selRdv.creneaux.concat(c).sort();
+      }
+      redessiner();
+    });
+    f.addEventListener('submit', (e) => {
+      e.preventDefault(); const fd = new FormData(f);
+      const rdv = { id: 'r' + Date.now(), sens: 'envoye', type: String(fd.get('type')), avec: selRdv.avec, annonceId: selRdv.annonceId, objet: String(fd.get('objet')),
+        creneaux: selRdv.creneaux.slice(), dureeHeures: Number(fd.get('duree')), lieu: String(fd.get('lieu')), statut: 'proposé',
+        message: Z.masquerCoordonnees(String(fd.get('message') || ''), false).texte };
+      const v = Z.verifierProposition(rdv, maintenant());
+      if (!v.ok) return toast(v.erreurs[0]);
+      if (selRdv.reponseA) etat.rdv = etat.rdv.map((r) => (r.id === selRdv.reponseA ? Object.assign({}, r, { statut: 'contre-proposé' }) : r));
+      etat.rdv.push(rdv); selRdv = null; sauver();
+      toast('Proposition envoyée. Vous serez prévenu dès qu’un créneau est accepté.'); aller('#/agenda');
+    });
+  }
+  let moisAgenda = null;
+  function vueAgenda() {
+    moisAgenda = moisAgenda || AUJOURDHUI.slice(0, 7);
+    const [an, mo] = moisAgenda.split('-').map(Number);
+    const premier = new Date(Date.UTC(an, mo - 1, 1)); const nb = new Date(Date.UTC(an, mo, 0)).getUTCDate();
+    const nomMois = premier.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+    let cases = ['L', 'M', 'M', 'J', 'V', 'S', 'D'].map((j) => `<span>${j}</span>`).join('') + '<span></span>'.repeat((premier.getUTCDay() + 6) % 7);
+    for (let j = 1; j <= nb; j++) {
+      const t = `${an}-${String(mo).padStart(2, '0')}-${String(j).padStart(2, '0')}`;
+      const conf = etat.rdv.some((r) => r.statut === 'confirmé' && r.creneau.startsWith(t));
+      const prop = etat.rdv.some((r) => r.statut === 'proposé' && r.creneaux.some((c) => c.startsWith(t)));
+      cases += `<button type="button" disabled class="${t < AUJOURDHUI ? 'passe' : ''} ${conf ? 'rdv-ok' : prop ? 'rdv-attente' : ''}">${j}</button>`;
+    }
+    const groupe = (titre, liste, rendu) => `<div class="panneau"><h3 style="margin-top:0">${titre} <span class="discret">(${liste.length})</span></h3>${liste.map(rendu).join('') || '<p class="discret">Rien pour le moment.</p>'}</div>`;
+    const entete = (r) => `<div><span class="badge badge-echange">${esc(Z.REGLES.typesRdv[r.type])}</span> <b>${esc(r.objet)}</b><br><span class="discret">avec ${esc(nomContact(r.avec))} · ${r.dureeHeures >= 8 ? 'journée' : r.dureeHeures + ' h'} · ${esc(r.lieu)}</span>${r.message ? `<p class="citation">« ${esc(r.message)} »</p>` : ''}</div>`;
+    const recus = etat.rdv.filter((r) => r.sens === 'recu' && r.statut === 'proposé');
+    const envoyes = etat.rdv.filter((r) => r.sens === 'envoye' && r.statut === 'proposé');
+    const confirmes = rdvConfirmes().slice().sort((a, b) => a.creneau.localeCompare(b.creneau));
+    const autres = etat.rdv.filter((r) => ['annulé', 'refusé', 'contre-proposé'].includes(r.statut));
+    return `<div class="page"><div class="conteneur">
+      <div class="titre-section"><div><div class="surtitre">Agenda</div><h2>Mes rendez-vous</h2><p>Travaux, échanges de matériel, réparations et remises d’outils : proposez des dates, acceptez un créneau, ajoutez-le à votre calendrier.</p></div><a class="btn btn-cta" href="#/rendez-vous?type=echange">＋ Proposer un rendez-vous</a></div>
+      <div class="agenda"><div class="panneau"><div class="calendrier"><div class="tete"><button data-mois-agenda="-1" aria-label="Mois précédent">‹</button><span>${nomMois}</span><button data-mois-agenda="1" aria-label="Mois suivant">›</button></div><div class="jours">${cases}</div></div>
+          <p class="legende"><span class="pastille-ok"></span> confirmé <span class="pastille-attente"></span> en attente</p></div>
+        <div>
+          ${groupe('À vous de répondre', recus, (r) => `<div class="rdv">${entete(r)}<div class="creneaux">${r.creneaux.map((c) => `<button class="btn btn-vert" data-accepter="${r.id}" data-c="${c}">✔ ${quand(c)}</button>`).join('')}</div>
+            <div class="actions-rdv"><a class="btn btn-contour" href="#/rendez-vous?type=${r.type}&avec=${r.avec}&objet=${encodeURIComponent(r.objet)}&reponse=${r.id}">Proposer d’autres dates</a><button class="btn btn-contour" data-refuser="${r.id}">Refuser</button></div></div>`)}
+          ${groupe('Confirmés', confirmes, (r) => `<div class="rdv rdv-confirme"><div class="date-rdv">${quand(r.creneau)}</div>${entete(r)}
+            <div class="actions-rdv"><button class="btn btn-contour" data-ics="${r.id}">📅 Ajouter à mon calendrier</button><button class="btn btn-contour" data-annuler="${r.id}">Annuler</button></div></div>`)}
+          ${groupe('En attente de réponse', envoyes, (r) => `<div class="rdv">${entete(r)}<div class="discret">Créneaux proposés : ${r.creneaux.map(quand).join(' · ')}</div>
+            <div class="actions-rdv"><button class="btn btn-contour" data-simuler="${r.id}">Démo : simuler l’acceptation</button><button class="btn btn-contour" data-annuler="${r.id}">Annuler</button></div></div>`)}
+          ${autres.length ? groupe('Historique', autres, (r) => `<div class="rdv rdv-passe">${entete(r)}<span class="discret">${esc(r.statut)}</span></div>`) : ''}
+        </div></div></div></div>`;
+  }
+  function brancherAgenda() {
+    const trouver = (id) => etat.rdv.find((r) => r.id === id);
+    const maj = (id, chg) => { etat.rdv = etat.rdv.map((r) => (r.id === id ? Object.assign({}, r, chg) : r)); sauver(); router(); };
+    const accepter = (r, c) => { const res = Z.confirmerRdv(r, c, etat.rdv); if (!res.ok) return toast(res.raison); maj(r.id, res.rdv); toast(`Rendez-vous confirmé : ${quand(c)}.`); };
+    vue.querySelector('.page').addEventListener('click', (e) => {
+      const b = e.target.closest('button'); if (!b) return;
+      if (b.dataset.moisAgenda) { const [a, m] = moisAgenda.split('-').map(Number); moisAgenda = new Date(Date.UTC(a, m - 1 + Number(b.dataset.moisAgenda), 1)).toISOString().slice(0, 7); router(); }
+      else if (b.dataset.accepter) accepter(trouver(b.dataset.accepter), b.dataset.c);
+      else if (b.dataset.simuler) { const r = trouver(b.dataset.simuler); accepter(r, r.creneaux[0]); }
+      else if (b.dataset.refuser) { maj(b.dataset.refuser, { statut: 'refusé' }); toast('Proposition refusée.'); }
+      else if (b.dataset.annuler) {
+        const r = trouver(b.dataset.annuler);
+        if (!Z.annulationGratuite(r, maintenant()) && !confirm('Moins de 24 h avant le rendez-vous : l’annulation sera signalée sur votre profil. Continuer ?')) return;
+        maj(r.id, { statut: 'annulé' }); toast('Rendez-vous annulé, votre interlocuteur est prévenu.');
+      } else if (b.dataset.ics) {
+        const r = trouver(b.dataset.ics);
+        const lien = document.createElement('a');
+        lien.href = URL.createObjectURL(new Blob([Z.versIcs(r)], { type: 'text/calendar' }));
+        lien.download = `zetools-${r.creneau.slice(0, 10)}.ics`; document.body.appendChild(lien); lien.click(); lien.remove();
+      }
+    });
+  }
+
+  /* =====================================================================
+     OFFRES DE PRIX : chacun propose son prix, l'autre accepte, refuse ou contre-propose
+     ===================================================================== */
+  function vueOffres() {
+    const M = maintenant();
+    const unite = (o) => (o.mode === 'location' ? ' / jour' : '');
+    const etiquette = (o) => { const st = Z.offreExpiree(o, M) ? 'expirée' : o.statut; return `<span class="badge ${st === 'acceptée' ? 'badge-echange' : st === 'refusée' || st === 'expirée' ? 'badge-vente' : 'badge-location'}">${st}</span>`; };
+    const tete = (o) => `<div><b>${esc(o.titre)}</b> ${etiquette(o)}<br><span class="discret">${o.mode === 'vente' ? 'Achat' : 'Location'} · prix affiché ${Z.euros(o.prixAffiche)}${unite(o)} · ${o.sens === 'recue' ? 'offre de' : 'propriétaire :'} ${esc(nomContact(o.avec))}</span></div>`;
+    const montants = (o) => `<div class="montants"><span>Offre <b>${Z.euros(o.montant)}${unite(o)}</b> <small>(−${Z.remiseSurNeuf(o.montant, o.prixAffiche)} %)</small></span>${o.contre ? `<span>Contre-proposition <b>${Z.euros(o.contre)}${unite(o)}</b></span>` : ''}${o.prixFinal ? `<span class="final">Prix convenu <b>${Z.euros(o.prixFinal)}${unite(o)}</b></span>` : ''}</div>`;
+    const vivante = (o) => !Z.offreExpiree(o, M);
+    const recue = (o) => `<div class="rdv">${tete(o)}${montants(o)}${o.statut === 'en attente' && vivante(o) ? `<div class="actions-rdv"><button class="btn btn-vert" data-offre="${o.id}" data-reponse="accepter">✔ Accepter ${Z.euros(o.montant)}</button>
+        <span class="offre-saisie"><input type="number" step="0.5" min="${o.montant}" max="${o.prixAffiche}" placeholder="Mon prix" aria-label="Contre-proposition" data-contre="${o.id}"><button class="btn btn-contour" data-offre="${o.id}" data-reponse="contre">Contre-proposer</button></span>
+        <button class="btn btn-contour" data-offre="${o.id}" data-reponse="refuser">Refuser</button></div>` : o.statut === 'contre-offre' && vivante(o) ? '<span class="discret">En attente de la réponse de l’acheteur.</span>' : ''}</div>`;
+    const envoyee = (o) => `<div class="rdv">${tete(o)}${montants(o)}<div class="actions-rdv">${!vivante(o) ? '' : o.statut === 'en attente' ? `<button class="btn btn-contour" data-offre="${o.id}" data-reponse="demo">Démo : simuler la réponse du propriétaire</button><button class="btn btn-contour" data-offre="${o.id}" data-reponse="refuser">Retirer mon offre</button>`
+        : o.statut === 'contre-offre' ? `<button class="btn btn-vert" data-offre="${o.id}" data-reponse="accepter">✔ Accepter ${Z.euros(o.contre)}</button><button class="btn btn-contour" data-offre="${o.id}" data-reponse="refuser">Refuser</button>`
+        : o.statut === 'acceptée' ? `<a class="btn btn-cta" href="#/annonce/${o.annonceId}">${o.mode === 'vente' ? 'Payer' : 'Réserver'} au prix convenu</a>` : ''}</div></div>`;
+    const recues = etat.offres.filter((o) => o.sens === 'recue'), envoyees = etat.offres.filter((o) => o.sens === 'envoyee');
+    return `<div class="page"><div class="conteneur" style="max-width:900px">
+      <div class="titre-section"><div><div class="surtitre">Négociation</div><h2>Offres de prix</h2><p>Proposez votre prix sur une annonce : le propriétaire accepte, refuse ou vous fait une contre-proposition. Si vous êtes d’accord, la vente ou la location se conclut au prix convenu, avec le même paiement sécurisé.</p></div><a class="btn btn-cta" href="#/annonces">Trouver un outil</a></div>
+      <div class="panneau"><h3 style="margin-top:0">Offres reçues sur mes annonces <span class="discret">(${recues.length})</span></h3>${recues.map(recue).join('') || '<p class="discret">Aucune offre reçue.</p>'}</div>
+      <div class="panneau"><h3 style="margin-top:0">Mes offres envoyées <span class="discret">(${envoyees.length})</span></h3>${envoyees.map(envoyee).join('') || '<p class="discret">Vous n’avez pas encore fait d’offre. Sur une annonce, cliquez sur « Proposer mon prix ».</p>'}</div>
+      <div class="alerte alerte-info">Règles : une offre ne peut pas être inférieure à ${Math.round(Z.REGLES.offres.plancher * 100)} % du prix affiché ; ${Z.REGLES.offres.maxParAnnonce} offres au plus par annonce ; chaque offre vaut ${Z.REGLES.offres.validiteHeures} h et engage son auteur pendant ce délai. Un prix accepté reste réservé ${Z.REGLES.offres.validiteHeures} h.</div>
+    </div></div>`;
+  }
+  function brancherOffres() {
+    vue.querySelector('.page').addEventListener('click', (e) => {
+      const b = e.target.closest('[data-offre]'); if (!b) return;
+      const o = etat.offres.find((x) => x.id === b.dataset.offre); const M = maintenant();
+      let r;
+      if (b.dataset.reponse === 'demo') r = Z.reponseVendeurDemo(o, M);
+      else if (b.dataset.reponse === 'contre') r = Z.repondreOffre(o, 'contre', M, Number(vue.querySelector(`[data-contre="${o.id}"]`).value));
+      else r = Z.repondreOffre(o, b.dataset.reponse, M);
+      if (!r.ok) return toast(r.raison);
+      etat.offres = etat.offres.map((x) => (x.id === o.id ? r.offre : x)); sauver();
+      toast({ 'acceptée': `Accord conclu à ${Z.euros(r.offre.prixFinal)}.`, 'refusée': 'Offre refusée.', 'contre-offre': `Contre-proposition de ${Z.euros(r.offre.contre)} envoyée.` }[r.offre.statut]); router();
+    });
+  }
+
   /* ---------- routeur ---------- */
   function router() {
     const [chemin, qs] = (location.hash.slice(1) || '/').split('?');
@@ -807,7 +1197,7 @@
     switch (seg[0]) {
       case undefined: html = vueAccueil(); apres = brancherAccueil; break;
       case 'annonces': html = vueAnnonces(params); apres = brancherFiltres; break;
-      case 'annonce': html = vueFiche(seg[1]); apres = () => { const a = annonce(seg[1]); if (a) brancherFiche(a); }; break;
+      case 'annonce': html = vueFiche(seg[1]); apres = () => { const a = Z.appliquerOffres(annonce(seg[1]), etat.offres, maintenant()); if (a) brancherFiche(a); }; break;
       case 'messages': html = vueMessages(params); apres = () => brancherMessages(params); break;
       case 'mon-espace': html = vueMonEspace(); apres = brancherEspace; break;
       case 'favoris': html = vueMonEspace(); apres = () => { brancherEspace(); const h = [...document.querySelectorAll('h3')].find((x) => x.textContent === 'Mes favoris'); if (h) h.scrollIntoView(); }; break;
@@ -816,10 +1206,16 @@
       case 'travaux': if (params.get('metier') !== null) { filtreTravaux.metier = params.get('metier'); filtreTravaux.vise = ''; } html = vueTravaux(); apres = brancherTravaux; break;
       case 'espace-artisan': html = vueEspaceArtisan(); apres = brancherEspaceArtisan; break;
       case 'reparer': html = vueReparer(); break;
-      case 'securite': html = blocReassurance(); break;
+      case 'destockage': html = vueDestockage(); apres = brancherDestockage; break;
+      case 'lot': html = vueLot(seg[1]); apres = () => brancherLot(seg[1]); break;
+      case 'espace-enseigne': html = vueEspaceEnseigne(); apres = brancherEspaceEnseigne; break;
+      case 'rendez-vous': html = vueRendezVous(params); apres = brancherRendezVous; break;
+      case 'agenda': html = vueAgenda(); apres = brancherAgenda; break;
+      case 'offres': html = vueOffres(); apres = brancherOffres; break;
+      case 'securite': html = vueLegal('securite'); break;
       case 'atelier': html = vueAtelier(); break;
       case 'aide': html = vueAide(); break;
-      case 'legal': html = vueLegal(); break;
+      case 'legal': html = vueLegal(seg[1]); break;
       case 'credits': html = vueCredits(); break;
       default: html = '<div class="page"><div class="conteneur vide">Page introuvable. <a href="#/">Retour à l’accueil</a></div></div>';
     }

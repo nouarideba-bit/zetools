@@ -1,6 +1,6 @@
 # ZETOOLS · maquette de la plateforme (phase 1)
 
-Plateforme communautaire et sécurisée pour **acheter, louer ou échanger des outils d’occasion** entre particuliers et professionnels, **trouver un artisan géolocalisé** pour ses travaux et **faire réparer** ses outils. Zone pilote : Île-de-France.
+Plateforme communautaire et sécurisée pour **acheter, louer ou échanger des outils d’occasion à petit prix** entre particuliers et professionnels, **négocier le prix**, **trouver un artisan géolocalisé**, **faire réparer** ses outils, **prendre rendez-vous** et profiter du **déstockage des enseignes**. Zone pilote : Île-de-France.
 
 > Maquette cliquable : les paiements, les comptes et les données sont **simulés**. Rien n’est encaissé, aucune donnée ne quitte le navigateur.
 
@@ -9,7 +9,7 @@ Plateforme communautaire et sécurisée pour **acheter, louer ou échanger des o
 - **Un seul fichier, à envoyer ou ouvrir n’importe où :** `dist/zetools-maquette.html`
 - **Version de travail :** `index.html`, ouvert dans un navigateur.
 - **Assembler à nouveau la version en un fichier :** `./assembler.sh`
-- **Tests de la logique (72 tests) :** `node tests/tester.js`
+- **Tests de la logique (112 tests) :** `node tests/tester.js`
 
 ## Ce que la maquette montre
 
@@ -17,10 +17,15 @@ Plateforme communautaire et sécurisée pour **acheter, louer ou échanger des o
 |---|---|
 | Accueil | Vidéo de fond, héro avec recherche par transaction (vente / location / échange), catégorie et lieu ; les 3 modes ; 7 catégories illustrées en vidéo ; annonces à la une ; réassurance ; parcours en 4 étapes ; offre pro ; L’Atelier |
 | Catalogue | Filtres par transaction, catégorie, ville ou code postal, recherche plein texte |
-| Fiche outil | Calendrier de disponibilité, devis détaillé (remises, assurance, frais, caution), achat avec séquestre, proposition d’échange |
+| Fiche outil | Calendrier de disponibilité, devis détaillé (remises, assurance, frais, caution), achat avec séquestre, proposition d’échange, prix neuf de référence et remise, « Proposer mon prix » |
 | Messagerie | Masquage automatique des téléphones, e-mails, IBAN, adresses, liens et messageries externes tant qu’aucune transaction n’est payée |
 | Mon espace | « Mon calendrier de location », mes annonces, mes favoris |
-| Déposer une annonce | Formulaire complet, publication immédiate dans la maquette |
+| Déposer une annonce | Formulaire complet, prix neuf de référence, prix conseillé et plafond calculés selon l’état, refus des prix trop élevés |
+| Offres de prix (`#/offres`) | L’acheteur ou le locataire propose son prix ; le propriétaire accepte, refuse ou contre-propose ; le prix convenu s’applique 48 h |
+| Agenda (`#/agenda`, `#/rendez-vous`) | Proposer jusqu’à 3 créneaux (jour et heure) pour des travaux, un échange, une réparation ou une remise ; acceptation, contre-proposition, annulation, export `.ics` |
+| Déstockage (`#/destockage`, `#/lot/…`) | Produits neufs des enseignes à prix cassés, prix barré de référence sur 30 jours, stock par magasin, paiement et retrait en magasin |
+| Espace enseigne (`#/espace-enseigne`) | Espace privé des distributeurs, négoces, fabricants et loueurs : indicateurs, lots, retraits à préparer, publication d’un lot. Noms d’enseignes fictifs |
+| Documents juridiques (`#/legal/…`) | Conditions générales, conditions professionnels et enseignes, mentions légales, confidentialité et cookies, sécurité et caution, règles de prix (ZETools SAS). Projets à valider par un avocat |
 | Trouver un artisan (`#/travaux`) | Géolocalisation (navigateur ou code postal), carte OpenStreetMap, artisans abonnés classés par distance, demande de travaux gratuite (petits, moyens, gros) |
 | Espace artisan (`#/espace-artisan`) | Abonnement 39 €/mois ou 390 €/an, 30 jours d’essai, 0 % de commission ; demandes de sa zone sur carte ; réponse contrôlée (abonnement, métier, zone, décennale pour les gros travaux) |
 | Outils à réparer (`#/reparer`) | Réparateurs proches, outils vendus « à réparer », dépôt d’un outil en panne, bonus réparation |
@@ -30,6 +35,8 @@ Plateforme communautaire et sécurisée pour **acheter, louer ou échanger des o
 
 - `logique.js` : règles métier (prix, commissions, disponibilités, masquage, recherche).
 - `donnees.js` : annonces, membres et réservations fictives ; liens des photos.
+- `juridique.js` : textes juridiques ; les tarifs y sont repris de `logique.js`.
+- `juridique/` : les mêmes textes en Markdown pour l’avocat, produits par `node outils/exporter-juridique.js`.
 - `app.js` : écrans et navigation.
 - `style.css` : charte graphique (anthracite / acier, jaune chantier, vert forêt).
 - [`CAHIER_DES_CHARGES.md`](CAHIER_DES_CHARGES.md) : règles économiques et prérequis.

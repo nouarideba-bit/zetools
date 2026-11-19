@@ -17,7 +17,13 @@ Lancer une première version en ligne sur **une zone test (Île-de-France)** et 
 | Commission sur vente (séquestre) | 8 % |
 | Frais de mise en relation d’un échange | 2,90 € par partie |
 | Durée maximale d’une location | 30 jours |
-| Caution | empreinte bancaire, jamais débitée sauf litige |
+| Caution | empreinte bancaire, jamais débitée sauf litige ; plafonnée au prix de vente maximum de l’outil |
+| **Prix de vente maximum** (part du prix neuf) | neuf 70 %, très bon état 50 %, bon état 40 %, état correct 30 %, à réparer 15 % |
+| **Loyer maximum** | 4 % du prix neuf par jour, 2 € minimum |
+| Prix conseillé | 80 % du maximum |
+| **Offre de prix** (négociation) | 50 % du prix affiché au minimum, 3 offres par annonce, validité 48 h, une contre-proposition |
+| **Déstockage enseignes** | commission 8 %, 2 unités par client et par lot, retrait sous 7 jours |
+| **Rendez-vous** | 3 créneaux proposés au plus, de 8 h à 20 h hors dimanche, annulation gratuite jusqu’à 24 h avant |
 
 Ces chiffres sont des hypothèses de travail à valider avec votre étude de marché ; ils ne constituent pas une recommandation financière.
 

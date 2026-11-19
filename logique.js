@@ -24,6 +24,20 @@
     // abonnement artisan : accès à toutes les demandes de travaux, sans commission ni frais par contact
     abonnementArtisan: { mensuel: 39, annuel: 390, essaiJours: 30 },
     tailles: { petit: 'Petits travaux', moyen: 'Travaux moyens', gros: 'Gros travaux' },
+    // Prix plafonnés : ZETOOLS vend de l'occasion (et du neuf entre particuliers) toujours sous le prix magasin.
+    // Plafond de vente = part du prix neuf de référence, selon l'état de l'outil.
+    plafondsVente: { 'Neuf': 0.70, 'Très bon état': 0.50, 'Bon état': 0.40, 'État correct': 0.30, 'À réparer': 0.15 },
+    locationJourMax: 0.04,                // loyer journalier ≤ 4 % du prix neuf
+    locationJourMin: 2,                   // € minimum par jour
+    partConseillee: 0.8,                  // prix conseillé = 80 % du plafond
+    // Déstockage enseignes : produits neufs, prix barré conforme à l'art. L.112-1-1 du Code de la consommation
+    commissionDestockage: 0.08,           // commission sur chaque vente de lot
+    maxParClient: 2,                      // limite par acheteur et par lot (évite la revente)
+    // Rendez-vous (travaux, échanges, réparations, remises)
+    rdv: { heureDebut: 8, heureFin: 20, pasMinutes: 60, maxCreneaux: 3, delaiMinHeures: 2, annulationGratuiteHeures: 24 },
+    // Offres de prix : l'acheteur ou le locataire propose son prix, le propriétaire accepte, refuse ou contre-propose
+    offres: { plancher: 0.5, validiteHeures: 48, maxParAnnonce: 3, seuilAcceptationDemo: 0.8 },
+    typesRdv: { travaux: 'Travaux', echange: 'Échange de matériel', reparation: 'Réparation', remise: 'Remise d’un outil' },
   };
 
   const arrondi = (x) => Math.round(x * 100) / 100;
@@ -252,6 +266,169 @@
     return { ok: true };
   }
 
+  /* ---------- Prix plafonnés (occasion et neuf entre particuliers) ---------- */
+  function tauxPlafond(etat) {
+    const t = REGLES.plafondsVente[etat];
+    return typeof t === 'number' ? t : REGLES.plafondsVente['Bon état'];
+  }
+  const demiEuro = (x) => Math.round(x * 2) / 2;
+  function plafondPrix(prixNeuf, etat) {
+    if (!(prixNeuf > 0)) return null;
+    const venteMax = Math.floor(prixNeuf * tauxPlafond(etat));
+    const jourMax = Math.max(REGLES.locationJourMin, Math.floor(prixNeuf * REGLES.locationJourMax * 2) / 2);
+    return {
+      venteMax,
+      venteConseillee: Math.max(1, Math.round(venteMax * REGLES.partConseillee)),
+      jourMax,
+      jourConseille: Math.max(REGLES.locationJourMin, demiEuro(jourMax * REGLES.partConseillee)),
+      cautionMax: Math.max(venteMax, 20),
+      taux: tauxPlafond(etat),
+    };
+  }
+  function verifierPrix(a) {
+    const erreurs = [];
+    const p = plafondPrix(a.prixNeuf, a.etat);
+    if (!p) return { ok: false, erreurs: ['Indiquez le prix neuf de référence de l’outil.'] };
+    const modes = a.modes || [];
+    if (modes.includes('vente') && a.prixVente > p.venteMax) erreurs.push(`Prix de vente trop élevé : ${euros(p.venteMax)} maximum pour un outil « ${a.etat} » (${Math.round(p.taux * 100)} % du neuf).`);
+    if (modes.includes('location') && a.prixJour > p.jourMax) erreurs.push(`Loyer trop élevé : ${euros(p.jourMax)} par jour maximum (4 % du prix neuf).`);
+    if (modes.includes('location') && a.caution > p.cautionMax) erreurs.push(`Caution trop élevée : ${euros(p.cautionMax)} maximum.`);
+    return { ok: erreurs.length === 0, erreurs, plafond: p };
+  }
+  function remiseSurNeuf(prix, prixNeuf) {
+    if (!(prix > 0) || !(prixNeuf > 0) || prix >= prixNeuf) return 0;
+    return Math.round((1 - prix / prixNeuf) * 100);
+  }
+
+  /* ---------- Déstockage enseignes (neuf) ---------- */
+  function stockLot(lot) { return (lot.magasins || []).reduce((t, m) => t + (m.stock || 0), 0); }
+  function verifierLot(lot, aujourdHui) {
+    const erreurs = [];
+    if (!lot.titre || String(lot.titre).trim().length < 4) erreurs.push('Indiquez la désignation du produit.');
+    if (!(lot.prixReference > 0)) erreurs.push('Indiquez le prix de référence : le plus bas pratiqué dans vos magasins au cours des 30 derniers jours.');
+    if (!(lot.prixDestockage > 0)) erreurs.push('Indiquez le prix de déstockage.');
+    else if (lot.prixReference > 0 && lot.prixDestockage >= lot.prixReference) erreurs.push('Le prix de déstockage doit être inférieur au prix de référence.');
+    if (!(stockLot(lot) > 0)) erreurs.push('Indiquez au moins un magasin avec du stock.');
+    if (!lot.fin) erreurs.push('Indiquez la date de fin de l’opération.');
+    else if (aujourdHui && versDate(lot.fin) < versDate(aujourdHui)) erreurs.push('La date de fin est passée.');
+    return { ok: erreurs.length === 0, erreurs };
+  }
+  function devisLot(lot, quantite) {
+    const q = Math.max(1, Math.min(quantite || 1, REGLES.maxParClient, stockLot(lot)));
+    const total = arrondi(lot.prixDestockage * q);
+    const commission = arrondi(total * REGLES.commissionDestockage);
+    return { quantite: q, total, commission, versementEnseigne: arrondi(total - commission), economie: arrondi((lot.prixReference - lot.prixDestockage) * q), remise: remiseSurNeuf(lot.prixDestockage, lot.prixReference) };
+  }
+  function retirerDuStock(lot, cp, quantite) {
+    const magasins = (lot.magasins || []).map((m) => ({ ...m }));
+    const m = magasins.find((x) => x.cp === cp && x.stock >= quantite) || magasins.find((x) => x.stock >= quantite);
+    if (!m) return { ok: false, raison: 'Stock insuffisant dans les magasins de l’enseigne.' };
+    m.stock -= quantite;
+    return { ok: true, magasin: m.nom, magasins };
+  }
+
+  /* ---------- Rendez-vous : travaux, échanges, réparations ---------- */
+  const deuxChiffres = (n) => String(n).padStart(2, '0');
+  /** Créneaux d'une journée, hors dimanche, en retirant les heures passées et celles déjà prises. */
+  function creneauxJour(date, opts = {}) {
+    const R = REGLES.rdv; const pris = opts.pris || [];
+    if (versDate(date).getUTCDay() === 0) return [];
+    const res = [];
+    for (let m = R.heureDebut * 60; m < R.heureFin * 60; m += R.pasMinutes) {
+      const heure = `${deuxChiffres(Math.floor(m / 60))}:${deuxChiffres(m % 60)}`;
+      const debut = `${date}T${heure}`;
+      if (opts.maintenant && debut < avancer(opts.maintenant, R.delaiMinHeures)) continue;
+      res.push({ debut, heure, libre: !pris.includes(debut) });
+    }
+    return res;
+  }
+  function avancer(dateHeure, heures) {
+    const d = new Date(dateHeure + 'Z'); d.setUTCHours(d.getUTCHours() + heures);
+    return d.toISOString().slice(0, 16);
+  }
+  function verifierProposition(p, maintenant) {
+    const R = REGLES.rdv; const erreurs = [];
+    if (!REGLES.typesRdv[p.type]) erreurs.push('Choisissez le type de rendez-vous.');
+    const c = p.creneaux || [];
+    if (!c.length) erreurs.push('Proposez au moins un créneau.');
+    if (c.length > R.maxCreneaux) erreurs.push(`${R.maxCreneaux} créneaux au maximum.`);
+    if (new Set(c).size !== c.length) erreurs.push('Un même créneau est proposé deux fois.');
+    if (maintenant && c.some((x) => x < avancer(maintenant, R.delaiMinHeures))) erreurs.push(`Chaque créneau doit commencer au moins ${R.delaiMinHeures} h après maintenant.`);
+    if (c.some((x) => versDate(x.slice(0, 10)).getUTCDay() === 0)) erreurs.push('Pas de rendez-vous le dimanche.');
+    return { ok: erreurs.length === 0, erreurs };
+  }
+  /** Accepter un créneau : le rendez-vous est confirmé, sauf conflit avec un autre rendez-vous confirmé. */
+  function confirmerRdv(rdv, creneau, autres = []) {
+    if (!(rdv.creneaux || []).includes(creneau)) return { ok: false, raison: 'Ce créneau ne fait pas partie de la proposition.' };
+    const fin = avancer(creneau, rdv.dureeHeures || 1);
+    const conflit = autres.find((o) => o.id !== rdv.id && o.statut === 'confirmé' && o.creneau < fin && creneau < avancer(o.creneau, o.dureeHeures || 1));
+    if (conflit) return { ok: false, raison: 'Vous avez déjà un rendez-vous confirmé sur ce créneau.' };
+    return { ok: true, rdv: { ...rdv, statut: 'confirmé', creneau } };
+  }
+  function annulationGratuite(rdv, maintenant) {
+    if (rdv.statut !== 'confirmé') return true;
+    return avancer(maintenant, REGLES.rdv.annulationGratuiteHeures) <= rdv.creneau;
+  }
+  /** Fichier iCalendar (RFC 5545) d'un rendez-vous confirmé, heure de Paris. */
+  function versIcs(rdv) {
+    const t = (x) => x.replace(/[-:]/g, '') + '00';
+    const echap = (x) => String(x || '').replace(/[\\,;]/g, (c) => '\\' + c).replace(/\n/g, '\\n');
+    return ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//ZETools//Agenda//FR', 'BEGIN:VEVENT',
+      `UID:${rdv.id}@zetools.fr`, `DTSTAMP:${t(rdv.creneau)}Z`,
+      `DTSTART;TZID=Europe/Paris:${t(rdv.creneau)}`, `DTEND;TZID=Europe/Paris:${t(avancer(rdv.creneau, rdv.dureeHeures || 1))}`,
+      `SUMMARY:${echap('ZETools · ' + (REGLES.typesRdv[rdv.type] || 'Rendez-vous') + ' · ' + rdv.objet)}`,
+      `DESCRIPTION:${echap('Rendez-vous confirmé sur ZETools. Adresse exacte dans votre messagerie.')}`,
+      'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
+  }
+
+  /* ---------- Offres de prix (négociation) ---------- */
+  const prixAffiche = (a, mode) => (mode === 'vente' ? a.prixVente : mode === 'location' ? a.prixJour : null);
+  function verifierOffre(a, mode, montant, dejaFaites = 0) {
+    const O = REGLES.offres; const prix = prixAffiche(a, mode);
+    if (!(a.modes || []).includes(mode) || !(prix > 0)) return { ok: false, raison: 'Une offre de prix porte sur une vente ou une location.' };
+    if (!(montant > 0)) return { ok: false, raison: 'Indiquez le prix que vous proposez.' };
+    if (montant >= prix) return { ok: false, raison: 'Votre offre doit être inférieure au prix affiché. À ce prix, achetez ou réservez directement.' };
+    const mini = arrondi(Math.ceil(prix * O.plancher * 2) / 2);
+    if (montant < mini) return { ok: false, raison: `Offre trop basse : ${euros(mini)} au minimum (${Math.round(O.plancher * 100)} % du prix affiché).` };
+    if (dejaFaites >= O.maxParAnnonce) return { ok: false, raison: `${O.maxParAnnonce} offres au maximum par annonce.` };
+    return { ok: true, prix, mini };
+  }
+  function creerOffre(a, mode, montant, maintenant) {
+    return { id: 'o' + maintenant.replace(/\D/g, '') + Math.round(montant * 100), sens: 'envoyee', annonceId: a.id, titre: a.titre, avec: a.membre, mode,
+      prixAffiche: prixAffiche(a, mode), montant: arrondi(montant), statut: 'en attente', expire: avancer(maintenant, REGLES.offres.validiteHeures) };
+  }
+  const offreExpiree = (o, maintenant) => ['en attente', 'contre-offre'].includes(o.statut) && maintenant > o.expire;
+  /** Réponse à une offre. Le propriétaire répond à une offre « en attente » ; l'auteur répond à une « contre-offre ». */
+  function repondreOffre(o, action, maintenant, contre) {
+    if (offreExpiree(o, maintenant)) return { ok: false, raison: 'Cette offre a expiré.' };
+    if (!['en attente', 'contre-offre'].includes(o.statut)) return { ok: false, raison: 'Cette offre a déjà reçu une réponse.' };
+    if (action === 'refuser') return { ok: true, offre: { ...o, statut: 'refusée' } };
+    if (action === 'accepter') return { ok: true, offre: { ...o, statut: 'acceptée', prixFinal: o.statut === 'contre-offre' ? o.contre : o.montant, expire: avancer(maintenant, REGLES.offres.validiteHeures) } };
+    if (action === 'contre') {
+      if (o.statut !== 'en attente') return { ok: false, raison: 'Une seule contre-proposition par offre.' };
+      if (!(contre > o.montant && contre < o.prixAffiche)) return { ok: false, raison: `Votre contre-proposition doit se situer entre ${euros(o.montant)} et ${euros(o.prixAffiche)}.` };
+      return { ok: true, offre: { ...o, statut: 'contre-offre', contre: arrondi(contre), expire: avancer(maintenant, REGLES.offres.validiteHeures) } };
+    }
+    return { ok: false, raison: 'Réponse inconnue.' };
+  }
+  /** Démonstration : le vendeur accepte à partir de 80 % du prix, sinon contre-propose à mi-chemin. */
+  function reponseVendeurDemo(o, maintenant) {
+    if (o.montant >= o.prixAffiche * REGLES.offres.seuilAcceptationDemo) return repondreOffre(o, 'accepter', maintenant);
+    const milieu = Math.round((o.montant + o.prixAffiche)) / 2;
+    return repondreOffre(o, 'contre', maintenant, milieu >= o.prixAffiche ? o.prixAffiche - 0.5 : milieu);
+  }
+  /** Annonce au prix négocié, si une offre acceptée est encore valable. */
+  function appliquerOffres(a, offres, maintenant) {
+    if (!a) return a;
+    const r = { ...a };
+    for (const o of offres) {
+      if (o.annonceId !== a.id || o.sens !== 'envoyee' || o.statut !== 'acceptée' || maintenant > o.expire) continue;
+      if (o.mode === 'vente') { r.prixVenteAffiche = a.prixVente; r.prixVente = o.prixFinal; }
+      if (o.mode === 'location') { r.prixJourAffiche = a.prixJour; r.prixJour = o.prixFinal; }
+    }
+    return r;
+  }
+
   function formatDate(t) {
     const [a, m, j] = String(t).split('-');
     return `${j}/${m}/${a}`;
@@ -264,6 +441,10 @@
     REGLES, MASQUE, nbJours, tauxRemise, tauxCommission, devisLocation, devisVente,
     verifierDisponibilite, joursOccupes, masquerCoordonnees, filtrer, formatDate, euros, versTexte, versDate,
     positionCodePostal, distanceKm, positionApprochee, formatDistance, artisansProches, demandesPourArtisan, abonnementActif, coutAbonnement, peutRepondre,
+    plafondPrix, verifierPrix, remiseSurNeuf,
+    stockLot, verifierLot, devisLot, retirerDuStock,
+    verifierOffre, creerOffre, offreExpiree, repondreOffre, reponseVendeurDemo, appliquerOffres,
+    creneauxJour, avancer, verifierProposition, confirmerRdv, annulationGratuite, versIcs,
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = ZT;
   else racine.ZT = ZT;

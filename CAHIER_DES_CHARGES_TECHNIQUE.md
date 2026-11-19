@@ -23,6 +23,10 @@ Documents liés :
 - **[ZETOOLS] Deux modules supplémentaires :**
   4. **Artisans géolocalisés sur abonnement.** Le client publie gratuitement une demande de travaux (petits, moyens ou gros). Les artisans abonnés à 39 €/mois ou 390 €/an y répondent, sans commission ni coût par contact.
   5. **Outils à réparer.** Demande de réparation adressée aux réparateurs proches, vente ou troc d’outils pour pièces, bonus réparation QualiRépar.
+  6. **Prix plafonnés.** Tout outil se vend nettement sous le prix neuf : plafond selon l’état (70 % neuf, 50 % très bon, 40 % bon, 30 % correct, 15 % à réparer), loyer limité à 4 % du prix neuf par jour. Le prix neuf de référence est obligatoire.
+  7. **Offres de prix.** L’acheteur ou le locataire propose son prix ; le propriétaire accepte, refuse ou contre-propose une fois. Offre valable 48 h, plancher à 50 % du prix affiché.
+  8. **Déstockage des enseignes.** Espace privé pour les grandes surfaces de bricolage, négoces de matériaux, fabricants, loueurs et quincailleries : lots neufs à prix cassés, stock par magasin, paiement en ligne, retrait en magasin. Commission de 8 %.
+  9. **Agenda.** Proposition de 1 à 3 créneaux (date et heure) pour des travaux, un échange, une réparation ou une remise ; confirmation, contre-proposition, annulation, export iCalendar.
 - **Zone pilote :** Île-de-France.
 
 ## 2. Architecture et stack
@@ -142,6 +146,16 @@ Documents liés :
   - obligations d’information des plateformes en ligne (classement des offres, avis) ;
   - assurance responsabilité civile de la plateforme.
 
+### G. [ZETOOLS] Modules ajoutés le 19/11/2026
+- **Offres de prix :** table `offres_prix`. Le prix affiché est figé dans l’offre. Au paiement, la transaction reprend le prix convenu ; commissions calculées sur ce prix.
+- **Déstockage :** tables `enseignes`, `magasins`, `lots_destockage`, `lot_stocks`, `commandes_lots`. Le stock se décrémente dans la même transaction SQL que la commande. Phase 2 : import CSV ou flux EDI, synchronisation avec le logiciel de caisse.
+- **Agenda :** tables `rendez_vous` et `rdv_creneaux`, contrainte d’exclusion contre les doubles réservations, rappels par notification 24 h et 2 h avant, flux iCalendar par membre.
+- **Documents juridiques :** `juridique.js` (site) et dossier `juridique/` (Markdown pour l’avocat).
+
+**[Vigilance] Prix barrés.** Toute annonce de réduction de prix par un professionnel doit afficher le prix le plus bas pratiqué au cours des 30 jours précédents (article L. 112-1-1 du Code de la consommation). L’enseigne l’atteste lot par lot ; ZETools conserve l’attestation horodatée.
+
+**[Vigilance] Noms d’enseignes.** La maquette utilise des noms fictifs. Aucun nom ni logo de distributeur réel ne doit apparaître avant la signature d’un contrat avec lui.
+
 ## 5. Découpage en phases
 
 | Phase | Durée | Contenu |
@@ -154,7 +168,7 @@ Documents liés :
 
 ## 6. Ce que la maquette valide déjà
 
-72 tests automatisés réussis :
+112 tests automatisés réussis :
 - prix, remises et commissions ;
 - disponibilités ;
 - masquage des coordonnées ;
@@ -162,6 +176,11 @@ Documents liés :
 - géolocalisation par code postal et distances ;
 - double rayon client et artisan ;
 - règles de réponse des artisans : abonnement actif, métier, zone, décennale pour les gros travaux, pas de double réponse ;
-- coût de l’abonnement.
+- coût de l’abonnement ;
+- prix plafonnés selon l’état, loyers et cautions ;
+- offres de prix : plancher, contre-proposition, expiration, prix convenu ;
+- lots de déstockage : prix de référence, stock par magasin, limite par client, commission ;
+- rendez-vous : créneaux, dimanches, conflits, annulation, export iCalendar ;
+- cohérence des tarifs entre les textes juridiques et les règles.
 
 La maquette sert de brief visuel et fonctionnel au prestataire.
