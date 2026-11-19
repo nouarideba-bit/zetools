@@ -368,5 +368,21 @@ test('logo et pictogrammes SVG valides', () => {
   for (const k of Object.keys(PDFM.PICTOS)) assert.match(PDFM.pictoSvg(k), /^<svg class="picto".*<\/svg>$/);
 });
 
+const QRM = require('../qr.js');
+test('QR code : taille, carrés de repérage, versions 1 à 6', () => {
+  const m = QRM.qrMatrice('ZETOOLS'); assert.strictEqual(m.length, 21);
+  for (const [x, y] of [[0, 0], [14, 0], [0, 14]]) { assert.ok(m[y][x] && m[y + 6][x + 6] && m[y + 3][x + 3]); assert.ok(!m[y + 1][x + 1]); }
+  assert.strictEqual(QRM.qrMatrice(DM.SITE_PUBLIC + '#/fiche-technique/f1').length, 33);
+  assert.throws(() => QRM.qrMatrice('x'.repeat(107)));
+});
+test('chaque fiche a au moins une vidéo YouTube décrite', () => {
+  for (const f of DM.FICHES) { assert.ok(f.videos.length >= 1, f.id); for (const v of f.videos) { assert.match(v.yt, /^[\w-]{11}$/); assert.ok(v.titre && v.chaine); if (v.debuts) assert.strictEqual(v.debuts.length, f.etapes.length); } }
+});
+test('PDF : encart vidéo avec QR code quand l’adresse est fournie', () => {
+  const f = DM.FICHES[0]; const avec = PDFM.fichePdf(f, null, { url: DM.SITE_PUBLIC + '#/fiche-technique/f1' }), sans = PDFM.fichePdf(f);
+  assert.match(avec, /\(La fiche en vid\\351o\) Tj/); assert.ok(!/La fiche en vid/.test(sans));
+  assert.ok(avec.length > sans.length + 2000);
+});
+
 console.log(`\n${ok} réussis, ${ko} échoués`);
 process.exit(ko ? 1 : 0);
