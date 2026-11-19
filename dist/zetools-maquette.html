@@ -302,6 +302,91 @@ table.tableau { width: 100%; border-collapse: collapse; background: var(--carte)
   .carte-geo { height: 300px; }
 }
 
+/* ---------- prix bas : comparaison avec le neuf ---------- */
+.carte .neuf { font-size: .85rem; color: var(--texte-doux); margin-top: 2px; }
+.carte .neuf s { opacity: .8; }
+.remise { display: inline-block; background: #e03131; color: #fff; font-weight: 800; font-size: .8rem; padding: 1px 7px; border-radius: 999px; }
+
+/* ---------- déstockage enseignes ---------- */
+.hero-destock { background: linear-gradient(120deg, #23272b 0%, #3a2a00 100%); }
+.badge-destock { background: #e03131; color: #fff; }
+.carte-lot .enseigne-nom { font-size: .8rem; font-weight: 700; color: var(--texte-doux); text-transform: uppercase; letter-spacing: .02em; }
+.barre { color: var(--texte-doux); font-weight: 400; font-size: .85em; margin-left: 6px; }
+.prix-lot { font-size: 2rem; font-weight: 800; margin: 8px 0 14px; }
+button.puce { border: 1px solid transparent; cursor: pointer; font-size: .85rem; padding: 6px 12px; }
+button.puce.active { background: var(--anthracite); color: #fff; }
+.note-legale { font-size: .8rem; color: var(--texte-doux); margin-top: 16px; }
+.bandeau-action { display: flex; gap: 16px; align-items: center; justify-content: space-between; flex-wrap: wrap; margin-top: 24px; }
+.bandeau-action > div { flex: 1; min-width: 240px; }
+.liste-avantages { padding-left: 18px; color: var(--texte-doux); }
+.liste-avantages li { margin: 6px 0; }
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 16px; }
+.kpi { background: var(--carte); border-radius: var(--rayon); padding: 16px; box-shadow: var(--ombre); display: flex; flex-direction: column; }
+.kpi b { font-size: 1.5rem; }
+.kpi span { color: var(--texte-doux); font-size: .85rem; }
+.tableau-defile { overflow-x: auto; }
+.tableau-defile .tableau { width: 100%; border-collapse: collapse; min-width: 560px; }
+.formulaire label.case { flex-direction: row; align-items: flex-start; gap: 8px; font-weight: 400; }
+
+/* ---------- agenda et rendez-vous ---------- */
+.rdv-grille { display: grid; grid-template-columns: minmax(260px, 340px) 1fr; gap: 24px; align-items: start; }
+.calendrier .jours button.marque { box-shadow: inset 0 -4px 0 var(--vert); }
+.calendrier .jours button.rdv-ok { background: var(--vert); color: #fff; font-weight: 800; }
+.calendrier .jours button.rdv-attente { background: var(--jaune); font-weight: 800; color: var(--anthracite); }
+.calendrier .jours button:disabled { cursor: default; }
+.creneaux { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 16px; }
+.creneaux button:not(.btn) { border: 1px solid var(--bord); background: #fff; border-radius: 8px; padding: 8px 12px; cursor: pointer; font-weight: 600; }
+.creneaux button:not(.btn):hover:not(:disabled) { border-color: var(--anthracite); }
+.creneaux button.choisi { background: var(--jaune); border-color: var(--jaune); }
+.creneaux button:disabled { opacity: .4; text-decoration: line-through; cursor: not-allowed; }
+.choisis { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
+.choisis .puce { font-size: .88rem; padding: 5px 10px; }
+.choisis .puce button { border: 0; background: none; cursor: pointer; font-weight: 800; color: var(--vert); }
+.agenda { display: grid; grid-template-columns: minmax(260px, 340px) 1fr; gap: 20px; align-items: start; }
+.legende { font-size: .82rem; color: var(--texte-doux); margin: 12px 0 0; }
+.pastille-ok, .pastille-attente { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--vert); margin: 0 4px 0 8px; }
+.pastille-attente { background: var(--jaune); }
+.rdv { padding: 14px 0; border-top: 1px solid var(--bord); }
+.rdv:first-of-type { border-top: 0; padding-top: 0; }
+.rdv-confirme .date-rdv { font-weight: 800; color: var(--vert); text-transform: capitalize; margin-bottom: 4px; }
+.rdv-passe { opacity: .6; }
+.rdv .citation { margin: 6px 0 0; font-style: italic; color: var(--texte-doux); font-size: .9rem; }
+.actions-rdv { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.actions-rdv .btn, .creneaux .btn { padding: 8px 12px; font-size: .88rem; }
+
+/* ---------- pages juridiques ---------- */
+.juridique { display: grid; grid-template-columns: 240px 1fr; gap: 24px; align-items: start; }
+.juridique nav { position: sticky; top: 84px; display: flex; flex-direction: column; gap: 4px; }
+.juridique nav a { padding: 8px 12px; border-radius: 8px; color: var(--texte); text-decoration: none; font-weight: 600; font-size: .92rem; }
+.juridique nav a.actif { background: var(--anthracite); color: #fff; }
+.juridique article h3 { margin: 26px 0 8px; font-size: 1.05rem; }
+.juridique article p, .juridique article li { font-size: .95rem; }
+.juridique article table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+.juridique article th, .juridique article td { text-align: left; padding: 8px 10px; border: 1px solid var(--bord); font-size: .88rem; vertical-align: top; }
+.juridique article th { background: var(--fond); }
+.a-completer { background: #fff6d6; color: #6b5200; padding: 0 4px; border-radius: 4px; font-weight: 600; }
+
+@media (max-width: 760px) {
+  .rdv-grille, .agenda, .juridique { grid-template-columns: 1fr; }
+  .juridique nav { position: static; flex-direction: row; flex-wrap: wrap; }
+}
+
+/* ---------- offres de prix ---------- */
+.bloc-offre { margin-top: 14px; padding-top: 14px; border-top: 1px dashed var(--bord); display: flex; flex-direction: column; gap: 6px; }
+.offre-saisie { display: inline-flex; gap: 6px; flex-wrap: wrap; }
+.offre-saisie input { border: 1px solid var(--bord); border-radius: 8px; padding: 8px 10px; width: 190px; max-width: 100%; }
+.actions-rdv .offre-saisie input { width: 110px; }
+.montants { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 8px; font-size: .95rem; }
+.montants small { color: var(--texte-doux); }
+.montants .final { color: var(--vert); }
+
+/* ---------- en-tête : liens lisibles sur fond sombre ---------- */
+.entete .lien-entete { color: #fff; }
+.entete .lien-entete:hover { background: var(--anthracite-2); color: var(--jaune); }
+.entete .recherche-entete { min-width: 200px; }
+@media (max-width: 1240px) { .entete .lien-entete { font-size: .82rem; padding: 6px 4px; } .entete .conteneur { gap: 8px; } }
+@media (max-width: 1080px) { .entete .lien-entete { display: none; } }
+
 </style>
 </head>
 <body>
@@ -316,6 +401,9 @@ table.tableau { width: 100%; border-collapse: collapse; background: var(--carte)
       <nav class="actions-entete" aria-label="Mon compte">
         <a class="lien-entete" href="#/travaux" title="Trouver un artisan près de chez moi">📍 Artisans</a>
         <a class="lien-entete" href="#/reparer" title="Outils à réparer">🪛 Réparer</a>
+        <a class="lien-entete" href="#/destockage" title="Déstockage des enseignes : du neuf à prix cassés">🏷️ Déstockage</a>
+        <a class="icone-btn" href="#/offres" title="Offres de prix : proposer et négocier">🤝</a>
+        <a class="icone-btn" href="#/agenda" title="Mon agenda de rendez-vous">📅</a>
         <a class="icone-btn" href="#/messages" title="Messagerie">💬<span class="bulle" id="bulle-msg">2</span></a>
         <a class="icone-btn" href="#/favoris" title="Favoris">♡</a>
         <a class="icone-btn" href="#/mon-espace" title="Mon espace">👤</a>
@@ -334,12 +422,12 @@ table.tableau { width: 100%; border-collapse: collapse; background: var(--carte)
           <p>Le bon outil, au bon moment, à deux rues de chez vous. Moins d’achats inutiles, plus d’outils qui servent.</p>
           <div class="reseaux"><a href="#/" title="Instagram">IG</a><a href="#/" title="Facebook">f</a><a href="#/" title="YouTube">▶</a><a href="#/" title="LinkedIn">in</a></div>
         </div>
-        <div><h4>Plateforme</h4><a href="#/annonces?mode=vente">Acheter</a><a href="#/annonces?mode=location">Louer</a><a href="#/annonces?mode=echange">Échanger</a><a href="#/deposer">Déposer une annonce</a><a href="#/travaux">Trouver un artisan</a><a href="#/reparer">Outils à réparer</a><a href="#/espace-artisan">Espace artisan abonné</a></div>
-        <div><h4>Ressources</h4><a href="#/atelier">L’Atelier · guide du bon bricoleur</a><a href="#/aide">FAQ</a><a href="#/securite">Sécurité et caution</a><a href="#/pros">Offres professionnelles</a></div>
-        <div><h4>Légal</h4><a href="#/legal">Conditions générales</a><a href="#/legal">Mentions légales</a><a href="#/legal">Confidentialité</a><a href="#/credits">Crédits photos</a></div>
+        <div><h4>Plateforme</h4><a href="#/annonces?mode=vente">Acheter</a><a href="#/annonces?mode=location">Louer</a><a href="#/annonces?mode=echange">Échanger</a><a href="#/deposer">Déposer une annonce</a><a href="#/travaux">Trouver un artisan</a><a href="#/reparer">Outils à réparer</a><a href="#/espace-artisan">Espace artisan abonné</a><a href="#/destockage">Déstockage des enseignes</a><a href="#/offres">Offres de prix</a><a href="#/agenda">Agenda et rendez-vous</a></div>
+        <div><h4>Ressources</h4><a href="#/atelier">L’Atelier · guide du bon bricoleur</a><a href="#/aide">FAQ</a><a href="#/legal/securite">Sécurité et caution</a><a href="#/legal/prix">Règles de prix</a><a href="#/pros">Offres professionnelles</a><a href="#/espace-enseigne">Espace enseigne (privé)</a></div>
+        <div><h4>Légal</h4><a href="#/legal/cgu">Conditions générales</a><a href="#/legal/pros">Conditions professionnels et enseignes</a><a href="#/legal/mentions">Mentions légales</a><a href="#/legal/confidentialite">Confidentialité et cookies</a><a href="#/credits">Crédits photos et vidéos</a></div>
         <div><h4>Zone pilote</h4><p style="font-size:.92rem;margin:0">Île-de-France · lancement 2027.<br>Électroportatif et jardinage d’abord.</p></div>
       </div>
-      <div class="bas"><span>© 2026 ZETOOLS · maquette non contractuelle</span><span>Paiements opérés à terme par un prestataire agréé (Stripe Connect ou Mangopay)</span></div>
+      <div class="bas"><span>© 2026 ZETools SAS · 58 rue de Ponthieu, 75008 Paris · maquette non contractuelle</span><span>Paiements opérés à terme par un prestataire agréé (Stripe Connect ou Mangopay)</span></div>
     </div>
   </footer>
 
@@ -370,6 +458,20 @@ table.tableau { width: 100%; border-collapse: collapse; background: var(--carte)
     // abonnement artisan : accès à toutes les demandes de travaux, sans commission ni frais par contact
     abonnementArtisan: { mensuel: 39, annuel: 390, essaiJours: 30 },
     tailles: { petit: 'Petits travaux', moyen: 'Travaux moyens', gros: 'Gros travaux' },
+    // Prix plafonnés : ZETOOLS vend de l'occasion (et du neuf entre particuliers) toujours sous le prix magasin.
+    // Plafond de vente = part du prix neuf de référence, selon l'état de l'outil.
+    plafondsVente: { 'Neuf': 0.70, 'Très bon état': 0.50, 'Bon état': 0.40, 'État correct': 0.30, 'À réparer': 0.15 },
+    locationJourMax: 0.04,                // loyer journalier ≤ 4 % du prix neuf
+    locationJourMin: 2,                   // € minimum par jour
+    partConseillee: 0.8,                  // prix conseillé = 80 % du plafond
+    // Déstockage enseignes : produits neufs, prix barré conforme à l'art. L.112-1-1 du Code de la consommation
+    commissionDestockage: 0.08,           // commission sur chaque vente de lot
+    maxParClient: 2,                      // limite par acheteur et par lot (évite la revente)
+    // Rendez-vous (travaux, échanges, réparations, remises)
+    rdv: { heureDebut: 8, heureFin: 20, pasMinutes: 60, maxCreneaux: 3, delaiMinHeures: 2, annulationGratuiteHeures: 24 },
+    // Offres de prix : l'acheteur ou le locataire propose son prix, le propriétaire accepte, refuse ou contre-propose
+    offres: { plancher: 0.5, validiteHeures: 48, maxParAnnonce: 3, seuilAcceptationDemo: 0.8 },
+    typesRdv: { travaux: 'Travaux', echange: 'Échange de matériel', reparation: 'Réparation', remise: 'Remise d’un outil' },
   };
 
   const arrondi = (x) => Math.round(x * 100) / 100;
@@ -598,6 +700,169 @@ table.tableau { width: 100%; border-collapse: collapse; background: var(--carte)
     return { ok: true };
   }
 
+  /* ---------- Prix plafonnés (occasion et neuf entre particuliers) ---------- */
+  function tauxPlafond(etat) {
+    const t = REGLES.plafondsVente[etat];
+    return typeof t === 'number' ? t : REGLES.plafondsVente['Bon état'];
+  }
+  const demiEuro = (x) => Math.round(x * 2) / 2;
+  function plafondPrix(prixNeuf, etat) {
+    if (!(prixNeuf > 0)) return null;
+    const venteMax = Math.floor(prixNeuf * tauxPlafond(etat));
+    const jourMax = Math.max(REGLES.locationJourMin, Math.floor(prixNeuf * REGLES.locationJourMax * 2) / 2);
+    return {
+      venteMax,
+      venteConseillee: Math.max(1, Math.round(venteMax * REGLES.partConseillee)),
+      jourMax,
+      jourConseille: Math.max(REGLES.locationJourMin, demiEuro(jourMax * REGLES.partConseillee)),
+      cautionMax: Math.max(venteMax, 20),
+      taux: tauxPlafond(etat),
+    };
+  }
+  function verifierPrix(a) {
+    const erreurs = [];
+    const p = plafondPrix(a.prixNeuf, a.etat);
+    if (!p) return { ok: false, erreurs: ['Indiquez le prix neuf de référence de l’outil.'] };
+    const modes = a.modes || [];
+    if (modes.includes('vente') && a.prixVente > p.venteMax) erreurs.push(`Prix de vente trop élevé : ${euros(p.venteMax)} maximum pour un outil « ${a.etat} » (${Math.round(p.taux * 100)} % du neuf).`);
+    if (modes.includes('location') && a.prixJour > p.jourMax) erreurs.push(`Loyer trop élevé : ${euros(p.jourMax)} par jour maximum (4 % du prix neuf).`);
+    if (modes.includes('location') && a.caution > p.cautionMax) erreurs.push(`Caution trop élevée : ${euros(p.cautionMax)} maximum.`);
+    return { ok: erreurs.length === 0, erreurs, plafond: p };
+  }
+  function remiseSurNeuf(prix, prixNeuf) {
+    if (!(prix > 0) || !(prixNeuf > 0) || prix >= prixNeuf) return 0;
+    return Math.round((1 - prix / prixNeuf) * 100);
+  }
+
+  /* ---------- Déstockage enseignes (neuf) ---------- */
+  function stockLot(lot) { return (lot.magasins || []).reduce((t, m) => t + (m.stock || 0), 0); }
+  function verifierLot(lot, aujourdHui) {
+    const erreurs = [];
+    if (!lot.titre || String(lot.titre).trim().length < 4) erreurs.push('Indiquez la désignation du produit.');
+    if (!(lot.prixReference > 0)) erreurs.push('Indiquez le prix de référence : le plus bas pratiqué dans vos magasins au cours des 30 derniers jours.');
+    if (!(lot.prixDestockage > 0)) erreurs.push('Indiquez le prix de déstockage.');
+    else if (lot.prixReference > 0 && lot.prixDestockage >= lot.prixReference) erreurs.push('Le prix de déstockage doit être inférieur au prix de référence.');
+    if (!(stockLot(lot) > 0)) erreurs.push('Indiquez au moins un magasin avec du stock.');
+    if (!lot.fin) erreurs.push('Indiquez la date de fin de l’opération.');
+    else if (aujourdHui && versDate(lot.fin) < versDate(aujourdHui)) erreurs.push('La date de fin est passée.');
+    return { ok: erreurs.length === 0, erreurs };
+  }
+  function devisLot(lot, quantite) {
+    const q = Math.max(1, Math.min(quantite || 1, REGLES.maxParClient, stockLot(lot)));
+    const total = arrondi(lot.prixDestockage * q);
+    const commission = arrondi(total * REGLES.commissionDestockage);
+    return { quantite: q, total, commission, versementEnseigne: arrondi(total - commission), economie: arrondi((lot.prixReference - lot.prixDestockage) * q), remise: remiseSurNeuf(lot.prixDestockage, lot.prixReference) };
+  }
+  function retirerDuStock(lot, cp, quantite) {
+    const magasins = (lot.magasins || []).map((m) => ({ ...m }));
+    const m = magasins.find((x) => x.cp === cp && x.stock >= quantite) || magasins.find((x) => x.stock >= quantite);
+    if (!m) return { ok: false, raison: 'Stock insuffisant dans les magasins de l’enseigne.' };
+    m.stock -= quantite;
+    return { ok: true, magasin: m.nom, magasins };
+  }
+
+  /* ---------- Rendez-vous : travaux, échanges, réparations ---------- */
+  const deuxChiffres = (n) => String(n).padStart(2, '0');
+  /** Créneaux d'une journée, hors dimanche, en retirant les heures passées et celles déjà prises. */
+  function creneauxJour(date, opts = {}) {
+    const R = REGLES.rdv; const pris = opts.pris || [];
+    if (versDate(date).getUTCDay() === 0) return [];
+    const res = [];
+    for (let m = R.heureDebut * 60; m < R.heureFin * 60; m += R.pasMinutes) {
+      const heure = `${deuxChiffres(Math.floor(m / 60))}:${deuxChiffres(m % 60)}`;
+      const debut = `${date}T${heure}`;
+      if (opts.maintenant && debut < avancer(opts.maintenant, R.delaiMinHeures)) continue;
+      res.push({ debut, heure, libre: !pris.includes(debut) });
+    }
+    return res;
+  }
+  function avancer(dateHeure, heures) {
+    const d = new Date(dateHeure + 'Z'); d.setUTCHours(d.getUTCHours() + heures);
+    return d.toISOString().slice(0, 16);
+  }
+  function verifierProposition(p, maintenant) {
+    const R = REGLES.rdv; const erreurs = [];
+    if (!REGLES.typesRdv[p.type]) erreurs.push('Choisissez le type de rendez-vous.');
+    const c = p.creneaux || [];
+    if (!c.length) erreurs.push('Proposez au moins un créneau.');
+    if (c.length > R.maxCreneaux) erreurs.push(`${R.maxCreneaux} créneaux au maximum.`);
+    if (new Set(c).size !== c.length) erreurs.push('Un même créneau est proposé deux fois.');
+    if (maintenant && c.some((x) => x < avancer(maintenant, R.delaiMinHeures))) erreurs.push(`Chaque créneau doit commencer au moins ${R.delaiMinHeures} h après maintenant.`);
+    if (c.some((x) => versDate(x.slice(0, 10)).getUTCDay() === 0)) erreurs.push('Pas de rendez-vous le dimanche.');
+    return { ok: erreurs.length === 0, erreurs };
+  }
+  /** Accepter un créneau : le rendez-vous est confirmé, sauf conflit avec un autre rendez-vous confirmé. */
+  function confirmerRdv(rdv, creneau, autres = []) {
+    if (!(rdv.creneaux || []).includes(creneau)) return { ok: false, raison: 'Ce créneau ne fait pas partie de la proposition.' };
+    const fin = avancer(creneau, rdv.dureeHeures || 1);
+    const conflit = autres.find((o) => o.id !== rdv.id && o.statut === 'confirmé' && o.creneau < fin && creneau < avancer(o.creneau, o.dureeHeures || 1));
+    if (conflit) return { ok: false, raison: 'Vous avez déjà un rendez-vous confirmé sur ce créneau.' };
+    return { ok: true, rdv: { ...rdv, statut: 'confirmé', creneau } };
+  }
+  function annulationGratuite(rdv, maintenant) {
+    if (rdv.statut !== 'confirmé') return true;
+    return avancer(maintenant, REGLES.rdv.annulationGratuiteHeures) <= rdv.creneau;
+  }
+  /** Fichier iCalendar (RFC 5545) d'un rendez-vous confirmé, heure de Paris. */
+  function versIcs(rdv) {
+    const t = (x) => x.replace(/[-:]/g, '') + '00';
+    const echap = (x) => String(x || '').replace(/[\\,;]/g, (c) => '\\' + c).replace(/\n/g, '\\n');
+    return ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//ZETools//Agenda//FR', 'BEGIN:VEVENT',
+      `UID:${rdv.id}@zetools.fr`, `DTSTAMP:${t(rdv.creneau)}Z`,
+      `DTSTART;TZID=Europe/Paris:${t(rdv.creneau)}`, `DTEND;TZID=Europe/Paris:${t(avancer(rdv.creneau, rdv.dureeHeures || 1))}`,
+      `SUMMARY:${echap('ZETools · ' + (REGLES.typesRdv[rdv.type] || 'Rendez-vous') + ' · ' + rdv.objet)}`,
+      `DESCRIPTION:${echap('Rendez-vous confirmé sur ZETools. Adresse exacte dans votre messagerie.')}`,
+      'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
+  }
+
+  /* ---------- Offres de prix (négociation) ---------- */
+  const prixAffiche = (a, mode) => (mode === 'vente' ? a.prixVente : mode === 'location' ? a.prixJour : null);
+  function verifierOffre(a, mode, montant, dejaFaites = 0) {
+    const O = REGLES.offres; const prix = prixAffiche(a, mode);
+    if (!(a.modes || []).includes(mode) || !(prix > 0)) return { ok: false, raison: 'Une offre de prix porte sur une vente ou une location.' };
+    if (!(montant > 0)) return { ok: false, raison: 'Indiquez le prix que vous proposez.' };
+    if (montant >= prix) return { ok: false, raison: 'Votre offre doit être inférieure au prix affiché. À ce prix, achetez ou réservez directement.' };
+    const mini = arrondi(Math.ceil(prix * O.plancher * 2) / 2);
+    if (montant < mini) return { ok: false, raison: `Offre trop basse : ${euros(mini)} au minimum (${Math.round(O.plancher * 100)} % du prix affiché).` };
+    if (dejaFaites >= O.maxParAnnonce) return { ok: false, raison: `${O.maxParAnnonce} offres au maximum par annonce.` };
+    return { ok: true, prix, mini };
+  }
+  function creerOffre(a, mode, montant, maintenant) {
+    return { id: 'o' + maintenant.replace(/\D/g, '') + Math.round(montant * 100), sens: 'envoyee', annonceId: a.id, titre: a.titre, avec: a.membre, mode,
+      prixAffiche: prixAffiche(a, mode), montant: arrondi(montant), statut: 'en attente', expire: avancer(maintenant, REGLES.offres.validiteHeures) };
+  }
+  const offreExpiree = (o, maintenant) => ['en attente', 'contre-offre'].includes(o.statut) && maintenant > o.expire;
+  /** Réponse à une offre. Le propriétaire répond à une offre « en attente » ; l'auteur répond à une « contre-offre ». */
+  function repondreOffre(o, action, maintenant, contre) {
+    if (offreExpiree(o, maintenant)) return { ok: false, raison: 'Cette offre a expiré.' };
+    if (!['en attente', 'contre-offre'].includes(o.statut)) return { ok: false, raison: 'Cette offre a déjà reçu une réponse.' };
+    if (action === 'refuser') return { ok: true, offre: { ...o, statut: 'refusée' } };
+    if (action === 'accepter') return { ok: true, offre: { ...o, statut: 'acceptée', prixFinal: o.statut === 'contre-offre' ? o.contre : o.montant, expire: avancer(maintenant, REGLES.offres.validiteHeures) } };
+    if (action === 'contre') {
+      if (o.statut !== 'en attente') return { ok: false, raison: 'Une seule contre-proposition par offre.' };
+      if (!(contre > o.montant && contre < o.prixAffiche)) return { ok: false, raison: `Votre contre-proposition doit se situer entre ${euros(o.montant)} et ${euros(o.prixAffiche)}.` };
+      return { ok: true, offre: { ...o, statut: 'contre-offre', contre: arrondi(contre), expire: avancer(maintenant, REGLES.offres.validiteHeures) } };
+    }
+    return { ok: false, raison: 'Réponse inconnue.' };
+  }
+  /** Démonstration : le vendeur accepte à partir de 80 % du prix, sinon contre-propose à mi-chemin. */
+  function reponseVendeurDemo(o, maintenant) {
+    if (o.montant >= o.prixAffiche * REGLES.offres.seuilAcceptationDemo) return repondreOffre(o, 'accepter', maintenant);
+    const milieu = Math.round((o.montant + o.prixAffiche)) / 2;
+    return repondreOffre(o, 'contre', maintenant, milieu >= o.prixAffiche ? o.prixAffiche - 0.5 : milieu);
+  }
+  /** Annonce au prix négocié, si une offre acceptée est encore valable. */
+  function appliquerOffres(a, offres, maintenant) {
+    if (!a) return a;
+    const r = { ...a };
+    for (const o of offres) {
+      if (o.annonceId !== a.id || o.sens !== 'envoyee' || o.statut !== 'acceptée' || maintenant > o.expire) continue;
+      if (o.mode === 'vente') { r.prixVenteAffiche = a.prixVente; r.prixVente = o.prixFinal; }
+      if (o.mode === 'location') { r.prixJourAffiche = a.prixJour; r.prixJour = o.prixFinal; }
+    }
+    return r;
+  }
+
   function formatDate(t) {
     const [a, m, j] = String(t).split('-');
     return `${j}/${m}/${a}`;
@@ -610,6 +875,10 @@ table.tableau { width: 100%; border-collapse: collapse; background: var(--carte)
     REGLES, MASQUE, nbJours, tauxRemise, tauxCommission, devisLocation, devisVente,
     verifierDisponibilite, joursOccupes, masquerCoordonnees, filtrer, formatDate, euros, versTexte, versDate,
     positionCodePostal, distanceKm, positionApprochee, formatDistance, artisansProches, demandesPourArtisan, abonnementActif, coutAbonnement, peutRepondre,
+    plafondPrix, verifierPrix, remiseSurNeuf,
+    stockLot, verifierLot, devisLot, retirerDuStock,
+    verifierOffre, creerOffre, offreExpiree, repondreOffre, reponseVendeurDemo, appliquerOffres,
+    creneauxJour, avancer, verifierProposition, confirmerRdv, annulationGratuite, versIcs,
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = ZT;
   else racine.ZT = ZT;
@@ -674,51 +943,51 @@ table.tableau { width: 100%; border-collapse: collapse; background: var(--carte)
   // modes : 'vente' | 'location' | 'echange' (une annonce peut en cumuler plusieurs)
   const ANNONCES = [
     { id: 'a1', titre: 'Perceuse-visseuse 18 V + 2 batteries', marque: 'DeWalt', categorie: 'electro', etat: 'Très bon état',
-      modes: ['location', 'vente'], prixJour: 9, prixVente: 145, caution: 120, ville: 'Montreuil', cp: '93100', membre: 'm1',
+      modes: ['location', 'vente'], prixNeuf: 220, prixJour: 6, prixVente: 89, caution: 90, ville: 'Montreuil', cp: '93100', membre: 'm1',
       photo: U('1572981779307-38b8cabb2407'), description: 'Perceuse-visseuse sans fil, mandrin 13 mm, 2 batteries 2 Ah et chargeur rapide. Idéale montage de meubles, fixations murales, perçage bois et métal.',
       indispo: [] },
     { id: 'a2', titre: 'Perforateur SDS+ 800 W avec coffret de forets', marque: 'Bosch', categorie: 'electro', etat: 'Bon état',
-      modes: ['location'], prixJour: 14, prixVente: null, caution: 200, ville: 'Vincennes', cp: '94300', membre: 'm2',
+      modes: ['location'], prixNeuf: 180, prixJour: 6, prixVente: null, caution: 70, ville: 'Vincennes', cp: '94300', membre: 'm2',
       photo: U('1585201731775-0597e1be4bfb'), description: 'Perforateur burineur pour béton et parpaing. Livré avec 6 forets SDS+ et burin plat. Parfait pour un week-end de travaux.',
       indispo: [{ debut: '2026-12-24', fin: '2026-12-26' }] },
     { id: 'a3', titre: 'Visseuse à chocs 18 V compacte', marque: 'Milwaukee', categorie: 'electro', etat: 'Très bon état',
-      modes: ['location', 'echange'], prixJour: 8, prixVente: null, caution: 110, ville: 'Boulogne-Billancourt', cp: '92100', membre: 'm3',
+      modes: ['location', 'echange'], prixNeuf: 150, prixJour: 5, prixVente: null, caution: 60, ville: 'Boulogne-Billancourt', cp: '92100', membre: 'm3',
       photo: U('1623161551706-318825cd18ef'), description: 'Visseuse à chocs pour vis longues et terrasses bois. Recherche en échange : ponceuse excentrique.',
       echangeContre: 'Ponceuse excentrique', indispo: [] },
     { id: 'a4', titre: 'Sécateur de précision + gants', marque: 'Felco', categorie: 'jardin', etat: 'Neuf',
-      modes: ['vente', 'echange'], prixJour: null, prixVente: 38, caution: 0, ville: 'Nogent-sur-Marne', cp: '94130', membre: 'm5',
+      modes: ['vente', 'echange'], prixNeuf: 45, prixJour: null, prixVente: 29, caution: 0, ville: 'Nogent-sur-Marne', cp: '94130', membre: 'm5',
       photo: U('1523301551780-cd17359a95d0'), description: 'Sécateur à lame forgée, jamais utilisé, avec gants de jardinage taille 9.',
       echangeContre: 'Cisaille à haies manuelle', indispo: [] },
     { id: 'a5', titre: 'Brouette renforcée 100 L', marque: 'Haemmerlin', categorie: 'chantier', etat: 'Bon état',
-      modes: ['location', 'vente'], prixJour: 5, prixVente: 45, caution: 40, ville: 'Saint-Maur-des-Fossés', cp: '94100', membre: 'm4',
+      modes: ['location', 'vente'], prixNeuf: 75, prixJour: 3, prixVente: 25, caution: 25, ville: 'Saint-Maur-des-Fossés', cp: '94100', membre: 'm4',
       photo: U('1621272156506-cdbdb6a47243'), description: 'Brouette de chantier, roue gonflée neuve. Pratique pour un déménagement de terre ou un petit chantier de maçonnerie.',
       indispo: [] },
     { id: 'a6', titre: 'Lot de 4 outils de jardin à main', marque: 'Fiskars', categorie: 'jardin', etat: 'Très bon état',
-      modes: ['vente'], prixJour: null, prixVente: 25, caution: 0, ville: 'Montreuil', cp: '93100', membre: 'm1',
+      modes: ['vente'], prixNeuf: 40, prixJour: null, prixVente: 15, caution: 0, ville: 'Montreuil', cp: '93100', membre: 'm1',
       photo: U('1526381805515-3fec2d69e7cc'), description: 'Transplantoir, griffe, binette et serfouette. Manches bois, rangement mural inclus.',
       indispo: [] },
     { id: 'a7', titre: 'Pelles et bêches de terrassement (×3)', marque: 'Leborgne', categorie: 'chantier', etat: 'Bon état',
-      modes: ['location'], prixJour: 6, prixVente: null, caution: 50, ville: 'Nogent-sur-Marne', cp: '94130', membre: 'm5',
+      modes: ['location'], prixNeuf: 90, prixJour: 3, prixVente: null, caution: 30, ville: 'Nogent-sur-Marne', cp: '94130', membre: 'm5',
       photo: U('1537877853655-34bdcda5e833'), description: 'Une pelle ronde, une pelle carrée et une bêche. Pour une plantation de haie ou une tranchée.',
       indispo: [] },
     { id: 'a8', titre: 'Coffret d’outils d’ébéniste anciens', marque: 'Peugeot Frères', categorie: 'main', etat: 'Bon état',
-      modes: ['echange', 'vente'], prixJour: null, prixVente: 90, caution: 0, ville: 'Vincennes', cp: '94300', membre: 'm2',
+      modes: ['echange', 'vente'], prixNeuf: 200, prixJour: null, prixVente: 60, caution: 0, ville: 'Vincennes', cp: '94300', membre: 'm2',
       photo: U('1774963711952-713bb7a52c4e'), description: 'Rabots, ciseaux à bois et vilebrequin restaurés. Échange possible contre une scie sur table.',
       echangeContre: 'Scie sur table', indispo: [] },
     { id: 'a9', titre: 'Taille-haie / élagage : kit de taille', marque: 'Wolf-Garten', categorie: 'jardin', etat: 'Très bon état',
-      modes: ['location'], prixJour: 7, prixVente: null, caution: 60, ville: 'Boulogne-Billancourt', cp: '92100', membre: 'm3',
+      modes: ['location'], prixNeuf: 160, prixJour: 5, prixVente: null, caution: 60, ville: 'Boulogne-Billancourt', cp: '92100', membre: 'm3',
       photo: U('1617576683096-00fc8eecb3af'), description: 'Cisaille à haies, sécateur de force et gants. La bonne trousse pour la taille d’automne.',
       indispo: [] },
     { id: 'a10', titre: 'Servante d’atelier garnie 120 pièces', marque: 'Facom', categorie: 'meca', etat: 'Bon état',
-      modes: ['vente', 'location'], prixJour: 12, prixVente: 390, caution: 300, ville: 'Saint-Maur-des-Fossés', cp: '94100', membre: 'm4',
+      modes: ['vente', 'location'], prixNeuf: 650, prixJour: 10, prixVente: 229, caution: 200, ville: 'Saint-Maur-des-Fossés', cp: '94100', membre: 'm4',
       photo: U('1540104539488-92a51bbc0410'), description: 'Servante 6 tiroirs : douilles, clés mixtes, tournevis, pinces. Pour une révision moto ou une vidange.',
       indispo: [] },
     { id: 'a11', titre: 'Visseuse 18 V : batterie HS, pour bricoleur', marque: 'Makita', categorie: 'electro', etat: 'À réparer',
-      modes: ['vente', 'echange'], prixJour: null, prixVente: 25, caution: 0, ville: 'Vincennes', cp: '94300', membre: 'm2',
+      modes: ['vente', 'echange'], prixNeuf: 120, prixJour: null, prixVente: 15, caution: 0, ville: 'Vincennes', cp: '94300', membre: 'm2',
       photo: U('1623161551727-54c918bdcec1'), description: 'Moteur et mandrin OK, la batterie ne tient plus la charge. Idéal pour qui a déjà des batteries Makita 18 V.',
       panne: 'Batterie à remplacer', echangeContre: 'Batterie 18 V', indispo: [] },
     { id: 'a12', titre: 'Lot d’outils anciens à restaurer', marque: 'Divers', categorie: 'main', etat: 'À réparer',
-      modes: ['vente'], prixJour: null, prixVente: 15, caution: 0, ville: 'Nogent-sur-Marne', cp: '94130', membre: 'm5',
+      modes: ['vente'], prixNeuf: 100, prixJour: null, prixVente: 10, caution: 0, ville: 'Nogent-sur-Marne', cp: '94130', membre: 'm5',
       photo: U('1774365294150-5d6051b6c53a'), description: 'Râteaux et outils de jardin anciens : manches à changer, métal sain. Pour amateur de restauration.',
       panne: 'Manches cassés, rouille de surface', indispo: [] },
   ];
@@ -835,9 +1104,307 @@ table.tableau { width: 100%; border-collapse: collapse; background: var(--carte)
 
   PHOTOS.artisans = U('1621905251918-48416bd8575a', 1400);
 
-  const D = { PHOTOS, VIDEOS, CATEGORIES, MEMBRES, ANNONCES, RESERVATIONS, ARTICLES, CREDITS, METIERS, ARTISANS, DEMANDES };
+
+  // Déstockage enseignes : noms d'enseignes FICTIFS (maquette publique, aucune marque réelle de distributeur).
+  // Types d'acteurs visés : grandes surfaces de bricolage, négoces de matériaux, fabricants, loueurs, quincailleries.
+  const TYPES_ENSEIGNE = { gsb: 'Grande surface de bricolage', negoce: 'Négoce de matériaux', fabricant: 'Fabricant', loueur: 'Loueur de matériel', quincaillerie: 'Quincaillerie' };
+  const ENSEIGNES = [
+    { id: 'e1', nom: 'Brico Horizon', type: 'gsb', siret: true, magasins: 6, logo: '🏬' },
+    { id: 'e2', nom: 'Matériaux du Val', type: 'negoce', siret: true, magasins: 3, logo: '🧱' },
+    { id: 'e3', nom: 'Forgeval Outillage', type: 'fabricant', siret: true, magasins: 1, logo: '🏭' },
+    { id: 'e4', nom: 'Location Chantier Plus', type: 'loueur', siret: true, magasins: 4, logo: '🚚' },
+  ];
+  const LOTS = [
+    { id: 'l1', enseigne: 'e1', titre: 'Perceuse-visseuse 18 V, 2 batteries, coffret', categorie: 'electro', photo: U('1572981779307-38b8cabb2407'),
+      prixReference: 149, prixDestockage: 69, motif: 'Fin de série', fin: '2026-12-20',
+      magasins: [{ nom: 'Brico Horizon Montreuil', cp: '93100', stock: 14 }, { nom: 'Brico Horizon Créteil', cp: '94000', stock: 9 }] },
+    { id: 'l2', enseigne: 'e1', titre: 'Taille-haie électrique 600 W, lame 55 cm', categorie: 'jardin', photo: U('1617576683096-00fc8eecb3af'),
+      prixReference: 99, prixDestockage: 45, motif: 'Fin de saison', fin: '2026-12-31',
+      magasins: [{ nom: 'Brico Horizon Nanterre', cp: '92000', stock: 22 }] },
+    { id: 'l3', enseigne: 'e2', titre: 'Brouette de chantier 100 L, roue gonflée', categorie: 'chantier', photo: U('1621272156506-cdbdb6a47243'),
+      prixReference: 89, prixDestockage: 39, motif: 'Surstock', fin: '2027-01-15',
+      magasins: [{ nom: 'Matériaux du Val Vitry', cp: '94400', stock: 40 }, { nom: 'Matériaux du Val Ivry', cp: '94200', stock: 18 }] },
+    { id: 'l4', enseigne: 'e3', titre: 'Servante d’atelier 7 tiroirs garnie 150 pièces', categorie: 'meca', photo: U('1540104539488-92a51bbc0410'),
+      prixReference: 699, prixDestockage: 349, motif: 'Emballage abîmé, produit neuf', fin: '2026-12-15',
+      magasins: [{ nom: 'Forgeval, dépôt usine Gennevilliers', cp: '92230', stock: 6 }] },
+    { id: 'l5', enseigne: 'e4', titre: 'Perforateur SDS+ 800 W, sorti du parc de location, révisé', categorie: 'electro', photo: U('1585201731775-0597e1be4bfb'),
+      prixReference: 189, prixDestockage: 79, motif: 'Renouvellement du parc', fin: '2027-01-31', reconditionne: true,
+      magasins: [{ nom: 'Location Chantier Plus Saint-Denis', cp: '93200', stock: 11 }] },
+    { id: 'l6', enseigne: 'e2', titre: 'Lot de 3 pelles et bêches de terrassement', categorie: 'chantier', photo: U('1537877853655-34bdcda5e833'),
+      prixReference: 75, prixDestockage: 29, motif: 'Changement de référence', fin: '2026-12-31',
+      magasins: [{ nom: 'Matériaux du Val Vitry', cp: '94400', stock: 25 }] },
+  ];
+
+  // Rendez-vous reçus en démonstration (proposés par d'autres membres)
+  const RDV_DEMO = [
+    { id: 'r-demo-1', type: 'echange', sens: 'recu', avec: 'm3', objet: 'Échange ponceuse contre visseuse à chocs', annonceId: 'a3',
+      creneaux: ['2026-11-28T10:00', '2026-11-28T14:00', '2026-11-30T18:00'], dureeHeures: 1, lieu: 'Lieu public proche (parvis de la mairie conseillé)', statut: 'proposé',
+      message: 'Je peux samedi matin ou lundi soir, dites-moi ce qui vous arrange.' },
+  ];
+
+  // Offres de prix reçues en démonstration (sur des annonces fictives du compte de démonstration)
+  const OFFRES_DEMO = [
+    { id: 'o-demo-1', sens: 'recue', avec: 'm2', titre: 'Votre scie sauteuse 650 W', mode: 'vente', prixAffiche: 45, montant: 32, statut: 'en attente', expire: '2026-12-31T20:00' },
+    { id: 'o-demo-2', sens: 'recue', avec: 'm1', titre: 'Votre échelle télescopique 3,80 m', mode: 'location', prixAffiche: 5, montant: 4, statut: 'en attente', expire: '2026-12-31T20:00' },
+  ];
+
+  const D = { PHOTOS, VIDEOS, CATEGORIES, MEMBRES, ANNONCES, RESERVATIONS, ARTICLES, CREDITS, METIERS, ARTISANS, DEMANDES, TYPES_ENSEIGNE, ENSEIGNES, LOTS, RDV_DEMO, OFFRES_DEMO };
   if (typeof module !== 'undefined' && module.exports) module.exports = D;
   else racine.ZT_DONNEES = D;
+})(typeof window !== 'undefined' ? window : globalThis);
+
+</script>
+  <script>
+/* ZETOOLS · textes juridiques (projet à faire valider par un avocat avant mise en ligne).
+   Les chiffres viennent de logique.js (REGLES) : un seul endroit à modifier.
+   Fonctionne dans le navigateur (window.ZT_JURIDIQUE) et sous Node (module.exports). */
+(function (racine) {
+  'use strict';
+  const Z = (typeof module !== 'undefined' && module.exports) ? require('./logique.js') : racine.ZT;
+  const R = Z.REGLES;
+  const pc = (x) => String(Math.round(x * 1000) / 10).replace('.', ',') + ' %';
+  const eur = (x) => String(x).replace('.', ',') + ' €';
+  const AC = (quoi) => `<span class="a-completer">[À COMPLÉTER : ${quoi}]</span>`;
+
+  const SOCIETE = {
+    nom: 'ZETools', forme: 'société par actions simplifiée (SAS)',
+    siege: '58 rue de Ponthieu, 75008 Paris', version: 'Projet du 19 novembre 2026',
+  };
+  const S = `<b>ZETools</b>, ${SOCIETE.forme} au capital de ${AC('montant du capital')}, dont le siège social est situé ${SOCIETE.siege}, immatriculée au registre du commerce et des sociétés de Paris sous le numéro ${AC('numéro SIREN')}`;
+  const plaf = R.plafondsVente;
+
+  const PAGES = [
+    /* ------------------------------------------------------------------ */
+    { id: 'cgu', titre: 'Conditions générales d’utilisation et de services', court: 'Conditions générales',
+      intro: 'Elles s’appliquent à toute personne qui utilise la plateforme ZETools, comme particulier ou comme professionnel. Les professionnels sont en outre soumis aux conditions particulières professionnels et enseignes.',
+      sections: [
+        ['Article 1. Objet', `<p>Les présentes conditions régissent l’accès et l’utilisation de la plateforme ZETools (site et application), éditée par ${S} (« ZETools »).</p>
+          <p>La plateforme met en relation ses membres pour : la vente d’outils, la location d’outils, l’échange d’outils, la mise en relation avec des artisans et des réparateurs, l’achat de produits déstockés par des enseignes, et la prise de rendez-vous entre membres.</p>`],
+        ['Article 2. Définitions', `<ul>
+          <li><b>Membre</b> : toute personne titulaire d’un compte.</li>
+          <li><b>Particulier</b> : membre qui agit à des fins qui n’entrent pas dans le cadre d’une activité professionnelle.</li>
+          <li><b>Professionnel</b> : membre qui agit dans le cadre de son activité commerciale, artisanale, industrielle ou libérale, y compris les artisans abonnés et les enseignes.</li>
+          <li><b>Annonce</b> : offre de vente, de location ou d’échange publiée par un membre.</li>
+          <li><b>Transaction</b> : contrat conclu entre deux membres par l’intermédiaire de la plateforme.</li>
+          <li><b>Prestataire de paiement</b> : l’établissement agréé qui encaisse et reverse les fonds, ${AC('nom et agrément du prestataire, par exemple Stripe ou Mangopay')}.</li></ul>`],
+        ['Article 3. Rôle de ZETools', `<p>ZETools est un opérateur de plateforme en ligne au sens de l’article L. 111-7 du Code de la consommation, et un hébergeur des contenus publiés par les membres.</p>
+          <p><b>ZETools n’est pas partie aux contrats</b> de vente, de location, d’échange, de travaux ou de réparation : ces contrats sont conclus directement entre les membres. ZETools n’est ni vendeur, ni loueur, ni entrepreneur de travaux, et ne vérifie pas matériellement les outils.</p>
+          <p>ZETools fournit en revanche ses propres services, dont elle répond : mise en relation, messagerie, agenda, paiement sécurisé par le prestataire de paiement, gestion de la caution, traitement des litiges.</p>`],
+        ['Article 4. Inscription et compte', `<ul>
+          <li>L’inscription est réservée aux personnes majeures et capables, et aux personnes morales représentées par une personne habilitée.</li>
+          <li>Le membre fournit des informations exactes et les tient à jour. Un numéro de téléphone vérifié est exigé pour publier, louer ou réserver.</li>
+          <li>Le prestataire de paiement vérifie l’identité du membre avant tout versement, conformément à la réglementation de lutte contre le blanchiment.</li>
+          <li>Le membre indique s’il agit comme particulier ou comme professionnel. Se présenter comme particulier alors que l’on agit à titre professionnel constitue une pratique commerciale trompeuse (article L. 121-4 du Code de la consommation).</li>
+          <li>Le compte est personnel. Le membre garde ses identifiants secrets et répond de l’usage de son compte.</li></ul>`],
+        ['Article 5. Annonces', `<p>Le membre publie sous sa seule responsabilité. Il garantit qu’il est propriétaire de l’outil ou autorisé à en disposer, et que la description, l’état et les photos sont fidèles.</p>
+          <p><b>Sont interdits</b> : les outils volés ou d’origine douteuse ; les outils rappelés par leur fabricant ; les machines dont les dispositifs de sécurité ont été retirés ou neutralisés ; les équipements de protection individuelle contre les chutes ou à usage unique déjà utilisés ; les contrefaçons ; les produits dont la vente entre particuliers est réglementée (produits chimiques, explosifs, armes).</p>
+          <p>Un outil en panne est publié avec l’état « À réparer » et la description de la panne.</p>
+          <p><b>Prix plafonnés.</b> ZETools est une place de marché d’outils à petit prix. Le prix de vente ne peut dépasser une part du prix neuf de référence, selon l’état : ${pc(plaf['Neuf'])} pour un outil neuf, ${pc(plaf['Très bon état'])} en très bon état, ${pc(plaf['Bon état'])} en bon état, ${pc(plaf['État correct'])} en état correct, ${pc(plaf['À réparer'])} à réparer. Le loyer ne peut dépasser ${pc(R.locationJourMax)} du prix neuf par jour. Le détail figure dans les règles de prix.</p>`],
+        ['Article 6. Classement des annonces et avis', `<p><b>Classement.</b> Par défaut, les annonces sont classées selon : la correspondance avec la recherche, la proximité géographique, la disponibilité aux dates demandées, la date de publication et la note du membre. Aucune rémunération ne modifie ce classement, sauf mention « Annonce mise en avant » apposée sur l’annonce concernée (articles L. 111-7 et D. 111-7 du Code de la consommation).</p>
+          <p><b>Avis.</b> Seuls les membres ayant réalisé une transaction ou un rendez-vous confirmé peuvent déposer un avis. Les avis sont contrôlés avant publication, publiés par ordre chronologique et conservés ${AC('durée de publication des avis')}. Un avis peut être refusé s’il est injurieux, hors sujet ou s’il contient des données personnelles ; son auteur en est informé (articles L. 111-7-2 et D. 111-17 du Code de la consommation).</p>`],
+        ['Article 7. Vente', `<p>La vente est conclue entre le vendeur et l’acheteur lorsque l’acheteur paie le prix. Le prix est conservé par le prestataire de paiement jusqu’à la confirmation de la remise par l’acheteur (code de remise ou QR code), puis versé au vendeur, déduction faite de la commission.</p>
+          <p><b>Offres de prix.</b> L’acheteur ou le locataire peut proposer un prix inférieur au prix affiché, dans la limite de ${pc(R.offres.plancher)} de ce prix. Son offre l’engage pendant ${R.offres.validiteHeures} heures (article 1116 du Code civil). Le propriétaire l’accepte, la refuse ou fait une contre-proposition, valable ${R.offres.validiteHeures} heures. Le contrat est formé par l’acceptation, au prix convenu, et le paiement intervient dans les ${R.offres.validiteHeures} heures ; à défaut, l’accord est caduc. Les commissions et frais se calculent sur le prix convenu.</p>
+          <p>Vendeur professionnel : l’acheteur consommateur bénéficie du droit de rétractation, de la garantie légale de conformité et de la garantie des vices cachés (article 18). Vendeur particulier : seule la garantie des vices cachés des articles 1641 et suivants du Code civil s’applique, ainsi que l’obligation de délivrer un outil conforme à l’annonce.</p>`],
+        ['Article 8. Location', `<ul>
+          <li>La location est un contrat de louage de chose conclu entre le propriétaire et le locataire (articles 1709 et suivants du Code civil), pour une durée de 1 à ${R.dureeMax} jours.</li>
+          <li>Le locataire utilise l’outil conformément à sa destination et à la notice, avec les équipements de protection adaptés. Il ne le prête pas et ne le sous-loue pas.</li>
+          <li>Un état des lieux photographique est réalisé à la remise et au retour, dans l’application. Il fait foi entre les parties.</li>
+          <li>Le locataire répond des dégradations et des pertes survenues pendant la location, sauf s’il prouve qu’elles ont eu lieu sans sa faute (article 1732 du Code civil). L’usure normale reste à la charge du propriétaire.</li>
+          <li>Le loyer est versé au propriétaire 24 heures après le retour, si aucun litige n’est ouvert.</li></ul>`],
+        ['Article 9. Caution', `<p>La caution prend la forme d’une <b>empreinte bancaire</b> : une autorisation de prélèvement sur la carte du locataire, qui n’est pas débitée. Elle est levée au retour de l’outil en bon état.</p>
+          <p>En cas de dégradation, de perte ou de non-restitution, constatée par l’état des lieux, tout ou partie de la caution peut être prélevée, après une procédure contradictoire de 72 heures pendant laquelle le locataire présente ses observations. Le fonctionnement détaillé figure à la page « Sécurité et caution ».</p>`],
+        ['Article 10. Échange', `<p>L’échange est un contrat par lequel les membres se donnent un outil pour un autre (articles 1702 et suivants du Code civil). Si les valeurs diffèrent, les membres peuvent convenir d’une soulte, payée par l’intermédiaire de la plateforme. Chaque partie règle des frais de mise en relation de ${eur(R.fraisEchange)}.</p>`],
+        ['Article 11. Artisans, travaux et réparations', `<p>Le client publie gratuitement une demande de travaux ou de réparation. Les artisans abonnés y répondent par un devis. Le contrat de travaux ou de réparation est conclu directement entre le client et l’artisan, qui en est seul responsable : conformité, délais, garanties légales, assurance de responsabilité civile et, pour les ouvrages qui en relèvent, assurance décennale (article 1792 du Code civil).</p>
+          <p>ZETools vérifie à l’inscription le numéro SIRET et, pour les gros travaux, l’attestation d’assurance décennale, sur la base des documents fournis. Cette vérification ne vaut pas garantie de la qualité des travaux.</p>`],
+        ['Article 12. Déstockage des enseignes', `<p>Les produits proposés en déstockage sont vendus par des professionnels identifiés sur chaque offre. Le prix barré est le prix le plus bas pratiqué par l’enseigne au cours des trente jours précédant la réduction (article L. 112-1-1 du Code de la consommation). L’achat est limité à ${R.maxParClient} unités par client et par lot. Le retrait a lieu en magasin, sur présentation du code de retrait, dans un délai de 7 jours.</p>`],
+        ['Article 13. Agenda et rendez-vous', `<ul>
+          <li>Un membre peut proposer jusqu’à ${R.rdv.maxCreneaux} créneaux pour des travaux, un échange, une réparation ou la remise d’un outil. Le rendez-vous est confirmé lorsque l’autre membre accepte un créneau.</li>
+          <li>L’annulation est libre jusqu’à ${R.rdv.annulationGratuiteHeures} heures avant le rendez-vous. Passé ce délai, ou en cas d’absence, l’annulation est mentionnée sur le profil du membre. Des absences répétées peuvent entraîner la suspension du compte.</li>
+          <li>L’adresse exacte n’est communiquée qu’après confirmation. Pour un échange entre particuliers, ZETools recommande un lieu public.</li></ul>`],
+        ['Article 14. Prix des services de ZETools', `<table><tr><th>Service</th><th>Prix, toutes taxes comprises</th></tr>
+          <tr><td>Inscription, publication d’annonces, demande de travaux, agenda</td><td>Gratuit</td></tr>
+          <tr><td>Vente</td><td>Commission de ${pc(R.commissionVente)} du prix, à la charge du vendeur</td></tr>
+          <tr><td>Location, côté locataire</td><td>Frais de service de ${pc(R.fraisServiceLocataire)} du loyer</td></tr>
+          <tr><td>Location, côté propriétaire</td><td>Commission de ${R.paliersCommission.map((p) => pc(p.taux) + (p.aPartirDe ? ' à partir de ' + p.aPartirDe + ' locations' : '')).join(', puis ')}</td></tr>
+          <tr><td>Échange</td><td>${eur(R.fraisEchange)} par partie</td></tr>
+          <tr><td>Garantie casse et vol, optionnelle</td><td>${pc(R.assuranceTaux)} du loyer, avec un minimum de ${eur(R.assuranceMin)}</td></tr></table>
+          <p>Le prix total, frais compris, est affiché avant tout paiement. Les tarifs des professionnels figurent dans les conditions particulières.</p>`],
+        ['Article 15. Paiement', `<p>Les paiements sont encaissés par le prestataire de paiement, sur un compte de cantonnement. <b>ZETools ne détient à aucun moment les fonds des membres.</b> Le membre accepte les conditions du prestataire de paiement lors de l’ouverture de son compte de paiement.</p>
+          <p>Tout paiement hors plateforme prive le membre du séquestre, de la caution, de la garantie optionnelle et du traitement des litiges.</p>`],
+        ['Article 16. Messagerie et coordonnées', `<p>Avant le paiement ou la confirmation d’un rendez-vous, la messagerie masque automatiquement les numéros de téléphone, adresses électroniques, adresses postales, coordonnées bancaires et liens externes. Les coordonnées utiles sont communiquées après la transaction. Le contournement répété de cette protection peut entraîner la suspension du compte.</p>`],
+        ['Article 17. Obligations fiscales et sociales', `<p>Les revenus tirés de la plateforme peuvent être imposables et soumis à cotisations sociales. ZETools informe les membres de leurs obligations à chaque transaction et leur adresse chaque année, en janvier, un récapitulatif des opérations (article 242 bis du Code général des impôts).</p>
+          <p>ZETools déclare chaque année à l’administration fiscale les opérations qui entrent dans le champ des articles 1649 ter A et suivants du Code général des impôts. Pour les ventes de biens, sont déclarés les membres qui ont réalisé dans l’année au moins 30 ventes ou perçu plus de 2 000 €. Le membre concerné reçoit copie des informations transmises.</p>
+          <p>Pour information : la vente occasionnelle d’un bien personnel d’occasion n’est en principe pas imposable lorsque son prix n’excède pas 5 000 € (article 150 UA du Code général des impôts) ; les loyers sont des revenus à déclarer. Le membre qui vend ou loue de manière habituelle doit exercer sous un statut professionnel.</p>`],
+        ['Article 18. Droit de rétractation et garanties', `<p><b>Services de ZETools.</b> Le consommateur dispose de 14 jours pour se rétracter d’un service payant de ZETools (article L. 221-18 du Code de la consommation). S’il demande l’exécution immédiate du service, il reconnaît perdre ce droit une fois le service pleinement exécuté (article L. 221-28, 1°).</p>
+          <p><b>Achat auprès d’un professionnel</b> (vendeur professionnel, enseigne) : le consommateur dispose de 14 jours à compter de la réception ou du retrait pour se rétracter, sans motif. Il bénéficie de la garantie légale de conformité pendant 2 ans (articles L. 217-3 et suivants du Code de la consommation ; pour un bien d’occasion, le défaut est présumé exister à la délivrance pendant 12 mois) et de la garantie des vices cachés.</p>
+          <p><b>Transaction entre particuliers</b> : le droit de rétractation et la garantie légale de conformité ne s’appliquent pas. La garantie des vices cachés s’applique.</p>
+          <p><b>Location auprès d’un professionnel</b> : le consommateur dispose du droit de rétractation de 14 jours. S’il demande que la location commence avant la fin de ce délai, il paie la part du loyer correspondant aux jours écoulés (article L. 221-25) et perd son droit une fois la location entièrement exécutée (article L. 221-28, 1°). Entre particuliers, les conditions d’annulation affichées sur l’annonce s’appliquent.</p>`],
+        ['Article 19. Signalement, modération et suspension', `<p>Toute personne peut signaler un contenu illicite par le bouton « Signaler » ou à l’adresse ${AC('adresse de signalement')}. ZETools traite les signalements avec diligence et informe leur auteur de la suite donnée.</p>
+          <p>ZETools peut retirer une annonce, restreindre sa visibilité, suspendre ou clôturer un compte en cas de manquement aux présentes conditions ou de contenu illicite. Le membre reçoit une décision motivée et peut la contester gratuitement auprès de ${AC('adresse de réclamation')} pendant six mois (règlement (UE) 2022/2065 sur les services numériques).</p>`],
+        ['Article 20. Responsabilité', `<p>ZETools répond de l’exécution de ses propres services. Elle ne répond pas de l’exécution des contrats conclus entre les membres, de l’état des outils, de la qualité des travaux ni des dommages causés par l’usage d’un outil.</p>
+          <p>En qualité d’hébergeur, ZETools n’est responsable des contenus publiés par les membres que si, ayant eu connaissance de leur caractère illicite, elle n’a pas agi promptement pour les retirer.</p>
+          <p>Aucune clause des présentes ne limite les droits que la loi reconnaît au consommateur, ni la responsabilité de ZETools en cas de faute lourde, de dol ou de dommage corporel.</p>`],
+        ['Article 21. Données personnelles', `<p>ZETools traite les données personnelles des membres dans les conditions décrites dans la politique de confidentialité.</p>`],
+        ['Article 22. Propriété intellectuelle', `<p>La marque, le logo, la charte graphique et les logiciels de la plateforme appartiennent à ZETools. Le membre conserve ses droits sur ses photos et ses textes ; il accorde à ZETools une licence gratuite et non exclusive de reproduction et de représentation, pour le monde entier et pour la durée de publication de l’annonce, aux seules fins d’exploiter et de promouvoir la plateforme.</p>`],
+        ['Article 23. Durée, résiliation, modification', `<p>Le contrat est conclu pour une durée indéterminée. Le membre peut clôturer son compte à tout moment, depuis son espace, sans frais ; les transactions en cours vont à leur terme.</p>
+          <p>ZETools peut modifier les présentes conditions. Les membres en sont informés par courrier électronique au moins 15 jours avant l’entrée en vigueur. Le membre qui refuse la modification peut clôturer son compte.</p>`],
+        ['Article 24. Réclamations et médiation', `<p>Toute réclamation est adressée à ${AC('adresse du service clients')}. ZETools y répond dans un délai de 30 jours.</p>
+          <p>À défaut de solution, le consommateur peut saisir gratuitement le médiateur de la consommation : ${AC('nom, adresse et site du médiateur')} (articles L. 612-1 et suivants du Code de la consommation).</p>`],
+        ['Article 25. Droit applicable et tribunaux', `<p>Les présentes conditions sont soumises au droit français. Le consommateur peut saisir, à son choix, le tribunal de son domicile ou celui du lieu de livraison ou d’exécution (article R. 631-3 du Code de la consommation). Entre professionnels, le tribunal de commerce de Paris est seul compétent.</p>`],
+      ] },
+
+    /* ------------------------------------------------------------------ */
+    { id: 'pros', titre: 'Conditions particulières professionnels, artisans et enseignes', court: 'Conditions professionnels et enseignes',
+      intro: 'Elles complètent les conditions générales pour les membres qui agissent à titre professionnel. En cas de contradiction, elles prévalent.',
+      sections: [
+        ['Article 1. Accès', `<p>Le compte professionnel est ouvert après vérification : numéro SIRET, extrait d’immatriculation de moins de trois mois, identité du représentant, coordonnées bancaires auprès du prestataire de paiement. Le professionnel certifie ne proposer que des produits et services conformes au droit de l’Union européenne. Ses nom, adresse, numéro d’immatriculation et coordonnées sont affichés sur ses offres (article L. 111-7 du Code de la consommation ; article 30 du règlement (UE) 2022/2065).</p>`],
+        ['Article 2. Obligations du professionnel envers les consommateurs', `<p>Le professionnel reste seul responsable de ses obligations légales : information précontractuelle, droit de rétractation de 14 jours, garantie légale de conformité, garantie des vices cachés, facturation, reprise des équipements électriques usagés, sécurité et conformité des produits (marquage CE, notice en français).</p>`],
+        ['Article 3. Offres de loueurs et vendeurs professionnels', `<table><tr><th>Offre</th><th>Prix hors taxes</th><th>Contenu</th></tr>
+          <tr><td>Pro Solo</td><td>19 € par mois</td><td>Badge PRO, calendrier multi-outils, mise en avant locale, factures automatiques</td></tr>
+          <tr><td>Pro Business</td><td>à partir de 49 € par mois</td><td>Parc illimité, plusieurs utilisateurs, statistiques, export comptable</td></tr></table>
+          <p>Les commissions sur les ventes et les locations sont celles des conditions générales.</p>`],
+        ['Article 4. Abonnement artisan', `<ul>
+          <li>Prix : ${R.abonnementArtisan.mensuel} € hors taxes par mois, ou ${R.abonnementArtisan.annuel} € hors taxes par an. Essai gratuit de ${R.abonnementArtisan.essaiJours} jours, sans engagement.</li>
+          <li>L’abonnement donne accès à toutes les demandes de travaux et de réparation de la zone d’intervention de l’artisan, pour ses métiers. <b>Aucune commission sur les chantiers, aucun coût par contact.</b></li>
+          <li>L’artisan fournit et tient à jour ses attestations d’assurance de responsabilité civile professionnelle et, pour les gros travaux, d’assurance décennale. Une attestation expirée suspend l’accès aux demandes concernées.</li>
+          <li>L’artisan remet au client un devis écrit avant tous travaux, conformément à la réglementation applicable à son activité.</li>
+          <li>L’abonnement mensuel se renouvelle chaque mois et se résilie à tout moment depuis l’espace artisan, avec effet à la fin du mois payé. L’abonnement annuel se résilie à l’échéance.</li>
+          <li>ZETools ne garantit ni un nombre de demandes ni un chiffre d’affaires.</li></ul>`],
+        ['Article 5. Enseignes : déstockage', `<ul>
+          <li><b>Accès privé.</b> L’espace enseigne est réservé aux distributeurs, négoces de matériaux, fabricants, loueurs et quincailleries admis par ZETools.</li>
+          <li><b>Produits.</b> Produits neufs, ou reconditionnés et annoncés comme tels : fins de série, surstocks, fins de saison, emballages abîmés, retours, matériel sorti d’un parc de location et révisé.</li>
+          <li><b>Prix de référence.</b> L’enseigne déclare, pour chaque lot, le prix le plus bas qu’elle a pratiqué à l’égard de tous les consommateurs dans le point de vente concerné au cours des trente jours précédant la réduction (article L. 112-1-1 du Code de la consommation). Elle conserve la preuve de ce prix et la communique à ZETools sur demande. Elle garantit ZETools contre toute réclamation liée à un prix de référence inexact.</li>
+          <li><b>Stock.</b> L’enseigne tient à jour le stock par magasin. Une commande payée qui ne peut être honorée est remboursée intégralement au client sous 48 heures.</li>
+          <li><b>Retrait.</b> La commande est tenue à disposition pendant 7 jours. L’enseigne remet le produit contre le code de retrait et délivre la facture.</li>
+          <li><b>Commission.</b> ${pc(R.commissionDestockage)} hors taxes du prix de vente toutes taxes comprises, prélevée sur le versement. Aucun abonnement pendant la phase pilote.</li>
+          <li><b>Versement.</b> Le prix, net de commission, est versé par le prestataire de paiement à l’expiration du délai de rétractation du client, ou ${AC('délai de versement négocié')}.</li></ul>`],
+        ['Article 6. Classement et accès aux données', `<p>Les offres des professionnels sont classées selon les critères de l’article 6 des conditions générales. Le professionnel accède, dans son espace, aux données nécessaires à l’exécution de ses commandes et à ses statistiques. Il n’utilise les données des clients que pour exécuter la commande (règlement (UE) 2019/1150, articles 5 et 9).</p>`],
+        ['Article 7. Facturation et paiement', `<p>Les abonnements sont payables d’avance, par prélèvement ou carte bancaire. Tout retard de paiement entraîne, de plein droit, des pénalités au taux de ${AC('taux, au minimum trois fois le taux d’intérêt légal')} et une indemnité forfaitaire de recouvrement de 40 € (articles L. 441-10 et D. 441-5 du Code de commerce).</p>`],
+        ['Article 8. Suspension et résiliation', `<p>ZETools informe le professionnel de toute restriction ou suspension par une décision motivée, au plus tard au moment où elle prend effet. La résiliation de l’ensemble des services est notifiée au moins 30 jours à l’avance, sauf manquement grave ou répété, ou obligation légale (règlement (UE) 2019/1150, article 4). Le professionnel peut contester la décision auprès de ${AC('adresse de réclamation professionnels')}.</p>`],
+        ['Article 9. Modification', `<p>Toute modification des présentes conditions est notifiée au professionnel au moins 15 jours avant son entrée en vigueur. Le professionnel peut résilier son contrat avant cette date.</p>`],
+        ['Article 10. Responsabilité', `<p>La responsabilité de ZETools envers le professionnel est limitée aux dommages directs et plafonnée au montant des sommes payées par le professionnel à ZETools au cours des douze derniers mois, sauf faute lourde ou dolosive.</p>`],
+        ['Article 11. Droit applicable et tribunal', `<p>Droit français. Tout litige relève de la compétence exclusive du tribunal de commerce de Paris.</p>`],
+      ] },
+
+    /* ------------------------------------------------------------------ */
+    { id: 'mentions', titre: 'Mentions légales', court: 'Mentions légales',
+      intro: 'Informations publiées en application de la loi n° 2004-575 du 21 juin 2004 pour la confiance dans l’économie numérique (article 1-1, anciennement article 6, III).',
+      sections: [
+        ['Éditeur du site', `<p>${S}.</p><ul>
+          <li>Siège social : ${SOCIETE.siege}, France.</li>
+          <li>Numéro de TVA intracommunautaire : ${AC('numéro de TVA')}.</li>
+          <li>Téléphone : ${AC('numéro de téléphone')}.</li>
+          <li>Adresse électronique : ${AC('adresse de contact')}.</li>
+          <li>Directeur de la publication : ${AC('prénom et nom du président de la SAS')}, président.</li></ul>`],
+        ['Hébergeur', `<p>${AC('dénomination, adresse et téléphone de l’hébergeur du site')}.</p>`],
+        ['Prestataire de paiement', `<p>Les paiements sont opérés par ${AC('dénomination, siège, numéro d’agrément du prestataire de paiement')}. ZETools n’encaisse pas les fonds des membres.</p>`],
+        ['Point de contact', `<p>Autorités, membres et tiers peuvent contacter ZETools à l’adresse ${AC('adresse du point de contact unique')}, en français ou en anglais (articles 11 et 12 du règlement (UE) 2022/2065). Un contenu illicite se signale par le bouton « Signaler » présent sur chaque annonce et chaque profil.</p>`],
+        ['Médiation de la consommation', `<p>Après une réclamation écrite restée sans solution, le consommateur peut saisir gratuitement : ${AC('nom, adresse postale et site internet du médiateur')}.</p>`],
+        ['Qualité des vendeurs', `<p>ZETools est un opérateur de plateforme en ligne. Chaque annonce indique si le vendeur ou le loueur est un particulier ou un professionnel. Les règles protectrices du Code de la consommation (rétractation, garantie légale de conformité) ne s’appliquent pas aux contrats conclus entre particuliers.</p>`],
+        ['Propriété intellectuelle', `<p>La marque ZETools, le logo et l’ensemble des éléments du site sont protégés. Toute reproduction sans autorisation est interdite. Les photographies et vidéos d’illustration sont créditées à la page « Crédits photos et vidéos ».</p>`],
+        ['Assurance', `<p>Responsabilité civile professionnelle : ${AC('assureur, numéro de police, couverture géographique')}.</p>`],
+      ] },
+
+    /* ------------------------------------------------------------------ */
+    { id: 'confidentialite', titre: 'Politique de confidentialité et cookies', court: 'Confidentialité et cookies',
+      intro: 'ZETools traite vos données dans le respect du règlement (UE) 2016/679 (RGPD) et de la loi n° 78-17 du 6 janvier 1978.',
+      sections: [
+        ['1. Responsable du traitement', `<p>${S}. Contact pour toute question relative aux données : ${AC('adresse dédiée, par exemple donnees@…')}. Délégué à la protection des données : ${AC('nom du délégué, ou « non désigné »')}.</p>`],
+        ['2. Données traitées, finalités et bases légales', `<table><tr><th>Finalité</th><th>Données</th><th>Base légale</th></tr>
+          <tr><td>Création et gestion du compte</td><td>Identité, adresse électronique, téléphone, mot de passe chiffré</td><td>Exécution du contrat</td></tr>
+          <tr><td>Publication d’annonces, transactions, agenda</td><td>Annonces, photos, réservations, rendez-vous, états des lieux</td><td>Exécution du contrat</td></tr>
+          <tr><td>Paiement, caution, lutte contre la fraude</td><td>Données de paiement (traitées par le prestataire de paiement), pièce d’identité, historique</td><td>Exécution du contrat ; obligation légale ; intérêt légitime</td></tr>
+          <tr><td>Recherche par proximité</td><td>Code postal, ou position approximative si vous l’autorisez</td><td>Consentement pour la géolocalisation du navigateur ; exécution du contrat pour le code postal</td></tr>
+          <tr><td>Messagerie et masquage des coordonnées</td><td>Contenu des messages</td><td>Exécution du contrat ; intérêt légitime (sécurité des membres)</td></tr>
+          <tr><td>Vérification des professionnels</td><td>SIRET, attestations d’assurance, identité du représentant</td><td>Obligation légale ; intérêt légitime</td></tr>
+          <tr><td>Avis et réputation</td><td>Notes, avis, taux de réponse, annulations</td><td>Intérêt légitime</td></tr>
+          <tr><td>Déclarations fiscales</td><td>Identité, numéro fiscal, montants perçus, nombre de transactions</td><td>Obligation légale (Code général des impôts)</td></tr>
+          <tr><td>Lettres d’information</td><td>Adresse électronique</td><td>Consentement, ou intérêt légitime pour des services analogues déjà utilisés</td></tr>
+          <tr><td>Mesure d’audience</td><td>Données de navigation</td><td>Consentement, sauf outil exempté</td></tr></table>`],
+        ['3. Localisation', `<p>Votre position exacte n’est jamais affichée. Les annonces et les artisans sont situés à l’échelle de la commune ou d’un rayon d’environ un kilomètre. L’adresse exacte n’est communiquée à l’autre membre qu’après une transaction payée ou un rendez-vous confirmé.</p>`],
+        ['4. Destinataires', `<ul>
+          <li>Les autres membres, dans la limite nécessaire à la transaction : prénom, initiale du nom, commune, note, puis coordonnées après paiement ou confirmation.</li>
+          <li>Le prestataire de paiement, l’hébergeur, le prestataire d’envoi de SMS et de courriers électroniques, le fournisseur de cartographie, l’assureur de la garantie optionnelle : ${AC('liste nominative des sous-traitants')}.</li>
+          <li>L’administration fiscale et les autorités, lorsque la loi l’impose.</li></ul>
+          <p>ZETools ne vend pas vos données.</p>`],
+        ['5. Transferts hors de l’Union européenne', `<p>Les données sont hébergées dans l’Union européenne. ${AC('préciser les éventuels transferts et leurs garanties : décision d’adéquation, clauses contractuelles types')}.</p>`],
+        ['6. Durées de conservation', `<table><tr><th>Données</th><th>Durée</th></tr>
+          <tr><td>Compte</td><td>Pendant la vie du compte, puis 3 ans sans activité ; suppression ou anonymisation ensuite</td></tr>
+          <tr><td>Transactions, factures</td><td>10 ans (article L. 123-22 du Code de commerce)</td></tr>
+          <tr><td>Pièces d’identité</td><td>Conservées par le prestataire de paiement, 5 ans après la fin de la relation</td></tr>
+          <tr><td>Messages</td><td>${AC('durée, par exemple 1 an après la dernière transaction liée')}</td></tr>
+          <tr><td>États des lieux photographiques</td><td>${AC('durée, par exemple 1 an, ou jusqu’à la clôture du litige')}</td></tr>
+          <tr><td>Données fiscales déclarées</td><td>10 ans</td></tr>
+          <tr><td>Cookies et choix de consentement</td><td>6 mois pour le choix ; 13 mois au plus pour les cookies</td></tr></table>`],
+        ['7. Vos droits', `<p>Vous disposez des droits d’accès, de rectification, d’effacement, de limitation, d’opposition et de portabilité, et du droit de retirer votre consentement à tout moment. Vous pouvez définir des directives sur le sort de vos données après votre décès. Écrivez à ${AC('adresse dédiée')} ; ZETools répond dans un délai d’un mois.</p>
+          <p>Vous pouvez introduire une réclamation auprès de la CNIL, 3 place de Fontenoy, 75007 Paris, www.cnil.fr.</p>`],
+        ['8. Sécurité', `<p>Connexions chiffrées, mots de passe hachés, accès internes restreints et journalisés, sauvegardes quotidiennes. Toute violation de données présentant un risque est notifiée à la CNIL dans les 72 heures et, si le risque est élevé, aux personnes concernées.</p>`],
+        ['9. Mineurs', `<p>La plateforme est réservée aux personnes majeures. ZETools supprime tout compte ouvert par un mineur dont elle a connaissance.</p>`],
+        ['10. Cookies et traceurs', `<table><tr><th>Catégorie</th><th>Rôle</th><th>Consentement</th></tr>
+          <tr><td>Strictement nécessaires</td><td>Connexion, panier, sécurité, mémorisation de vos choix</td><td>Non requis</td></tr>
+          <tr><td>Mesure d’audience</td><td>Statistiques de fréquentation</td><td>Requis, sauf outil exempté configuré selon les recommandations de la CNIL</td></tr>
+          <tr><td>Contenus tiers</td><td>Fonds de carte, vidéos d’illustration : votre adresse IP est transmise au fournisseur</td><td>Requis, ou hébergement des contenus par ZETools</td></tr>
+          <tr><td>Publicité</td><td>Aucun à ce jour</td><td>Requis le cas échéant</td></tr></table>
+          <p>Vous pouvez accepter ou refuser les traceurs, aussi simplement l’un que l’autre, et modifier votre choix à tout moment par le lien « Gérer mes cookies » en bas de page.</p>`],
+        ['11. Modification', `<p>Cette politique peut évoluer. La date de mise à jour figure en tête de page ; les modifications importantes vous sont notifiées.</p>`],
+      ] },
+
+    /* ------------------------------------------------------------------ */
+    { id: 'securite', titre: 'Sécurité et caution', court: 'Sécurité et caution',
+      intro: 'Comment ZETools protège votre argent, vos outils et votre personne.',
+      sections: [
+        ['1. Votre argent est séquestré', `<ul>
+          <li>Vous payez sur ZETools. Le prix est conservé par un prestataire de paiement agréé et n’est versé au vendeur, au loueur ou à l’enseigne qu’après la remise de l’outil.</li>
+          <li>Vente : le vendeur est payé quand vous confirmez la remise, par code ou QR code.</li>
+          <li>Location : le propriétaire est payé 24 heures après le retour, si aucun litige n’est ouvert.</li>
+          <li>Ne payez jamais en dehors de la plateforme : virement, espèces, lien reçu par message. Vous perdriez toute protection.</li></ul>`],
+        ['2. La caution : une empreinte, pas un débit', `<ul>
+          <li>La caution est fixée par le propriétaire, dans la limite du plafond de vente de l’outil : elle ne peut jamais dépasser ce que vaut l’outil sur ZETools.</li>
+          <li>Elle prend la forme d’une empreinte bancaire sur la carte du locataire, enregistrée au début de la location. Rien n’est débité.</li>
+          <li>L’empreinte est levée automatiquement au retour de l’outil en bon état.</li>
+          <li>Pour une location de plus de 7 jours, l’empreinte est renouvelée en cours de location, ou la caution est prélevée puis remboursée au retour : vous en êtes informé avant de payer.</li></ul>`],
+        ['3. L’état des lieux par photos', `<p>À la remise et au retour, chacun photographie l’outil dans l’application : vue d’ensemble, plaque signalétique, accessoires, défauts existants. Les photos sont horodatées et servent de preuve. Sans état des lieux de départ, l’outil est présumé remis en bon état de fonctionnement.</p>`],
+        ['4. En cas de casse, de perte ou de retard', `<ol>
+          <li><b>Signalement</b> par le propriétaire dans les 24 heures qui suivent le retour, avec photos.</li>
+          <li><b>Échange contradictoire</b> : le locataire a 72 heures pour répondre. Les deux parties peuvent s’accorder sur un montant.</li>
+          <li><b>Décision</b> : à défaut d’accord, ZETools examine l’état des lieux, la valeur de l’outil et un devis de réparation, puis propose un montant, plafonné à la caution.</li>
+          <li><b>Prélèvement</b> de la somme retenue sur l’empreinte ; le solde est libéré.</li>
+          <li><b>Recours</b> : chaque partie conserve le droit de saisir le médiateur ou le tribunal.</li></ol>
+          <p>L’usure normale n’est jamais retenue. Un retard est facturé au tarif journalier, par jour commencé.</p>`],
+        ['5. La garantie casse et vol, en option', `<p>Pour ${pc(R.assuranceTaux)} du loyer (minimum ${eur(R.assuranceMin)}), le locataire peut souscrire une garantie qui prend en charge la casse accidentelle et le vol au-delà d’une franchise. Assureur, plafonds et exclusions : ${AC('assureur, notice d’information, franchise')}.</p>`],
+        ['6. Des membres vérifiés', `<ul>
+          <li>Téléphone vérifié pour tous ; identité vérifiée par le prestataire de paiement avant tout versement.</li>
+          <li>Professionnels : SIRET vérifié ; artisans : assurance décennale vérifiée pour les gros travaux.</li>
+          <li>Avis déposés uniquement après une transaction ou un rendez-vous réel.</li></ul>`],
+        ['7. Vos coordonnées restent masquées', `<p>Téléphone, adresse électronique et adresse postale sont masqués dans la messagerie jusqu’au paiement ou à la confirmation du rendez-vous. L’adresse exacte n’apparaît jamais sur une annonce.</p>`],
+        ['8. Rencontrer en sécurité', `<ul>
+          <li>Pour un échange ou une vente entre particuliers, préférez un lieu public, en journée. L’agenda vous le propose par défaut.</li>
+          <li>Essayez l’outil à la remise. Vérifiez la plaque signalétique et le numéro de série.</li>
+          <li>Refusez tout outil dont un carter, une protection ou un arrêt d’urgence manque.</li></ul>`],
+        ['9. Utiliser l’outil en sécurité', `<ul>
+          <li>Lisez la notice ; le propriétaire la joint à l’annonce quand elle existe.</li>
+          <li>Portez les protections adaptées : lunettes, gants, protections auditives, chaussures de sécurité, masque.</li>
+          <li>Outils thermiques, tronçonneuses, travail en hauteur : réservés aux utilisateurs formés. En cas de doute, faites appel à un artisan.</li></ul>`],
+        ['10. Signaler', `<p>Un bouton « Signaler » figure sur chaque annonce, chaque profil et chaque conversation. En cas de danger immédiat, composez le 17 ou le 112. En cas de fraude, déposez plainte et prévenez ZETools : ${AC('adresse du service sécurité')}.</p>`],
+      ] },
+
+    /* ------------------------------------------------------------------ */
+    { id: 'prix', titre: 'Règles de prix', court: 'Règles de prix',
+      intro: 'Sur ZETools, un outil coûte toujours nettement moins cher que le neuf.',
+      sections: [
+        ['1. Le principe', `<p>ZETools est une place de marché d’outils d’occasion. Des membres peuvent aussi y vendre, louer ou échanger un outil neuf, jamais servi : il reste vendu sous le prix du magasin. Chaque annonce indique le prix neuf de référence et la remise obtenue.</p>`],
+        ['2. Prix de vente maximum', `<table><tr><th>État de l’outil</th><th>Prix maximum, en part du prix neuf</th></tr>
+          ${Object.entries(plaf).map(([e, t]) => `<tr><td>${e}</td><td>${pc(t)}</td></tr>`).join('')}</table>
+          <p>ZETools suggère un prix conseillé égal à ${pc(R.partConseillee)} du maximum : c’est le prix auquel les outils partent le plus vite.</p>`],
+        ['3. Location', `<p>Le loyer ne dépasse pas ${pc(R.locationJourMax)} du prix neuf par jour, avec un minimum de ${eur(R.locationJourMin)}. Des remises s’appliquent automatiquement : ${R.remises.slice().reverse().map((r) => pc(r.taux) + ' à partir de ' + r.aPartirDe + ' jours').join(', ')}. La caution ne dépasse pas le prix de vente maximum de l’outil.</p>`],
+        ['4. Prix neuf de référence', `<p>C’est le prix actuel du même modèle, ou du modèle équivalent, dans le commerce. Le membre l’indique de bonne foi ; ZETools peut le corriger ou demander un justificatif.</p>`],
+        ['5. Déstockage des enseignes', `<p>Les produits déstockés par les enseignes sont neufs et vendus par des professionnels : les plafonds ci-dessus ne s’y appliquent pas. Le prix barré est le prix le plus bas pratiqué par l’enseigne au cours des trente jours précédents.</p>`],
+      ] },
+  ];
+
+  const ZT_JURIDIQUE = { SOCIETE, PAGES };
+  if (typeof module !== 'undefined' && module.exports) module.exports = ZT_JURIDIQUE;
+  else racine.ZT_JURIDIQUE = ZT_JURIDIQUE;
 })(typeof window !== 'undefined' ? window : globalThis);
 
 </script>
@@ -856,6 +1423,9 @@ table.tableau { width: 100%; border-collapse: collapse; background: var(--carte)
     reservations: [],
     favoris: [],
     annonces: [],
+    lots: [], stocks: {}, retraits: [], enseigne: null,
+    rdv: window.ZT_DONNEES.RDV_DEMO.map((r) => Object.assign({}, r)),
+    offres: window.ZT_DONNEES.OFFRES_DEMO.map((o) => Object.assign({}, o)),
     conversations: [
       { id: 'c1', annonceId: 'a2', avec: 'm2', confirmee: false, messages: [
         { de: 'moi', texte: 'Bonjour, le perforateur est-il disponible le week-end du 13 décembre ?' },
@@ -898,6 +1468,12 @@ table.tableau { width: 100%; border-collapse: collapse; background: var(--carte)
     if (a.modes.includes('vente')) return Z.euros(a.prixVente);
     return '<small>Troc · contre</small> ' + esc(a.echangeContre || 'à proposer');
   }
+  // « −60 % vs neuf » : l'occasion reste toujours bien en dessous du prix magasin
+  function ligneNeuf(a) {
+    if (!a.prixNeuf) return '';
+    const r = a.modes.includes('vente') ? Z.remiseSurNeuf(a.prixVente, a.prixNeuf) : 0;
+    return `<div class="neuf">${r ? `<span class="remise">−${r} %</span> ` : ''}Neuf : <s>${Z.euros(a.prixNeuf)}</s></div>`;
+  }
   function carte(a) {
     const m = membre(a.membre); const fav = etat.favoris.includes(a.id);
     return `<a class="carte" href="#/annonce/${a.id}">
@@ -905,7 +1481,7 @@ table.tableau { width: 100%; border-collapse: collapse; background: var(--carte)
         <div class="badges">${badges(a)}</div>
         <button class="coeur" data-fav="${a.id}" aria-label="Ajouter aux favoris">${fav ? '❤️' : '♡'}</button></div>
       <div class="infos"><span class="badge badge-etat" style="align-self:start">${esc(a.etat)}</span>
-        <h3>${esc(a.titre)}</h3><div class="prix">${prixPrincipal(a)}</div>
+        <h3>${esc(a.titre)}</h3><div class="prix">${prixPrincipal(a)}</div>${ligneNeuf(a)}
         <div class="meta"><span>📍 ${esc(a.ville)}</span><span>★ ${m.note.toFixed(1)} (${m.avis})</span></div></div></a>`;
   }
   document.addEventListener('click', (e) => {
@@ -983,6 +1559,11 @@ table.tableau { width: 100%; border-collapse: collapse; background: var(--carte)
     </div></section>
 
     <section class="bloc" style="padding-top:0"><div class="conteneur">
+      <div class="titre-section"><div><div class="surtitre">Déstockage des enseignes</div><h2>Du neuf à prix cassés, retiré en magasin</h2><p>Fins de série et surstocks des grandes surfaces de bricolage, négoces, fabricants et loueurs.</p></div><a class="btn btn-contour" href="#/destockage">Voir tout le déstockage</a></div>
+      <div class="grille">${lotsActifs().slice(0, 4).map(carteLot).join('')}</div>
+    </div></section>
+
+    <section class="bloc" style="padding-top:0"><div class="conteneur">
       <div class="titre-section"><div><div class="surtitre">Travaux et réparation</div><h2>Vous avez l’outil, il vous manque la main ?</h2><p>Des artisans géolocalisés près de chez vous, et des réparateurs pour les outils en panne.</p></div></div>
       <div class="modes">
         <div class="mode"><img src="${PHOTOS.artisans}" alt="Artisan au travail"><div class="corps"><h3>📍 Trouver un artisan</h3><p>Petits, moyens ou gros travaux : publiez votre demande gratuitement, les artisans abonnés de votre secteur vous répondent, classés par distance.</p><a class="lien" href="#/travaux">Voir les artisans autour de moi →</a></div></div>
@@ -1056,7 +1637,7 @@ table.tableau { width: 100%; border-collapse: collapse; background: var(--carte)
   /* --- fiche outil : réservation, achat, échange --- */
   let selection = { debut: null, fin: null, mois: null, onglet: null, assurance: true };
   function vueFiche(id) {
-    const a = annonce(id);
+    const a = Z.appliquerOffres(annonce(id), etat.offres, maintenant());
     if (!a) return '<div class="page"><div class="conteneur vide">Annonce introuvable. <a href="#/annonces">Retour aux annonces</a></div></div>';
     const m = membre(a.membre);
     if (selection.id !== id) selection = { id, debut: null, fin: null, mois: AUJOURDHUI.slice(0, 7), onglet: a.modes[0], assurance: true };
@@ -1069,6 +1650,7 @@ table.tableau { width: 100%; border-collapse: collapse; background: var(--carte)
             <h2 style="margin-top:0">Description</h2><p>${esc(a.description)}</p>
             <div class="ligne"><span>Marque</span><b>${esc(a.marque)}</b></div>
             <div class="ligne"><span>État</span><b>${esc(a.etat)}</b></div>
+            ${a.prixNeuf ? `<div class="ligne"><span>Prix neuf de référence</span><b>${Z.euros(a.prixNeuf)}${a.modes.includes('vente') && Z.remiseSurNeuf(a.prixVente, a.prixNeuf) ? ` · vente à −${Z.remiseSurNeuf(a.prixVente, a.prixNeuf)} %` : ''}</b></div>` : ''}
             <div class="ligne"><span>Catégorie</span><b>${catNom(a.categorie)}</b></div>
             ${a.echangeContre ? `<div class="ligne"><span>Échange recherché</span><b>${esc(a.echangeContre)}</b></div>` : ''}
             <div class="ligne"><span>Remise</span><b>📍 ${esc(a.ville)} (${esc(a.cp)}) · adresse exacte après paiement</b></div>
@@ -1087,6 +1669,20 @@ table.tableau { width: 100%; border-collapse: collapse; background: var(--carte)
       </div></div></div>`;
   }
 
+  // « Proposer mon prix » : offre en attente, contre-offre, prix négocié ou formulaire
+  function blocOffre(a, mode) {
+    const unite = mode === 'location' ? ' / jour' : '';
+    const affiche = mode === 'vente' ? a.prixVenteAffiche : a.prixJourAffiche;
+    if (affiche) return `<div class="alerte alerte-ok">🤝 Prix négocié accepté : <b>${Z.euros(mode === 'vente' ? a.prixVente : a.prixJour)}${unite}</b> au lieu de ${Z.euros(affiche)}. Offre valable 48 h.</div>`;
+    const mes = etat.offres.filter((x) => x.sens === 'envoyee' && x.annonceId === a.id && x.mode === mode);
+    const enCours = mes.find((x) => ['en attente', 'contre-offre'].includes(x.statut) && !Z.offreExpiree(x, maintenant()));
+    if (enCours) return `<div class="alerte alerte-info">🤝 ${enCours.statut === 'contre-offre' ? `Le propriétaire vous propose <b>${Z.euros(enCours.contre)}${unite}</b>.` : `Votre offre de <b>${Z.euros(enCours.montant)}${unite}</b> attend la réponse du propriétaire.`} <a href="#/offres">Voir mes offres</a></div>`;
+    const mini = Math.ceil((mode === 'vente' ? a.prixVente : a.prixJour) * Z.REGLES.offres.plancher * 2) / 2;
+    if (mes.length >= Z.REGLES.offres.maxParAnnonce) return '<div class="alerte alerte-info">Vous avez atteint le nombre maximum d’offres pour cette annonce.</div>';
+    return `<div class="bloc-offre"><b>🤝 Proposer mon prix</b>
+      <div class="offre-saisie"><input type="number" id="montant-offre" min="${mini}" step="0.5" placeholder="Votre prix${unite} (min. ${Z.euros(mini)})" aria-label="Votre prix"><button class="btn btn-contour" data-action="offrir" data-mode="${mode}">Envoyer l’offre</button></div>
+      <span class="discret">Le propriétaire a 48 h pour accepter, refuser ou vous faire une contre-proposition. Rien n’est débité avant son accord.</span></div>`;
+  }
   function zoneTransaction(a) {
     const o = selection.onglet;
     if (o === 'vente') {
@@ -1095,13 +1691,15 @@ table.tableau { width: 100%; border-collapse: collapse; background: var(--carte)
         <div class="ligne discret"><span>Protection acheteur (séquestre)</span><span>incluse</span></div>
         <div class="ligne total"><span>Vous payez</span><span>${Z.euros(d.prix)}</span></div>
         <div class="alerte alerte-info">Le vendeur reçoit ${Z.euros(d.versementVendeur)} une fois la remise confirmée (commission ZETOOLS ${Z.euros(d.commission)}).</div>
-        <button class="btn btn-cta" style="width:100%" data-action="acheter">Acheter avec paiement sécurisé</button>`;
+        <button class="btn btn-cta" style="width:100%" data-action="acheter">Acheter avec paiement sécurisé</button>
+        ${blocOffre(a, 'vente')}`;
     }
     if (o === 'echange') {
       return `<p>Le propriétaire cherche : <b>${esc(a.echangeContre || 'à discuter')}</b>.</p>
         <label style="display:flex;flex-direction:column;gap:6px;font-weight:600">Votre proposition<textarea id="proposition" rows="3" style="border:1px solid var(--bord);border-radius:8px;padding:10px" placeholder="Ex. : ponceuse excentrique Makita, très bon état, avec 20 disques"></textarea></label>
         <div class="ligne discret"><span>Frais de mise en relation, par partie</span><span>${Z.euros(Z.REGLES.fraisEchange)}</span></div>
-        <button class="btn btn-vert" style="width:100%;margin-top:10px" data-action="echanger">Proposer l’échange</button>`;
+        <button class="btn btn-vert" style="width:100%;margin-top:10px" data-action="echanger">Proposer l’échange</button>
+        <a class="btn btn-contour" style="width:100%;margin-top:8px" href="#/rendez-vous?type=echange&annonce=${a.id}">📅 Proposer des dates et heures d’échange</a>`;
     }
     // location
     let detail = '';
@@ -1124,7 +1722,7 @@ table.tableau { width: 100%; border-collapse: collapse; background: var(--carte)
     }
     return `<div class="ligne"><span>Tarif</span><b>${Z.euros(a.prixJour)} / jour</b></div>
       <div class="ligne discret"><span>-10 % dès 3 jours · -20 % dès 7 jours</span><span></span></div>
-      ${calendrier(a)}${detail}`;
+      ${calendrier(a)}${detail}${blocOffre(a, 'location')}`;
   }
 
   function calendrier(a) {
@@ -1185,6 +1783,13 @@ table.tableau { width: 100%; border-collapse: collapse; background: var(--carte)
         sauver();
         toast(`Réservation confirmée (simulation) : ${Z.euros(d.totalLocataire)} payés, caution de ${Z.euros(d.caution)} bloquée.`);
         selection.debut = selection.fin = null; aller('#/mon-espace');
+      } else if (act.dataset.action === 'offrir') {
+        const mode = act.dataset.mode; const montant = Number(document.getElementById('montant-offre').value);
+        const base = annonce(a.id);
+        const v = Z.verifierOffre(base, mode, montant, etat.offres.filter((x) => x.sens === 'envoyee' && x.annonceId === a.id && x.mode === mode).length);
+        if (!v.ok) return toast(v.raison);
+        etat.offres.push(Z.creerOffre(base, mode, montant, maintenant())); sauver();
+        toast(`Offre de ${Z.euros(montant)} envoyée. Réponse sous 48 h.`); aller('#/offres');
       } else if (act.dataset.action === 'acheter') {
         deverrouillerConversation(a.id); sauver();
         toast(`Paiement de ${Z.euros(a.prixVente)} placé en séquestre (simulation). Le vendeur est prévenu.`);
@@ -1260,6 +1865,12 @@ table.tableau { width: 100%; border-collapse: collapse; background: var(--carte)
       <div class="titre-section"><div><h2>Mon espace</h2><p>Compte de démonstration · profil vérifié</p></div><a class="btn btn-cta" href="#/deposer">＋ Déposer une annonce</a></div>
       <h3>Mon calendrier de location</h3>
       ${mesRes.length ? `<table class="tableau"><thead><tr><th>Outil</th><th>Du</th><th>Au</th><th>Total payé</th><th>Caution bloquée</th><th>Statut</th></tr></thead><tbody>${mesRes.sort((x, y) => x.debut.localeCompare(y.debut)).map((r) => { const a = annonce(r.outilId); return `<tr><td><a href="#/annonce/${a.id}">${esc(a.titre)}</a></td><td>${Z.formatDate(r.debut)}</td><td>${Z.formatDate(r.fin)}</td><td>${r.total ? Z.euros(r.total) : '—'}</td><td>${Z.euros(r.caution ?? a.caution)}</td><td><span class="statut">${esc(r.statut)}</span></td></tr>`; }).join('')}</tbody></table>` : '<div class="vide">Aucune location pour l’instant.</div>'}
+      <h3 style="margin-top:32px">Mes offres de prix</h3>
+      <div class="panneau bandeau-action"><div>${etat.offres.filter((o) => o.sens === 'recue' && o.statut === 'en attente').length} offre(s) reçue(s) à traiter · ${etat.offres.filter((o) => o.sens === 'envoyee').length} envoyée(s).</div><a class="btn btn-contour" href="#/offres">🤝 Voir les offres</a></div>
+      <h3 style="margin-top:32px">Mes rendez-vous</h3>
+      <div class="panneau bandeau-action"><div>${etat.rdv.filter((r) => r.statut === 'confirmé').length} confirmé(s) · ${etat.rdv.filter((r) => r.statut === 'proposé').length} en attente. Travaux, échanges, réparations et remises d’outils.</div><a class="btn btn-contour" href="#/agenda">📅 Ouvrir mon agenda</a></div>
+      <h3 style="margin-top:32px">Mes retraits en magasin (déstockage)</h3>
+      ${etat.retraits.length ? etat.retraits.map((r) => `<div class="panneau"><div class="ligne"><span><b>Code ${esc(r.code)}</b> · ${r.quantite} × ${esc(r.titre)}<br><span class="discret">À retirer sous 7 jours : ${esc(r.magasin)}</span></span><b>${Z.euros(r.total)}</b></div></div>`).join('') : '<div class="vide">Aucun retrait en cours. <a href="#/destockage">Voir le déstockage des enseignes</a>.</div>'}
       <h3 style="margin-top:32px">Mes demandes de travaux</h3>
       ${blocMesDemandes()}
       <h3 style="margin-top:32px">Mes annonces</h3>
@@ -1278,10 +1889,12 @@ table.tableau { width: 100%; border-collapse: collapse; background: var(--carte)
         <label class="large">Titre<input name="titre" required maxlength="80" placeholder="Ex. : Ponceuse excentrique 125 mm + 20 disques"></label>
         <label>Marque<input name="marque" placeholder="Makita, Bosch…"></label>
         <label>Catégorie<select name="categorie" required>${CATEGORIES.map((c) => `<option value="${c.id}">${c.nom}</option>`).join('')}</select></label>
-        <label>État<select name="etat"><option>Neuf</option><option ${enPanne ? '' : 'selected'}>Très bon état</option><option>Bon état</option><option ${enPanne ? 'selected' : ''}>À réparer</option></select></label>
+        <label>État<select name="etat"><option>Neuf</option><option ${enPanne ? '' : 'selected'}>Très bon état</option><option>Bon état</option><option>État correct</option><option ${enPanne ? 'selected' : ''}>À réparer</option></select></label>
         <label class="large">Panne constatée (si à réparer)<input name="panne" placeholder="Ex. : batterie qui ne tient plus la charge"></label>
         <label>Code postal<input name="cp" required pattern="\\d{5}" placeholder="94300"></label>
         <div class="large"><b>Je propose</b><div class="cases" style="margin-top:6px"><label><input type="checkbox" name="modes" value="location" checked> la location</label><label><input type="checkbox" name="modes" value="vente"> la vente</label><label><input type="checkbox" name="modes" value="echange"> l’échange</label></div></div>
+        <label>Prix neuf de référence (€)<input name="prixNeuf" type="number" min="1" step="1" required placeholder="Prix en magasin aujourd’hui"></label>
+        <div class="large alerte alerte-info" id="aide-prix">Indiquez le prix neuf : ZETools calcule le prix conseillé et le plafond. Sur ZETools, un outil se vend toujours <b>bien en dessous du neuf</b> (70 % au plus pour un outil neuf, 50 % en très bon état, 40 % en bon état, 30 % en état correct, 15 % à réparer).</div>
         <label>Prix par jour (€)<input name="prixJour" type="number" min="1" step="0.5" placeholder="10"></label>
         <label>Prix de vente (€)<input name="prixVente" type="number" min="1" step="1" placeholder="120"></label>
         <label>Caution demandée (€)<input name="caution" type="number" min="0" step="10" placeholder="150"></label>
@@ -1292,7 +1905,16 @@ table.tableau { width: 100%; border-collapse: collapse; background: var(--carte)
       </form></div></div>`;
   }
   function brancherDeposer() {
-    document.getElementById('form-depot').addEventListener('submit', (e) => {
+    const form = document.getElementById('form-depot');
+    const aide = document.getElementById('aide-prix');
+    const majAide = () => {
+      const p = Z.plafondPrix(Number(form.prixNeuf.value), form.etat.value);
+      if (!p) return;
+      aide.innerHTML = `Pour un outil « ${esc(form.etat.value)} » vendu ${Z.euros(Number(form.prixNeuf.value))} neuf : <b>vente conseillée ${Z.euros(p.venteConseillee)}</b> (maximum ${Z.euros(p.venteMax)}) · <b>location conseillée ${Z.euros(p.jourConseille)} / jour</b> (maximum ${Z.euros(p.jourMax)}) · caution ${Z.euros(p.cautionMax)} au plus.`;
+      form.prixVente.placeholder = p.venteConseillee; form.prixJour.placeholder = p.jourConseille; form.caution.placeholder = Math.min(p.cautionMax, p.venteConseillee);
+    };
+    form.prixNeuf.addEventListener('input', majAide); form.etat.addEventListener('change', majAide);
+    form.addEventListener('submit', (e) => {
       e.preventDefault();
       const fd = new FormData(e.target);
       const modes = fd.getAll('modes');
@@ -1300,10 +1922,12 @@ table.tableau { width: 100%; border-collapse: collapse; background: var(--carte)
       if (!modes.length) return toast('Choisissez au moins : location, vente ou échange.');
       if (modes.includes('location') && !nb('prixJour')) return toast('Indiquez un prix par jour pour la location.');
       if (modes.includes('vente') && !nb('prixVente')) return toast('Indiquez un prix de vente.');
+      const controle = Z.verifierPrix({ prixNeuf: nb('prixNeuf'), etat: String(fd.get('etat')), modes, prixJour: nb('prixJour'), prixVente: nb('prixVente'), caution: nb('caution') || 0 });
+      if (!controle.ok) return toast(controle.erreurs[0]);
       const cp = String(fd.get('cp'));
       const a = {
         id: 'u' + Date.now(), titre: String(fd.get('titre')), marque: String(fd.get('marque') || '—'), categorie: String(fd.get('categorie')),
-        etat: String(fd.get('etat')), modes, prixJour: nb('prixJour'), prixVente: nb('prixVente'), caution: nb('caution') || 0,
+        etat: String(fd.get('etat')), modes, prixNeuf: nb('prixNeuf'), prixJour: nb('prixJour'), prixVente: nb('prixVente'), caution: nb('caution') || 0,
         ville: cp.startsWith('75') ? 'Paris' : 'Île-de-France', cp, membre: 'moi', photo: PHOTOS.atelier,
         description: Z.masquerCoordonnees(String(fd.get('description') || ''), false).texte,
         echangeContre: String(fd.get('echangeContre') || ''), indispo: [],
@@ -1321,7 +1945,9 @@ table.tableau { width: 100%; border-collapse: collapse; background: var(--carte)
         <div class="offre phare"><h3>Artisan abonné</h3><div class="tarif">39 € <small style="font-size:1rem">/ mois</small></div><ul><li>Toutes les demandes de travaux de votre zone : petits, moyens et gros</li><li>0 % de commission, 0 € par contact</li><li>Carte des chantiers autour de vous</li><li>390 € / an (2 mois offerts) · 30 jours d’essai</li></ul><a class="btn btn-cta" href="#/espace-artisan">Ouvrir mon espace artisan</a></div>
         <div class="offre"><h3>Pro Solo</h3><div class="tarif">19 € <small style="font-size:1rem">/ mois</small></div><ul><li>Badge PRO et SIRET vérifié</li><li>Calendrier de disponibilités multi-outils</li><li>Mise en avant locale</li><li>Factures automatiques</li></ul><a class="btn btn-cta" href="#/messages">Rejoindre la phase pilote</a></div>
         <div class="offre"><h3>Pro Business</h3><div class="tarif">dès 49 € <small style="font-size:1rem">/ mois</small></div><ul><li>Parc illimité, plusieurs comptes</li><li>Statistiques et export comptable</li><li>Interlocuteur dédié</li></ul></div>
+        <div class="offre"><h3>Enseigne · déstockage</h3><div class="tarif">${Math.round(Z.REGLES.commissionDestockage * 100)} % <small style="font-size:1rem">par vente</small></div><ul><li>Grandes surfaces de bricolage, négoces, fabricants, loueurs</li><li>Espace privé, stock par magasin, retrait en magasin</li><li>0 € d’abonnement pendant le pilote</li></ul><a class="btn btn-cta" href="#/espace-enseigne">Espace enseigne</a></div>
       </div>
+      <p class="note-legale">Prix hors taxes pour les professionnels. Détail : <a href="#/legal/pros">conditions particulières professionnels, artisans et enseignes</a> · <a href="#/legal/cgu">conditions générales</a> · <a href="#/legal/prix">règles de prix</a>.</p>
       ${blocReassurance().replace('class="bloc reassurance"', 'class="bloc reassurance" style="margin-top:40px;border-radius:16px"')}
     </div></div>`;
   }
@@ -1336,14 +1962,24 @@ table.tableau { width: 100%; border-collapse: collapse; background: var(--carte)
       ['Pourquoi ne puis-je pas donner mon numéro ?', 'Tant que rien n’est payé sur ZETOOLS, nous ne pouvons ni garantir la caution ni vous rembourser. Les coordonnées s’affichent automatiquement après paiement.'],
       ['Quand le propriétaire est-il payé ?', 'Le loyer est versé 24 h après le retour de l’outil, si aucun litige n’est ouvert. Pour une vente, après confirmation de la remise par l’acheteur.'],
       ['Un échange est-il protégé ?', 'Oui : chacun règle des frais de mise en relation et une caution croisée peut être demandée pour les outils de valeur différente.'],
+      ['Puis-je négocier le prix ?', 'Oui. Sur chaque annonce de vente ou de location, « Proposer mon prix » envoie votre offre au propriétaire. Il a 48 h pour accepter, refuser ou vous faire une contre-proposition. Rien n’est débité avant l’accord, et le paiement reste sécurisé.'],
+      ['Pourquoi les prix sont-ils plafonnés ?', 'ZETools est une place de marché d’outils à petit prix. Un outil d’occasion se vend au plus à 50 % du neuf en très bon état, 40 % en bon état, 30 % en état correct. Même un outil neuf, jamais servi, reste sous le prix du magasin (70 % au plus). Le prix neuf de référence et la remise sont affichés sur chaque annonce.'],
+      ['Comment fixer un rendez-vous pour des travaux ou un échange ?', 'Depuis la fiche d’un artisan ou d’une annonce, cliquez sur « Proposer un rendez-vous » : choisissez jusqu’à 3 créneaux dans le calendrier. L’autre partie en accepte un, et le rendez-vous s’inscrit dans votre agenda. Annulation gratuite jusqu’à 24 h avant.'],
+      ['Qu’est-ce que le déstockage des enseignes ?', 'Des professionnels (grandes surfaces de bricolage, négoces, fabricants, loueurs) y écoulent leurs fins de série et surstocks : des produits neufs, à prix cassés, payés en ligne et retirés en magasin, avec les garanties légales du vendeur.'],
       ['Faut-il être professionnel pour louer souvent ?', 'Au-delà d’un usage occasionnel, un numéro SIRET est demandé. Les revenus sont déclarés aux impôts conformément à la directive DAC7.'],
     ];
     return `<div class="page"><div class="conteneur" style="max-width:820px"><div class="titre-section"><div><h2>Questions fréquentes</h2></div></div>${q.map(([t, r]) => `<details class="panneau"><summary style="font-weight:700;cursor:pointer">${t}</summary><p>${r}</p></details>`).join('')}</div></div>`;
   }
 
-  function vueLegal() {
-    return `<div class="page"><div class="conteneur" style="max-width:820px"><div class="panneau"><h2>Conditions générales et mentions légales</h2>
-      <p><b>À rédiger avec un avocat avant tout lancement.</b> Points à couvrir : statut d’intermédiaire de la plateforme, CGU et CGV distinctes particuliers/professionnels, prestataire de paiement agréé (aucun fonds ne transite par ZETOOLS), obligations DAC7, assurance, médiation de la consommation, RGPD.</p></div></div></div>`;
+  function vueLegal(id) {
+    const J = window.ZT_JURIDIQUE; const p = J.PAGES.find((x) => x.id === id) || J.PAGES[0];
+    return `<div class="page"><div class="conteneur"><div class="juridique">
+      <nav aria-label="Documents juridiques">${J.PAGES.map((x) => `<a href="#/legal/${x.id}" class="${x.id === p.id ? 'actif' : ''}">${x.court}</a>`).join('')}<a href="#/pros">Offres professionnelles</a></nav>
+      <article class="panneau"><div class="surtitre">${J.SOCIETE.nom} SAS · ${J.SOCIETE.siege}</div><h2 style="margin:4px 0">${p.titre}</h2>
+        <p class="discret">${J.SOCIETE.version} · document de travail, à faire valider par un avocat avant mise en ligne. Les mentions surlignées restent à compléter.</p>
+        <p>${p.intro}</p>
+        ${p.sections.map(([t, h]) => `<h3>${t}</h3>${h}`).join('')}
+      </article></div></div></div>${p.id === 'securite' ? blocReassurance() : ''}`;
   }
 
   function vueCredits() {
@@ -1421,6 +2057,7 @@ table.tableau { width: 100%; border-collapse: collapse; background: var(--carte)
       <div class="puces">${a.metiers.map((m) => `<span class="puce">${metierIco(m)} ${esc(metierNom(m))}</span>`).join('')}</div>
       <div class="ligne discret"><span>Dès ${Z.euros(a.tarifHoraire)} / h · intervient ${esc(a.delai)}</span><span>${a.outils ? 'Vient avec ses outils' : 'Outils à fournir ou à louer'}</span></div>
       ${avecBouton ? `<button class="btn btn-cta" data-devis="${a.id}" style="width:100%;margin-top:6px">Demander un devis gratuit</button>` : ''}
+      <a class="btn btn-contour" href="#/rendez-vous?type=${a.metiers.includes('reparation') ? 'reparation' : 'travaux'}&avec=${a.id}" style="width:100%;margin-top:6px">📅 Proposer un rendez-vous</a>
     </div>`;
   }
 
@@ -1642,6 +2279,326 @@ table.tableau { width: 100%; border-collapse: collapse; background: var(--carte)
     </div></div>`;
   }
 
+  /* =====================================================================
+     DÉSTOCKAGE ENSEIGNES : produits neufs, prix barrés conformes (art. L.112-1-1 C. conso)
+     ===================================================================== */
+  const { TYPES_ENSEIGNE, ENSEIGNES, LOTS, RDV_DEMO } = window.ZT_DONNEES;
+  const enseigne = (id) => ENSEIGNES.find((e) => e.id === id) || { id, nom: 'Enseigne', type: 'gsb', logo: '🏬' };
+  const lotCourant = (l) => (etat.stocks[l.id] ? Object.assign({}, l, { magasins: etat.stocks[l.id] }) : l);
+  const tousLots = () => LOTS.concat(etat.lots).map(lotCourant);
+  const lotsActifs = () => tousLots().filter((l) => l.fin >= AUJOURDHUI && Z.stockLot(l) > 0);
+  const NOTE_REFERENCE = 'Prix de référence : prix le plus bas pratiqué par l’enseigne au cours des 30 jours précédant la réduction (art. L.112-1-1 du Code de la consommation). Produits neufs, garanties légales de l’enseigne.';
+
+  function carteLot(l) {
+    const e = enseigne(l.enseigne); const r = Z.remiseSurNeuf(l.prixDestockage, l.prixReference); const st = Z.stockLot(l);
+    return `<a class="carte carte-lot" href="#/lot/${l.id}">
+      <div class="visuel">${l.photo ? `<img loading="lazy" src="${l.photo}" alt="${esc(l.titre)}">` : ''}
+        <div class="badges"><span class="badge badge-destock">Déstockage</span><span class="remise">−${r} %</span></div></div>
+      <div class="infos"><span class="enseigne-nom">${e.logo} ${esc(e.nom)} · ${esc(TYPES_ENSEIGNE[e.type] || '')}</span>
+        <h3>${esc(l.titre)}</h3>
+        <div class="prix">${Z.euros(l.prixDestockage)} <s class="barre">${Z.euros(l.prixReference)}</s></div>
+        <div class="meta"><span>${l.reconditionne ? '♻️ Reconditionné' : '✨ Neuf'} · ${esc(l.motif)}</span></div>
+        <div class="meta"><span>📦 ${st} en stock · ${l.magasins.length} magasin${l.magasins.length > 1 ? 's' : ''}</span><span>⏳ jusqu’au ${Z.formatDate(l.fin)}</span></div></div></a>`;
+  }
+  let filtreLots = { cat: '', type: '' };
+  function vueDestockage() {
+    const lots = lotsActifs().filter((l) => (!filtreLots.cat || l.categorie === filtreLots.cat) && (!filtreLots.type || enseigne(l.enseigne).type === filtreLots.type));
+    const puce = (k, v, lib) => `<button class="puce ${filtreLots[k] === v ? 'active' : ''}" data-filtre-lot="${k}" data-valeur="${v}">${lib}</button>`;
+    return `<section class="hero hero-court hero-destock"><div class="conteneur">
+        <div class="surtitre" style="color:var(--jaune)">Déstockage des enseignes · produits neufs</div>
+        <h1>Les fins de série des pros, <em>à prix imbattables</em>.</h1>
+        <p class="sous">Grandes surfaces de bricolage, négoces de matériaux, fabricants et loueurs écoulent ici leurs surstocks. Vous payez en ligne et retirez en magasin.</p>
+      </div></section>
+      <div class="page"><div class="conteneur">
+        <div class="puces" style="margin-bottom:10px">${puce('cat', '', 'Toutes catégories')}${CATEGORIES.map((c) => puce('cat', c.id, `${c.icone} ${c.nom}`)).join('')}</div>
+        <div class="puces" style="margin-bottom:20px">${puce('type', '', 'Tous les acteurs')}${Object.entries(TYPES_ENSEIGNE).map(([k, v]) => puce('type', k, v)).join('')}</div>
+        <div class="grille">${lots.map(carteLot).join('') || '<div class="vide">Aucun lot pour ces critères. Revenez bientôt : les enseignes publient chaque semaine.</div>'}</div>
+        <p class="note-legale">${NOTE_REFERENCE} Limite de ${Z.REGLES.maxParClient} unités par client et par lot.</p>
+        <div class="panneau bandeau-action"><div><b>Vous êtes une enseigne, un négoce, un fabricant ou un loueur ?</b><br>Écoulez vos fins de série et surstocks auprès des bricoleurs de votre zone de chalandise, sans brader votre image : espace privé, retrait en magasin, 0 € d’abonnement pendant le pilote.</div><a class="btn btn-cta" href="#/espace-enseigne">Accéder à l’espace enseigne</a></div>
+      </div></div>`;
+  }
+  function brancherDestockage() {
+    vue.querySelectorAll('[data-filtre-lot]').forEach((b) => b.addEventListener('click', () => { filtreLots[b.dataset.filtreLot] = b.dataset.valeur; router(); }));
+  }
+  function vueLot(id) {
+    const l = tousLots().find((x) => x.id === id);
+    if (!l) return '<div class="page"><div class="conteneur vide">Lot introuvable. <a href="#/destockage">Retour au déstockage</a></div></div>';
+    const e = enseigne(l.enseigne); const d = Z.devisLot(l, 1);
+    const fini = l.fin < AUJOURDHUI || Z.stockLot(l) === 0;
+    return `<div class="page"><div class="conteneur">
+      <div class="fil"><a href="#/">Accueil</a> › <a href="#/destockage">Déstockage</a> › ${esc(l.titre)}</div>
+      <div class="fiche"><div><div class="photo-principale">${l.photo ? `<img src="${l.photo.replace('w=900', 'w=1400')}" alt="${esc(l.titre)}">` : ''}</div>
+          <div class="panneau" style="margin-top:16px"><h2 style="margin-top:0">Détails du lot</h2>
+            <div class="ligne"><span>Vendu par</span><b>${e.logo} ${esc(e.nom)} · ${esc(TYPES_ENSEIGNE[e.type])} ${e.siret ? '· ✔ SIRET vérifié' : ''}</b></div>
+            <div class="ligne"><span>Produit</span><b>${l.reconditionne ? 'Reconditionné, révisé par le loueur' : 'Neuf'}</b></div>
+            <div class="ligne"><span>Raison du déstockage</span><b>${esc(l.motif)}</b></div>
+            <div class="ligne"><span>Offre valable jusqu’au</span><b>${Z.formatDate(l.fin)} ou épuisement du stock</b></div>
+            <h3>Stock par magasin</h3>${l.magasins.map((m) => `<div class="ligne"><span>📍 ${esc(m.nom)} (${esc(m.cp)})</span><b>${m.stock} disponible${m.stock > 1 ? 's' : ''}</b></div>`).join('')}
+            <p class="note-legale">${NOTE_REFERENCE} Achat à distance auprès d’un professionnel : droit de rétractation de 14 jours et garantie légale de conformité de 2 ans (${l.reconditionne ? '1 an au moins pour un bien reconditionné, selon l’enseigne' : 'produit neuf'}).</p></div></div>
+        <div><div class="panneau"><div class="badges" style="display:flex;gap:6px"><span class="badge badge-destock">Déstockage</span><span class="remise">−${d.remise} %</span></div>
+          <h1>${esc(l.titre)}</h1>
+          <div class="prix-lot">${Z.euros(l.prixDestockage)} <s class="barre">${Z.euros(l.prixReference)}</s></div>
+          ${fini ? '<div class="alerte alerte-info">Cette offre est terminée.</div>' : `<form id="form-lot" class="formulaire" style="grid-template-columns:1fr 1fr">
+            <label>Quantité<select name="quantite">${Array.from({ length: Math.min(Z.REGLES.maxParClient, Z.stockLot(l)) }, (_, i) => `<option>${i + 1}</option>`).join('')}</select></label>
+            <label>Magasin de retrait<select name="cp">${l.magasins.filter((m) => m.stock > 0).map((m) => `<option value="${esc(m.cp)}">${esc(m.nom)}</option>`).join('')}</select></label>
+            <div class="large" id="devis-lot"></div>
+            <div class="large"><button class="btn btn-cta" style="width:100%">Payer et réserver en click & collect</button></div></form>`}
+          <p style="color:var(--texte-doux);font-size:.9rem">Paiement sécurisé par le prestataire agréé de ZETools. L’enseigne prépare votre commande ; vous la retirez avec votre code sous 7 jours.</p></div></div>
+      </div></div></div>`;
+  }
+  function brancherLot(id) {
+    const f = document.getElementById('form-lot'); if (!f) return;
+    const l = tousLots().find((x) => x.id === id);
+    const maj = () => { const d = Z.devisLot(l, Number(f.quantite.value)); document.getElementById('devis-lot').innerHTML = `<div class="ligne total"><span>Total</span><span>${Z.euros(d.total)}</span></div><div class="ligne discret"><span>Votre économie</span><span>${Z.euros(d.economie)}</span></div>`; };
+    f.quantite.addEventListener('change', maj); maj();
+    f.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const d = Z.devisLot(l, Number(f.quantite.value));
+      const r = Z.retirerDuStock(l, f.cp.value, d.quantite);
+      if (!r.ok) return toast(r.raison);
+      etat.stocks[l.id] = r.magasins;
+      const code = 'ZT-' + Math.random().toString(36).slice(2, 6).toUpperCase();
+      etat.retraits.push({ code, lotId: l.id, enseigne: l.enseigne, titre: l.titre, magasin: r.magasin, quantite: d.quantite, total: d.total, commission: d.commission, date: AUJOURDHUI });
+      sauver(); toast(`Réservé. Code de retrait ${code} à présenter en magasin.`); aller('#/mon-espace');
+    });
+  }
+
+  /* --- espace privé enseigne --- */
+  function vueEspaceEnseigne() {
+    if (!etat.enseigne) {
+      return `<div class="page"><div class="conteneur" style="max-width:760px"><div class="panneau">
+        <div class="surtitre">Espace privé · accès sur invitation</div><h2 style="margin-top:4px">Espace enseigne ZETools</h2>
+        <p>Réservé aux distributeurs et fabricants d’outillage : grandes surfaces de bricolage, négoces de matériaux, fabricants, loueurs, quincailleries. Chaque compte est vérifié avant ouverture (SIRET, extrait Kbis, signataire habilité, coordonnées bancaires auprès du prestataire de paiement).</p>
+        <ul class="liste-avantages"><li>Publiez vos fins de série, surstocks, retours et produits à l’emballage abîmé, magasin par magasin.</li><li>Vente en ligne, retrait en magasin : du trafic en point de vente, sans logistique supplémentaire.</li><li>Commission de ${Math.round(Z.REGLES.commissionDestockage * 100)} % sur les ventes réalisées, 0 € d’abonnement pendant le pilote.</li><li>Prix barrés contrôlés : vous attestez le prix de référence sur 30 jours, ZETools l’affiche conformément au Code de la consommation.</li></ul>
+        <form id="connexion-enseigne" class="formulaire" style="grid-template-columns:1fr">
+          <label>Démonstration, se connecter en tant que<select name="enseigne">${ENSEIGNES.map((e) => `<option value="${e.id}">${e.logo} ${esc(e.nom)} · ${esc(TYPES_ENSEIGNE[e.type])}</option>`).join('')}</select></label>
+          <button class="btn btn-cta">Entrer dans l’espace enseigne</button></form>
+        <p style="font-size:.88rem;color:var(--texte-doux)">Noms d’enseignes fictifs pour la maquette. Conditions : <a href="#/legal/pros">conditions particulières professionnels et enseignes</a>.</p></div></div></div>`;
+    }
+    const e = enseigne(etat.enseigne);
+    const mesLots = tousLots().filter((l) => l.enseigne === e.id);
+    const mesRetraits = etat.retraits.filter((r) => r.enseigne === e.id);
+    const ca = mesRetraits.reduce((t, r) => t + r.total, 0), com = mesRetraits.reduce((t, r) => t + r.commission, 0);
+    return `<div class="page"><div class="conteneur">
+      <div class="titre-section"><div><div class="surtitre">Espace enseigne · privé</div><h2>${e.logo} ${esc(e.nom)}</h2><p>${esc(TYPES_ENSEIGNE[e.type])} · ${e.magasins} point${e.magasins > 1 ? 's' : ''} de vente</p></div><button class="btn btn-contour" id="deconnexion-enseigne">Se déconnecter</button></div>
+      <div class="kpis"><div class="kpi"><b>${mesLots.filter((l) => l.fin >= AUJOURDHUI && Z.stockLot(l) > 0).length}</b><span>lots en ligne</span></div><div class="kpi"><b>${mesLots.reduce((t, l) => t + Z.stockLot(l), 0)}</b><span>unités en stock</span></div><div class="kpi"><b>${mesRetraits.reduce((t, r) => t + r.quantite, 0)}</b><span>unités vendues</span></div><div class="kpi"><b>${Z.euros(ca)}</b><span>chiffre d’affaires</span></div><div class="kpi"><b>${Z.euros(ca - com)}</b><span>versé après commission</span></div></div>
+      <div class="panneau"><h3 style="margin-top:0">Mes lots</h3><div class="tableau-defile"><table class="tableau"><thead><tr><th>Produit</th><th>Réf. 30 j</th><th>Déstockage</th><th>Remise</th><th>Stock</th><th>Fin</th></tr></thead><tbody>
+        ${mesLots.map((l) => `<tr><td><a href="#/lot/${l.id}">${esc(l.titre)}</a></td><td>${Z.euros(l.prixReference)}</td><td><b>${Z.euros(l.prixDestockage)}</b></td><td>−${Z.remiseSurNeuf(l.prixDestockage, l.prixReference)} %</td><td>${Z.stockLot(l)}</td><td>${Z.formatDate(l.fin)}</td></tr>`).join('') || '<tr><td colspan="6">Aucun lot publié.</td></tr>'}</tbody></table></div></div>
+      <div class="panneau"><h3 style="margin-top:0">Retraits à préparer</h3>${mesRetraits.map((r) => `<div class="ligne"><span><b>${esc(r.code)}</b> · ${r.quantite} × ${esc(r.titre)} · ${esc(r.magasin)}</span><b>${Z.euros(r.total)}</b></div>`).join('') || '<p style="color:var(--texte-doux)">Aucune commande pour le moment.</p>'}</div>
+      <form class="panneau formulaire" id="form-lot-enseigne"><h3 class="large" style="margin:0">Publier un lot</h3>
+        <label class="large">Désignation<input name="titre" required maxlength="90" placeholder="Ex. : Scie circulaire 1 400 W, lame 190 mm"></label>
+        <label>Catégorie<select name="categorie">${CATEGORIES.map((c) => `<option value="${c.id}">${c.nom}</option>`).join('')}</select></label>
+        <label>Raison du déstockage<select name="motif"><option>Fin de série</option><option>Surstock</option><option>Fin de saison</option><option>Emballage abîmé, produit neuf</option><option>Changement de référence</option><option>Renouvellement du parc</option></select></label>
+        <label>Prix de référence (€)<input name="prixReference" type="number" min="1" step="0.01" required placeholder="Le plus bas sur 30 jours"></label>
+        <label>Prix de déstockage (€)<input name="prixDestockage" type="number" min="1" step="0.01" required></label>
+        <label>Magasin<input name="magasin" required placeholder="${esc(e.nom)} Vitry"></label>
+        <label>Code postal<input name="cp" required pattern="\\d{5}" placeholder="94400"></label>
+        <label>Quantité disponible<input name="stock" type="number" min="1" step="1" required></label>
+        <label>Fin de l’opération<input name="fin" type="date" required min="${AUJOURDHUI}"></label>
+        <label class="large case"><input type="checkbox" name="atteste" required> J’atteste que le prix de référence est le prix le plus bas pratiqué dans ce magasin au cours des 30 jours précédant la réduction.</label>
+        <div class="large alerte alerte-info">Phase 2 : import du catalogue par fichier CSV ou flux EDI, et mise à jour automatique des stocks depuis votre logiciel de caisse.</div>
+        <div class="large"><button class="btn btn-cta">Publier le lot</button></div></form>
+    </div></div>`;
+  }
+  function brancherEspaceEnseigne() {
+    const c = document.getElementById('connexion-enseigne');
+    if (c) c.addEventListener('submit', (e) => { e.preventDefault(); etat.enseigne = c.enseigne.value; sauver(); router(); });
+    const d = document.getElementById('deconnexion-enseigne');
+    if (d) d.addEventListener('click', () => { etat.enseigne = null; sauver(); router(); });
+    const f = document.getElementById('form-lot-enseigne'); if (!f) return;
+    f.addEventListener('submit', (e) => {
+      e.preventDefault(); const fd = new FormData(f);
+      const lot = { id: 'l' + Date.now(), enseigne: etat.enseigne, titre: String(fd.get('titre')), categorie: String(fd.get('categorie')), motif: String(fd.get('motif')),
+        prixReference: Number(fd.get('prixReference')), prixDestockage: Number(fd.get('prixDestockage')), fin: String(fd.get('fin')), photo: PHOTOS.atelier,
+        magasins: [{ nom: String(fd.get('magasin')), cp: String(fd.get('cp')), stock: Number(fd.get('stock')) }] };
+      const v = Z.verifierLot(lot, AUJOURDHUI);
+      if (!v.ok) return toast(v.erreurs[0]);
+      etat.lots.push(lot); sauver(); toast('Lot publié dans le déstockage.'); router();
+    });
+  }
+
+  /* =====================================================================
+     AGENDA : proposer et réserver des dates et heures (travaux, échanges, réparations, remises)
+     ===================================================================== */
+  const maintenant = () => { const d = new Date(); const p = (n) => String(n).padStart(2, '0'); return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`; };
+  const quand = (c) => { const d = new Date(c.slice(0, 10) + 'T12:00:00Z'); return `${d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' })} à ${c.slice(11, 13)} h ${c.slice(14, 16) === '00' ? '' : c.slice(14, 16)}`.trim(); };
+  function nomContact(id) {
+    if (!id) return 'à choisir';
+    if (MEMBRES[id]) return MEMBRES[id].nom;
+    const a = ARTISANS.find((x) => x.id === id); return a ? a.nom : 'membre ZETools';
+  }
+  const rdvConfirmes = () => etat.rdv.filter((r) => r.statut === 'confirmé');
+  let selRdv = null;
+  function initSelRdv(params) {
+    const cle = params.toString();
+    if (selRdv && selRdv.cle === cle) return;
+    const a = params.get('annonce') ? annonce(params.get('annonce')) : null;
+    const art = params.get('avec') ? ARTISANS.find((x) => x.id === params.get('avec')) : null;
+    const type = params.get('type') || 'travaux';
+    selRdv = { cle, type, avec: params.get('avec') || (a ? a.membre : ''), annonceId: a ? a.id : '', reponseA: params.get('reponse') || '',
+      objet: params.get('objet') || (a ? `${Z.REGLES.typesRdv[type] || ''} · ${a.titre}` : art ? `${Z.REGLES.typesRdv[type]} avec ${art.nom}` : ''),
+      mois: AUJOURDHUI.slice(0, 7), jour: '', creneaux: [], dureeHeures: type === 'travaux' ? 2 : 1 };
+  }
+  function calendrierRdv() {
+    const [an, mo] = selRdv.mois.split('-').map(Number);
+    const premier = new Date(Date.UTC(an, mo - 1, 1)); const nb = new Date(Date.UTC(an, mo, 0)).getUTCDate();
+    const nomMois = premier.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+    let cases = ['L', 'M', 'M', 'J', 'V', 'S', 'D'].map((j) => `<span>${j}</span>`).join('') + '<span></span>'.repeat((premier.getUTCDay() + 6) % 7);
+    for (let j = 1; j <= nb; j++) {
+      const t = `${an}-${String(mo).padStart(2, '0')}-${String(j).padStart(2, '0')}`;
+      const dim = new Date(t + 'T00:00:00Z').getUTCDay() === 0;
+      const dis = t < AUJOURDHUI || dim || !Z.creneauxJour(t, { maintenant: maintenant() }).length;
+      const cls = [dis ? 'passe' : '', t === selRdv.jour ? 'choisi' : '', selRdv.creneaux.some((c) => c.startsWith(t)) ? 'marque' : ''].join(' ');
+      cases += `<button type="button" data-jour-rdv="${t}" class="${cls}" ${dis ? 'disabled' : ''}>${j}</button>`;
+    }
+    const pris = rdvConfirmes().map((r) => r.creneau);
+    const slots = selRdv.jour ? Z.creneauxJour(selRdv.jour, { maintenant: maintenant(), pris }) : [];
+    const max = Z.REGLES.rdv.maxCreneaux;
+    return `<div class="rdv-grille"><div class="calendrier"><div class="tete"><button type="button" data-mois-rdv="-1" aria-label="Mois précédent">‹</button><span>${nomMois}</span><button type="button" data-mois-rdv="1" aria-label="Mois suivant">›</button></div><div class="jours">${cases}</div></div>
+      <div><b>${selRdv.jour ? quand(selRdv.jour + 'T00:00').replace(/ à .*/, '') : 'Choisissez un jour'}</b>
+        <div class="creneaux">${slots.map((s) => `<button type="button" data-creneau="${s.debut}" class="${selRdv.creneaux.includes(s.debut) ? 'choisi' : ''}" ${s.libre ? '' : 'disabled title="Déjà pris dans votre agenda"'}>${s.heure}</button>`).join('') || (selRdv.jour ? '<span class="discret">Plus de créneau ce jour-là.</span>' : '')}</div>
+        <div class="choisis"><b>Vos propositions (${selRdv.creneaux.length}/${max})</b>${selRdv.creneaux.map((c) => `<span class="puce">${quand(c)} <button type="button" data-retirer="${c}" aria-label="Retirer">×</button></span>`).join('') || '<p class="discret">Proposez jusqu’à 3 créneaux : l’autre partie en choisit un.</p>'}</div></div></div>`;
+  }
+  function vueRendezVous(params) {
+    initSelRdv(params);
+    const s = selRdv;
+    return `<div class="page"><div class="conteneur" style="max-width:980px">
+      <div class="titre-section"><div><div class="surtitre">Agenda ZETools</div><h2>${s.reponseA ? 'Proposer d’autres dates' : 'Proposer un rendez-vous'}</h2><p>Choisissez des jours et des heures : votre interlocuteur accepte un créneau, et le rendez-vous s’ajoute à vos deux agendas.</p></div><a class="btn btn-contour" href="#/agenda">📅 Mon agenda</a></div>
+      <form class="panneau formulaire" id="form-rdv">
+        <label>Type<select name="type">${Object.entries(Z.REGLES.typesRdv).map(([k, v]) => `<option value="${k}" ${k === s.type ? 'selected' : ''}>${v}</option>`).join('')}</select></label>
+        <label>Avec<input value="${esc(nomContact(s.avec))}" disabled></label>
+        <label class="large">Objet<input name="objet" required maxlength="100" value="${esc(s.objet)}" placeholder="Ex. : pose d’une porte intérieure, échange ponceuse contre visseuse"></label>
+        <label>Durée<select name="duree">${[1, 2, 4, 8].map((h) => `<option value="${h}" ${h === s.dureeHeures ? 'selected' : ''}>${h === 4 ? 'Demi-journée' : h === 8 ? 'Journée' : h + ' h'}</option>`).join('')}</select></label>
+        <label>Lieu<select name="lieu"><option>Lieu public proche (conseillé pour un échange)</option><option ${s.type === 'travaux' ? 'selected' : ''}>À mon domicile (adresse transmise après confirmation)</option><option ${s.type === 'reparation' ? 'selected' : ''}>À l’atelier du professionnel</option><option>Visioconférence (premier contact, devis)</option></select></label>
+        <div class="large" id="zone-calendrier">${calendrierRdv()}</div>
+        <label class="large">Message<textarea name="message" rows="2" placeholder="Précisions utiles (accès, matériel à prévoir…). Vos coordonnées restent masquées."></textarea></label>
+        <div class="large alerte alerte-info">Annulation gratuite jusqu’à ${Z.REGLES.rdv.annulationGratuiteHeures} h avant le rendez-vous. Au-delà, l’annulation est signalée sur votre profil.</div>
+        <div class="large"><button class="btn btn-cta">Envoyer la proposition</button></div>
+      </form></div></div>`;
+  }
+  function brancherRendezVous() {
+    const f = document.getElementById('form-rdv');
+    const zone = document.getElementById('zone-calendrier');
+    const redessiner = () => { zone.innerHTML = calendrierRdv(); };
+    zone.addEventListener('click', (e) => {
+      const b = e.target.closest('button'); if (!b) return;
+      if (b.dataset.moisRdv) { const [a, m] = selRdv.mois.split('-').map(Number); const d = new Date(Date.UTC(a, m - 1 + Number(b.dataset.moisRdv), 1)); selRdv.mois = d.toISOString().slice(0, 7); }
+      else if (b.dataset.jourRdv) selRdv.jour = b.dataset.jourRdv;
+      else if (b.dataset.retirer) selRdv.creneaux = selRdv.creneaux.filter((c) => c !== b.dataset.retirer);
+      else if (b.dataset.creneau) {
+        const c = b.dataset.creneau;
+        if (selRdv.creneaux.includes(c)) selRdv.creneaux = selRdv.creneaux.filter((x) => x !== c);
+        else if (selRdv.creneaux.length >= Z.REGLES.rdv.maxCreneaux) return toast(`${Z.REGLES.rdv.maxCreneaux} créneaux au maximum : retirez-en un.`);
+        else selRdv.creneaux = selRdv.creneaux.concat(c).sort();
+      }
+      redessiner();
+    });
+    f.addEventListener('submit', (e) => {
+      e.preventDefault(); const fd = new FormData(f);
+      const rdv = { id: 'r' + Date.now(), sens: 'envoye', type: String(fd.get('type')), avec: selRdv.avec, annonceId: selRdv.annonceId, objet: String(fd.get('objet')),
+        creneaux: selRdv.creneaux.slice(), dureeHeures: Number(fd.get('duree')), lieu: String(fd.get('lieu')), statut: 'proposé',
+        message: Z.masquerCoordonnees(String(fd.get('message') || ''), false).texte };
+      const v = Z.verifierProposition(rdv, maintenant());
+      if (!v.ok) return toast(v.erreurs[0]);
+      if (selRdv.reponseA) etat.rdv = etat.rdv.map((r) => (r.id === selRdv.reponseA ? Object.assign({}, r, { statut: 'contre-proposé' }) : r));
+      etat.rdv.push(rdv); selRdv = null; sauver();
+      toast('Proposition envoyée. Vous serez prévenu dès qu’un créneau est accepté.'); aller('#/agenda');
+    });
+  }
+  let moisAgenda = null;
+  function vueAgenda() {
+    moisAgenda = moisAgenda || AUJOURDHUI.slice(0, 7);
+    const [an, mo] = moisAgenda.split('-').map(Number);
+    const premier = new Date(Date.UTC(an, mo - 1, 1)); const nb = new Date(Date.UTC(an, mo, 0)).getUTCDate();
+    const nomMois = premier.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+    let cases = ['L', 'M', 'M', 'J', 'V', 'S', 'D'].map((j) => `<span>${j}</span>`).join('') + '<span></span>'.repeat((premier.getUTCDay() + 6) % 7);
+    for (let j = 1; j <= nb; j++) {
+      const t = `${an}-${String(mo).padStart(2, '0')}-${String(j).padStart(2, '0')}`;
+      const conf = etat.rdv.some((r) => r.statut === 'confirmé' && r.creneau.startsWith(t));
+      const prop = etat.rdv.some((r) => r.statut === 'proposé' && r.creneaux.some((c) => c.startsWith(t)));
+      cases += `<button type="button" disabled class="${t < AUJOURDHUI ? 'passe' : ''} ${conf ? 'rdv-ok' : prop ? 'rdv-attente' : ''}">${j}</button>`;
+    }
+    const groupe = (titre, liste, rendu) => `<div class="panneau"><h3 style="margin-top:0">${titre} <span class="discret">(${liste.length})</span></h3>${liste.map(rendu).join('') || '<p class="discret">Rien pour le moment.</p>'}</div>`;
+    const entete = (r) => `<div><span class="badge badge-echange">${esc(Z.REGLES.typesRdv[r.type])}</span> <b>${esc(r.objet)}</b><br><span class="discret">avec ${esc(nomContact(r.avec))} · ${r.dureeHeures >= 8 ? 'journée' : r.dureeHeures + ' h'} · ${esc(r.lieu)}</span>${r.message ? `<p class="citation">« ${esc(r.message)} »</p>` : ''}</div>`;
+    const recus = etat.rdv.filter((r) => r.sens === 'recu' && r.statut === 'proposé');
+    const envoyes = etat.rdv.filter((r) => r.sens === 'envoye' && r.statut === 'proposé');
+    const confirmes = rdvConfirmes().slice().sort((a, b) => a.creneau.localeCompare(b.creneau));
+    const autres = etat.rdv.filter((r) => ['annulé', 'refusé', 'contre-proposé'].includes(r.statut));
+    return `<div class="page"><div class="conteneur">
+      <div class="titre-section"><div><div class="surtitre">Agenda</div><h2>Mes rendez-vous</h2><p>Travaux, échanges de matériel, réparations et remises d’outils : proposez des dates, acceptez un créneau, ajoutez-le à votre calendrier.</p></div><a class="btn btn-cta" href="#/rendez-vous?type=echange">＋ Proposer un rendez-vous</a></div>
+      <div class="agenda"><div class="panneau"><div class="calendrier"><div class="tete"><button data-mois-agenda="-1" aria-label="Mois précédent">‹</button><span>${nomMois}</span><button data-mois-agenda="1" aria-label="Mois suivant">›</button></div><div class="jours">${cases}</div></div>
+          <p class="legende"><span class="pastille-ok"></span> confirmé <span class="pastille-attente"></span> en attente</p></div>
+        <div>
+          ${groupe('À vous de répondre', recus, (r) => `<div class="rdv">${entete(r)}<div class="creneaux">${r.creneaux.map((c) => `<button class="btn btn-vert" data-accepter="${r.id}" data-c="${c}">✔ ${quand(c)}</button>`).join('')}</div>
+            <div class="actions-rdv"><a class="btn btn-contour" href="#/rendez-vous?type=${r.type}&avec=${r.avec}&objet=${encodeURIComponent(r.objet)}&reponse=${r.id}">Proposer d’autres dates</a><button class="btn btn-contour" data-refuser="${r.id}">Refuser</button></div></div>`)}
+          ${groupe('Confirmés', confirmes, (r) => `<div class="rdv rdv-confirme"><div class="date-rdv">${quand(r.creneau)}</div>${entete(r)}
+            <div class="actions-rdv"><button class="btn btn-contour" data-ics="${r.id}">📅 Ajouter à mon calendrier</button><button class="btn btn-contour" data-annuler="${r.id}">Annuler</button></div></div>`)}
+          ${groupe('En attente de réponse', envoyes, (r) => `<div class="rdv">${entete(r)}<div class="discret">Créneaux proposés : ${r.creneaux.map(quand).join(' · ')}</div>
+            <div class="actions-rdv"><button class="btn btn-contour" data-simuler="${r.id}">Démo : simuler l’acceptation</button><button class="btn btn-contour" data-annuler="${r.id}">Annuler</button></div></div>`)}
+          ${autres.length ? groupe('Historique', autres, (r) => `<div class="rdv rdv-passe">${entete(r)}<span class="discret">${esc(r.statut)}</span></div>`) : ''}
+        </div></div></div></div>`;
+  }
+  function brancherAgenda() {
+    const trouver = (id) => etat.rdv.find((r) => r.id === id);
+    const maj = (id, chg) => { etat.rdv = etat.rdv.map((r) => (r.id === id ? Object.assign({}, r, chg) : r)); sauver(); router(); };
+    const accepter = (r, c) => { const res = Z.confirmerRdv(r, c, etat.rdv); if (!res.ok) return toast(res.raison); maj(r.id, res.rdv); toast(`Rendez-vous confirmé : ${quand(c)}.`); };
+    vue.querySelector('.page').addEventListener('click', (e) => {
+      const b = e.target.closest('button'); if (!b) return;
+      if (b.dataset.moisAgenda) { const [a, m] = moisAgenda.split('-').map(Number); moisAgenda = new Date(Date.UTC(a, m - 1 + Number(b.dataset.moisAgenda), 1)).toISOString().slice(0, 7); router(); }
+      else if (b.dataset.accepter) accepter(trouver(b.dataset.accepter), b.dataset.c);
+      else if (b.dataset.simuler) { const r = trouver(b.dataset.simuler); accepter(r, r.creneaux[0]); }
+      else if (b.dataset.refuser) { maj(b.dataset.refuser, { statut: 'refusé' }); toast('Proposition refusée.'); }
+      else if (b.dataset.annuler) {
+        const r = trouver(b.dataset.annuler);
+        if (!Z.annulationGratuite(r, maintenant()) && !confirm('Moins de 24 h avant le rendez-vous : l’annulation sera signalée sur votre profil. Continuer ?')) return;
+        maj(r.id, { statut: 'annulé' }); toast('Rendez-vous annulé, votre interlocuteur est prévenu.');
+      } else if (b.dataset.ics) {
+        const r = trouver(b.dataset.ics);
+        const lien = document.createElement('a');
+        lien.href = URL.createObjectURL(new Blob([Z.versIcs(r)], { type: 'text/calendar' }));
+        lien.download = `zetools-${r.creneau.slice(0, 10)}.ics`; document.body.appendChild(lien); lien.click(); lien.remove();
+      }
+    });
+  }
+
+  /* =====================================================================
+     OFFRES DE PRIX : chacun propose son prix, l'autre accepte, refuse ou contre-propose
+     ===================================================================== */
+  function vueOffres() {
+    const M = maintenant();
+    const unite = (o) => (o.mode === 'location' ? ' / jour' : '');
+    const etiquette = (o) => { const st = Z.offreExpiree(o, M) ? 'expirée' : o.statut; return `<span class="badge ${st === 'acceptée' ? 'badge-echange' : st === 'refusée' || st === 'expirée' ? 'badge-vente' : 'badge-location'}">${st}</span>`; };
+    const tete = (o) => `<div><b>${esc(o.titre)}</b> ${etiquette(o)}<br><span class="discret">${o.mode === 'vente' ? 'Achat' : 'Location'} · prix affiché ${Z.euros(o.prixAffiche)}${unite(o)} · ${o.sens === 'recue' ? 'offre de' : 'propriétaire :'} ${esc(nomContact(o.avec))}</span></div>`;
+    const montants = (o) => `<div class="montants"><span>Offre <b>${Z.euros(o.montant)}${unite(o)}</b> <small>(−${Z.remiseSurNeuf(o.montant, o.prixAffiche)} %)</small></span>${o.contre ? `<span>Contre-proposition <b>${Z.euros(o.contre)}${unite(o)}</b></span>` : ''}${o.prixFinal ? `<span class="final">Prix convenu <b>${Z.euros(o.prixFinal)}${unite(o)}</b></span>` : ''}</div>`;
+    const vivante = (o) => !Z.offreExpiree(o, M);
+    const recue = (o) => `<div class="rdv">${tete(o)}${montants(o)}${o.statut === 'en attente' && vivante(o) ? `<div class="actions-rdv"><button class="btn btn-vert" data-offre="${o.id}" data-reponse="accepter">✔ Accepter ${Z.euros(o.montant)}</button>
+        <span class="offre-saisie"><input type="number" step="0.5" min="${o.montant}" max="${o.prixAffiche}" placeholder="Mon prix" aria-label="Contre-proposition" data-contre="${o.id}"><button class="btn btn-contour" data-offre="${o.id}" data-reponse="contre">Contre-proposer</button></span>
+        <button class="btn btn-contour" data-offre="${o.id}" data-reponse="refuser">Refuser</button></div>` : o.statut === 'contre-offre' && vivante(o) ? '<span class="discret">En attente de la réponse de l’acheteur.</span>' : ''}</div>`;
+    const envoyee = (o) => `<div class="rdv">${tete(o)}${montants(o)}<div class="actions-rdv">${!vivante(o) ? '' : o.statut === 'en attente' ? `<button class="btn btn-contour" data-offre="${o.id}" data-reponse="demo">Démo : simuler la réponse du propriétaire</button><button class="btn btn-contour" data-offre="${o.id}" data-reponse="refuser">Retirer mon offre</button>`
+        : o.statut === 'contre-offre' ? `<button class="btn btn-vert" data-offre="${o.id}" data-reponse="accepter">✔ Accepter ${Z.euros(o.contre)}</button><button class="btn btn-contour" data-offre="${o.id}" data-reponse="refuser">Refuser</button>`
+        : o.statut === 'acceptée' ? `<a class="btn btn-cta" href="#/annonce/${o.annonceId}">${o.mode === 'vente' ? 'Payer' : 'Réserver'} au prix convenu</a>` : ''}</div></div>`;
+    const recues = etat.offres.filter((o) => o.sens === 'recue'), envoyees = etat.offres.filter((o) => o.sens === 'envoyee');
+    return `<div class="page"><div class="conteneur" style="max-width:900px">
+      <div class="titre-section"><div><div class="surtitre">Négociation</div><h2>Offres de prix</h2><p>Proposez votre prix sur une annonce : le propriétaire accepte, refuse ou vous fait une contre-proposition. Si vous êtes d’accord, la vente ou la location se conclut au prix convenu, avec le même paiement sécurisé.</p></div><a class="btn btn-cta" href="#/annonces">Trouver un outil</a></div>
+      <div class="panneau"><h3 style="margin-top:0">Offres reçues sur mes annonces <span class="discret">(${recues.length})</span></h3>${recues.map(recue).join('') || '<p class="discret">Aucune offre reçue.</p>'}</div>
+      <div class="panneau"><h3 style="margin-top:0">Mes offres envoyées <span class="discret">(${envoyees.length})</span></h3>${envoyees.map(envoyee).join('') || '<p class="discret">Vous n’avez pas encore fait d’offre. Sur une annonce, cliquez sur « Proposer mon prix ».</p>'}</div>
+      <div class="alerte alerte-info">Règles : une offre ne peut pas être inférieure à ${Math.round(Z.REGLES.offres.plancher * 100)} % du prix affiché ; ${Z.REGLES.offres.maxParAnnonce} offres au plus par annonce ; chaque offre vaut ${Z.REGLES.offres.validiteHeures} h et engage son auteur pendant ce délai. Un prix accepté reste réservé ${Z.REGLES.offres.validiteHeures} h.</div>
+    </div></div>`;
+  }
+  function brancherOffres() {
+    vue.querySelector('.page').addEventListener('click', (e) => {
+      const b = e.target.closest('[data-offre]'); if (!b) return;
+      const o = etat.offres.find((x) => x.id === b.dataset.offre); const M = maintenant();
+      let r;
+      if (b.dataset.reponse === 'demo') r = Z.reponseVendeurDemo(o, M);
+      else if (b.dataset.reponse === 'contre') r = Z.repondreOffre(o, 'contre', M, Number(vue.querySelector(`[data-contre="${o.id}"]`).value));
+      else r = Z.repondreOffre(o, b.dataset.reponse, M);
+      if (!r.ok) return toast(r.raison);
+      etat.offres = etat.offres.map((x) => (x.id === o.id ? r.offre : x)); sauver();
+      toast({ 'acceptée': `Accord conclu à ${Z.euros(r.offre.prixFinal)}.`, 'refusée': 'Offre refusée.', 'contre-offre': `Contre-proposition de ${Z.euros(r.offre.contre)} envoyée.` }[r.offre.statut]); router();
+    });
+  }
+
   /* ---------- routeur ---------- */
   function router() {
     const [chemin, qs] = (location.hash.slice(1) || '/').split('?');
@@ -1651,7 +2608,7 @@ table.tableau { width: 100%; border-collapse: collapse; background: var(--carte)
     switch (seg[0]) {
       case undefined: html = vueAccueil(); apres = brancherAccueil; break;
       case 'annonces': html = vueAnnonces(params); apres = brancherFiltres; break;
-      case 'annonce': html = vueFiche(seg[1]); apres = () => { const a = annonce(seg[1]); if (a) brancherFiche(a); }; break;
+      case 'annonce': html = vueFiche(seg[1]); apres = () => { const a = Z.appliquerOffres(annonce(seg[1]), etat.offres, maintenant()); if (a) brancherFiche(a); }; break;
       case 'messages': html = vueMessages(params); apres = () => brancherMessages(params); break;
       case 'mon-espace': html = vueMonEspace(); apres = brancherEspace; break;
       case 'favoris': html = vueMonEspace(); apres = () => { brancherEspace(); const h = [...document.querySelectorAll('h3')].find((x) => x.textContent === 'Mes favoris'); if (h) h.scrollIntoView(); }; break;
@@ -1660,10 +2617,16 @@ table.tableau { width: 100%; border-collapse: collapse; background: var(--carte)
       case 'travaux': if (params.get('metier') !== null) { filtreTravaux.metier = params.get('metier'); filtreTravaux.vise = ''; } html = vueTravaux(); apres = brancherTravaux; break;
       case 'espace-artisan': html = vueEspaceArtisan(); apres = brancherEspaceArtisan; break;
       case 'reparer': html = vueReparer(); break;
-      case 'securite': html = blocReassurance(); break;
+      case 'destockage': html = vueDestockage(); apres = brancherDestockage; break;
+      case 'lot': html = vueLot(seg[1]); apres = () => brancherLot(seg[1]); break;
+      case 'espace-enseigne': html = vueEspaceEnseigne(); apres = brancherEspaceEnseigne; break;
+      case 'rendez-vous': html = vueRendezVous(params); apres = brancherRendezVous; break;
+      case 'agenda': html = vueAgenda(); apres = brancherAgenda; break;
+      case 'offres': html = vueOffres(); apres = brancherOffres; break;
+      case 'securite': html = vueLegal('securite'); break;
       case 'atelier': html = vueAtelier(); break;
       case 'aide': html = vueAide(); break;
-      case 'legal': html = vueLegal(); break;
+      case 'legal': html = vueLegal(seg[1]); break;
       case 'credits': html = vueCredits(); break;
       default: html = '<div class="page"><div class="conteneur vide">Page introuvable. <a href="#/">Retour à l’accueil</a></div></div>';
     }
