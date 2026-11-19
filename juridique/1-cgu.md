@@ -188,6 +188,24 @@ Les fiches techniques peuvent être téléchargées, imprimées et partagées gr
 
 Les vidéos présentées avec les fiches proviennent de chaînes tierces citées sur chaque fiche. Elles sont intégrées depuis YouTube, jamais copiées ; elles restent la propriété de leurs auteurs, qui peuvent les retirer à tout moment, et n’engagent pas ZETools. Elles peuvent différer des étapes de la fiche, qui seule fait référence.
 
+## Article 22-1. Urgence travaux
+
+Le service « Urgence travaux » met le membre en relation avec des professionnels d’astreinte immatriculés et assurés. Avant toute demande, la plateforme affiche pour chacun le délai d’arrivée estimé et le prix ferme de la première heure : forfait de déplacement, main-d’œuvre, majoration éventuelle (nuit de 20 h à 8 h, dimanche et jours fériés, non cumulables) et frais de service. Le prix de l’heure suivante est également affiché.
+
+Le professionnel confirme le prix sur place avant de commencer. Pour toute prestation dont le montant dépasse 150 € TTC, il remet un devis écrit détaillé avant l’exécution des travaux (arrêté du 24 janvier 2017 relatif à la publicité des prix des prestations de dépannage, de réparation et d’entretien dans le secteur du bâtiment et de l’équipement de la maison). Tout supplément doit être accepté par écrit par le client.
+
+Le droit de rétractation ne s’applique pas aux travaux d’entretien ou de réparation à réaliser en urgence au domicile du consommateur et expressément sollicités par lui, dans la limite des pièces de rechange et travaux strictement nécessaires pour répondre à l’urgence (article L. 221-28, 8°, du Code de la consommation). Les autres travaux restent soumis au droit commun.
+
+Le paiement passe exclusivement par la plateforme : aucun paiement en espèces ou par chèque ne doit être remis au professionnel. Les situations de danger (odeur de gaz, incendie, personne blessée) relèvent des services de secours et ne donnent lieu à aucune mise en relation.
+
+## Article 22-2. Bons cadeaux travaux
+
+Un bon cadeau d’une valeur de 20 à 500 € peut être acheté sur la plateforme et offert à un tiers. Il est utilisable, en une ou plusieurs fois, pour payer les services et les interventions réservés sur ZETools, dans la limite de son solde, pendant **[À COMPLÉTER : durée de validité, 12 mois proposés]** à compter de sa remise au bénéficiaire. Le thème indiqué sur le bon est une suggestion : il ne restreint pas son usage.
+
+Le bon n’est ni remboursable ni échangeable contre des espèces, sauf disposition légale contraire. Le solde non utilisé à l’échéance **[À COMPLÉTER : sort du solde expiré : perdu, prolongé sur demande ou remboursé, à arrêter après avis]**. Le code est personnel : ZETools ne répond pas de l’utilisation d’un code perdu ou divulgué avant que la perte lui ait été signalée ; après signalement, le solde restant est reporté sur un nouveau code.
+
+Lorsque le bon est envoyé par ZETools à l’adresse électronique indiquée par l’acheteur, celui-ci déclare avoir l’accord du bénéficiaire pour la transmission de cette adresse.
+
 ## Article 23. Durée, résiliation, modification
 
 Le contrat est conclu pour une durée indéterminée. Le membre peut clôturer son compte à tout moment, depuis son espace, sans frais ; les transactions en cours vont à leur terme.

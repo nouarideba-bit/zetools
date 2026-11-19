@@ -99,6 +99,8 @@ La plateforme est réservée aux personnes majeures. ZETools supprime tout compt
 
 | Publicité | Aucun à ce jour | Requis le cas échéant |
 
+Bons cadeaux : le prénom du bénéficiaire, son adresse électronique en cas d’envoi par ZETools et le message de l’acheteur sont utilisés pour émettre et envoyer le bon, puis conservés jusqu’à l’épuisement ou l’expiration du bon, **[À COMPLÉTER : durée de conservation complémentaire pour la comptabilité]**. Urgence travaux : l’adresse de l’intervention n’est transmise qu’au professionnel qui accepte la demande.
+
 Les vidéos des fiches techniques sont fournies par YouTube, service de Google Ireland Limited, dont la propre politique de confidentialité s’applique dès la lecture. Des données peuvent alors être transférées aux États-Unis : **[À COMPLÉTER : base du transfert à confirmer, par exemple certification de Google LLC au Data Privacy Framework UE–États-Unis]**.
 
 Vous pouvez accepter ou refuser les traceurs, aussi simplement l’un que l’autre, et modifier votre choix à tout moment par le lien « Gérer mes cookies » en bas de page.
