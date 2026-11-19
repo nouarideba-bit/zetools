@@ -95,7 +95,11 @@ La plateforme est réservée aux personnes majeures. ZETools supprime tout compt
 
 | Contenus tiers | Fonds de carte, vidéos d’illustration : votre adresse IP est transmise au fournisseur | Requis, ou hébergement des contenus par ZETools |
 
+| Vidéos des fiches techniques | Lecteur YouTube, en mode de confidentialité renforcée (youtube-nocookie.com) | Rien n’est chargé avant votre clic sur « Lire la vidéo » ; ce clic vaut consentement aux cookies de YouTube pour cette vidéo |
+
 | Publicité | Aucun à ce jour | Requis le cas échéant |
+
+Les vidéos des fiches techniques sont fournies par YouTube, service de Google Ireland Limited, dont la propre politique de confidentialité s’applique dès la lecture. Des données peuvent alors être transférées aux États-Unis : **[À COMPLÉTER : base du transfert à confirmer, par exemple certification de Google LLC au Data Privacy Framework UE–États-Unis]**.
 
 Vous pouvez accepter ou refuser les traceurs, aussi simplement l’un que l’autre, et modifier votre choix à tout moment par le lien « Gérer mes cookies » en bas de page.
 

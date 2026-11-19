@@ -186,6 +186,8 @@ La marque, le logo, la charte graphique et les logiciels de la plateforme appart
 
 Les fiches techniques peuvent être téléchargées, imprimées et partagées gratuitement pour un usage personnel, sans modification et avec la mention de ZETools. Toute exploitation commerciale est soumise à autorisation.
 
+Les vidéos présentées avec les fiches proviennent de chaînes tierces citées sur chaque fiche. Elles sont intégrées depuis YouTube, jamais copiées ; elles restent la propriété de leurs auteurs, qui peuvent les retirer à tout moment, et n’engagent pas ZETools. Elles peuvent différer des étapes de la fiche, qui seule fait référence.
+
 ## Article 23. Durée, résiliation, modification
 
 Le contrat est conclu pour une durée indéterminée. Le membre peut clôturer son compte à tout moment, depuis son espace, sans frais ; les transactions en cours vont à leur terme.
