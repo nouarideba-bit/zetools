@@ -148,6 +148,8 @@
     { id: 'jardin', nom: 'Jardinage & élagage', icone: '🌳' },
     { id: 'maconnerie', nom: 'Maçonnerie & gros œuvre', icone: '🧱' },
     { id: 'reparation', nom: 'Réparation d’outillage', icone: '🪛' },
+    { id: 'serrurerie', nom: 'Serrurerie', icone: '🔑' },
+    { id: 'vitrerie', nom: 'Vitrerie & mise en sécurité', icone: '🪟' },
   ];
 
   // position = siège ou domicile de l'artisan ; rayonKm = zone d'intervention qu'il a choisie
@@ -161,11 +163,11 @@
       presentation: 'Auto-entrepreneur multiservice : montage de meubles, fixations, peinture, petits dépannages.',
       abonnement: { formule: 'mensuel', finPeriode: '2026-12-15' } },
     { id: 'p3', nom: 'Plomberie Lemaire', ville: 'Saint-Maur-des-Fossés', lat: 48.7994, lon: 2.4997, rayonKm: 15, metiers: ['plomberie'],
-      tarifHoraire: 55, note: 4.7, avis: 89, siret: true, decennale: true, delai: 'urgences 7j/7', outils: true,
+      tarifHoraire: 55, note: 4.7, avis: 89, siret: true, decennale: true, delai: 'urgences 7j/7', outils: true, urgence: { delaiMin: 25, horaires: '24 h/24, 7 j/7' },
       presentation: 'Fuites, chauffe-eau, remplacement de sanitaires, rénovation de salle de bains.',
       abonnement: { formule: 'mensuel', finPeriode: '2026-12-03' } },
     { id: 'p4', nom: 'Élec Nogent', ville: 'Nogent-sur-Marne', lat: 48.8370, lon: 2.4827, rayonKm: 10, metiers: ['electricite'],
-      tarifHoraire: 50, note: 4.6, avis: 41, siret: true, decennale: true, delai: 'sous 3 jours', outils: true,
+      tarifHoraire: 50, note: 4.6, avis: 41, siret: true, decennale: true, delai: 'sous 3 jours', outils: true, urgence: { delaiMin: 35, horaires: '7 h – 23 h, 7 j/7' },
       presentation: 'Mise aux normes, tableaux électriques, prises et éclairages, bornes de recharge.',
       abonnement: { formule: 'annuel', finPeriode: '2027-03-31' } },
     { id: 'p5', nom: 'Jardins de l’Est', ville: 'Nogent-sur-Marne', lat: 48.8395, lon: 2.4790, rayonKm: 20, metiers: ['jardin'],
@@ -188,6 +190,75 @@
       tarifHoraire: 42, note: 4.7, avis: 38, siret: true, decennale: false, delai: 'sous 1 semaine', outils: true,
       presentation: 'Tondeuses, débroussailleuses, tronçonneuses : révision, réparation et remise en route avant la saison.',
       abonnement: { formule: 'mensuel', finPeriode: '2026-12-28' } },
+    // professionnels d'astreinte (urgence travaux) : SIRET, assurance et décennale vérifiées
+    { id: 'p10', nom: 'Serrures Express Vincennes', ville: 'Vincennes', lat: 48.8460, lon: 2.4330, rayonKm: 15, metiers: ['serrurerie'],
+      tarifHoraire: 60, note: 4.7, avis: 73, siret: true, decennale: true, delai: 'urgences 24 h/24', outils: true, urgence: { delaiMin: 20, horaires: '24 h/24, 7 j/7' },
+      presentation: 'Ouverture de porte claquée ou fermée à clé, remplacement de cylindre, mise en sécurité après effraction.',
+      abonnement: { formule: 'annuel', finPeriode: '2027-09-30' } },
+    { id: 'p11', nom: 'Vitrerie de l’Est', ville: 'Fontenay-sous-Bois', lat: 48.8510, lon: 2.4760, rayonKm: 15, metiers: ['vitrerie', 'menuiserie'],
+      tarifHoraire: 52, note: 4.5, avis: 29, siret: true, decennale: true, delai: 'urgences 7 h – 22 h', outils: true, urgence: { delaiMin: 40, horaires: '7 h – 22 h, 7 j/7' },
+      presentation: 'Vitre cassée : mise en sécurité immédiate (panneau de bois), puis remplacement du vitrage simple ou double.',
+      abonnement: { formule: 'mensuel', finPeriode: '2027-01-15' } },
+    { id: 'p12', nom: 'Chauffage Services Montreuil', ville: 'Montreuil', lat: 48.8590, lon: 2.4380, rayonKm: 12, metiers: ['plomberie'],
+      tarifHoraire: 58, note: 4.8, avis: 95, siret: true, decennale: true, delai: 'urgences 7j/7', outils: true, urgence: { delaiMin: 30, horaires: '6 h – 23 h, 7 j/7' },
+      presentation: 'Plombier-chauffagiste : fuites, chaudières et chauffe-eau en panne, canalisations bouchées.',
+      abonnement: { formule: 'mensuel', finPeriode: '2026-12-31' } },
+  ];
+
+  /* Urgence travaux : chaque type indique le métier appelé et les bons gestes en attendant le professionnel.
+     « danger » : la plateforme n'envoie personne et oriente vers les secours. */
+  const TYPES_URGENCE = [
+    { id: 'fuite', nom: 'Fuite d’eau, dégât des eaux', icone: '💧', metier: 'plomberie',
+      gestes: ['Coupez l’eau au robinet d’arrivée générale, souvent près du compteur.', 'Si l’eau approche des prises ou du tableau, coupez l’électricité au disjoncteur général.', 'Épongez et protégez les meubles ; photographiez les dégâts pour votre assurance.', 'Prévenez le voisin du dessous et votre syndic.'] },
+    { id: 'bouchon', nom: 'WC ou canalisation bouchés', icone: '🚽', metier: 'plomberie',
+      gestes: ['Arrêtez d’utiliser l’eau dans le logement.', 'N’utilisez pas de produit chimique : il abîme les canalisations et brûle les mains du dépanneur.', 'Essayez une ventouse, sans forcer.'] },
+    { id: 'chauffage', nom: 'Chauffage ou eau chaude en panne', icone: '🔥', metier: 'plomberie',
+      gestes: ['Vérifiez le disjoncteur de la chaudière ou du chauffe-eau.', 'Regardez la pression de la chaudière (souvent entre 1 et 2 bars) et le code d’erreur affiché.', 'Notez la marque et le modèle : le professionnel viendra avec les bonnes pièces.'] },
+    { id: 'electricite', nom: 'Panne de courant, disjoncteur qui saute', icone: '⚡', metier: 'electricite',
+      gestes: ['Vérifiez si la panne touche aussi vos voisins : si oui, appelez le dépannage Enedis : 09 72 67 50 suivi du numéro de votre département (09 72 67 50 94 dans le Val-de-Marne).', 'Débranchez les appareils, puis réenclenchez les disjoncteurs un par un pour trouver le circuit en cause.', 'Ne touchez jamais un fil dénudé, mouillé ou une prise qui chauffe.'] },
+    { id: 'serrure', nom: 'Porte claquée, clé perdue, serrure bloquée', icone: '🔑', metier: 'serrurerie',
+      gestes: ['Vérifiez si un proche, le gardien ou l’agence a un double des clés.', 'Préparez un justificatif de domicile : le serrurier doit vérifier que vous êtes chez vous.', 'Après une effraction, portez plainte avant de faire changer la serrure.'] },
+    { id: 'vitre', nom: 'Vitre cassée', icone: '🪟', metier: 'vitrerie',
+      gestes: ['Éloignez enfants et animaux, ramassez les éclats avec des gants épais.', 'Couvrez l’ouverture avec un carton ou une bâche et du ruban adhésif.', 'Mesurez la vitre (largeur, hauteur, épaisseur, simple ou double vitrage).'] },
+    { id: 'gaz', nom: 'Odeur de gaz', icone: '⚠️', danger: true,
+      gestes: ['Ne touchez à aucun interrupteur, n’allumez rien, ne téléphonez pas à l’intérieur.', 'Ouvrez les fenêtres, fermez le robinet de gaz si vous le pouvez, sortez.', 'Appelez Urgence Sécurité Gaz au 0 800 47 33 33 (gratuit, 24 h/24) ou les pompiers au 18 ou au 112.'] },
+  ];
+
+  /* Vidéothèque : les vidéos des fiches, plus des tutoriels choisis par thème.
+     Toutes vérifiées le 19/11/2026 (oEmbed YouTube : publiques, intégration autorisée). Intégrées, jamais copiées. */
+  const THEMES_VIDEO = [
+    { id: 'montage', nom: 'Montage et meubles', icone: '🪑' },
+    { id: 'fixation', nom: 'Percer et fixer', icone: '🔩' },
+    { id: 'peinture', nom: 'Peinture et sols', icone: '🖌️' },
+    { id: 'outils', nom: 'Entretien et réparation d’outils', icone: '🪛' },
+    { id: 'jardin', nom: 'Jardin', icone: '🌳' },
+    { id: 'urgence', nom: 'Bons gestes en cas d’urgence', icone: '🚨' },
+  ];
+  const VIDEOS_TUTOS = [
+    { yt: '7nc_KcN5Gx8', titre: 'Démonter un meuble ancien', chaine: 'Happy Hour TV', theme: 'montage', duree: '7:51' },
+    { yt: 'jIBfEU8oCSk', titre: 'Poser du parquet flottant', chaine: 'Castorama', theme: 'peinture', duree: '8:56' },
+    { yt: 'a4Q_etNIF1U', titre: 'Peindre un mur au rouleau', chaine: 'Leroy Merlin', theme: 'peinture', duree: '1:15' },
+    { yt: '4bXUM8NB6Z8', titre: 'Vérifier les charbons de vos outils', chaine: 'Korman Outillage', theme: 'outils', duree: '2:53' },
+    { yt: 'qLwRSj3TiPQ', titre: 'Changer les charbons d’une meuleuse ou d’une perceuse', chaine: 'Bricolage Direct', theme: 'outils', duree: '4:24' },
+    { yt: 'hcamAmqGYLo', titre: 'Affûter une lame de tondeuse', chaine: 'Action Création', theme: 'jardin', duree: '5:05' },
+    { yt: 'PyqQl1B4MkM', titre: 'Tailler une haie', chaine: 'Leroy Merlin', theme: 'jardin', duree: '4:38' },
+    { yt: 'UHERdAtVyGY', titre: 'Tailler une haie : conseils de jardinage', chaine: 'STIHL France', theme: 'jardin', duree: '1:51' },
+    { yt: 'fucu-rrmAiY', titre: 'Couper l’eau générale en cas de fuite', chaine: 'Logista Hometech', theme: 'urgence', duree: '2:17', urgence: 'fuite' },
+    { yt: 'TzmWCKPeB8Y', titre: 'Que faire quand l’électricité saute ?', chaine: 'Sikana', theme: 'urgence', duree: '1:41', urgence: 'electricite' },
+  ];
+  const THEME_FICHE = { f1: 'montage', f2: 'fixation', f3: 'montage', f4: 'fixation', f5: 'peinture', f6: 'outils' };
+
+  /* Coupons de travaux à offrir */
+  const THEMES_COUPON = [
+    { id: 'libre', nom: 'Travaux au choix', icone: '🎁', idee: 'Pour tous les services et artisans de ZETools.' },
+    { id: 'meubles', nom: 'Montage de meubles', icone: '🪑', idee: 'Idéal pour un emménagement ou une chambre d’enfant.' },
+    { id: 'peinture', nom: 'Un coup de peinture', icone: '🖌️', idee: 'Une pièce rafraîchie, sans y passer le week-end.' },
+    { id: 'jardin', nom: 'Jardin', icone: '🌳', idee: 'Tonte, taille de haie, élagage.' },
+    { id: 'depannage', nom: 'Petits dépannages', icone: '🔧', idee: 'Pour les parents ou grands-parents : fixations, joints, ampoules.' },
+  ];
+  const PROCHES = [
+    { id: 'parent', nom: 'Un parent', icone: '👵' }, { id: 'enfant', nom: 'Un enfant', icone: '🧒' }, { id: 'ami', nom: 'Un ami', icone: '🤝' },
+    { id: 'collegue', nom: 'Un collègue', icone: '💼' }, { id: 'voisin', nom: 'Un voisin', icone: '🏡' }, { id: 'autre', nom: 'Une autre personne', icone: '💛' },
   ];
 
   // demandes de clients : position déjà floutée à ~1 km, adresse exacte jamais publiée
@@ -336,7 +407,7 @@
     { id: 'o-demo-2', sens: 'recue', avec: 'm1', titre: 'Votre échelle télescopique 3,80 m', mode: 'location', prixAffiche: 5, montant: 4, statut: 'en attente', expire: '2026-12-31T20:00' },
   ];
 
-  const D = { PHOTOS, VIDEOS, CATEGORIES, MEMBRES, ANNONCES, RESERVATIONS, ARTICLES, CREDITS, METIERS, ARTISANS, DEMANDES, TYPES_ENSEIGNE, ENSEIGNES, LOTS, RDV_DEMO, OFFRES_DEMO, SERVICES, FICHES, SITE_PUBLIC };
+  const D = { PHOTOS, VIDEOS, CATEGORIES, MEMBRES, ANNONCES, RESERVATIONS, ARTICLES, CREDITS, METIERS, ARTISANS, DEMANDES, TYPES_ENSEIGNE, ENSEIGNES, LOTS, RDV_DEMO, OFFRES_DEMO, SERVICES, FICHES, SITE_PUBLIC, TYPES_URGENCE, THEMES_VIDEO, VIDEOS_TUTOS, THEME_FICHE, THEMES_COUPON, PROCHES };
   if (typeof module !== 'undefined' && module.exports) module.exports = D;
   else racine.ZT_DONNEES = D;
 })(typeof window !== 'undefined' ? window : globalThis);

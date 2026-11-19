@@ -484,6 +484,143 @@
     return Number(x).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' });
   }
 
+  /* =====================================================================
+     URGENCE TRAVAUX : un professionnel disponible maintenant, prix annoncé avant le déplacement
+     ===================================================================== */
+  Object.assign(REGLES, {
+    urgence: {
+      forfaitDeplacement: 39,          // hypothèse de travail, fixée par ZETools pour tous
+      majorationNuit: 0.5,             // de 20 h à 8 h
+      majorationDimancheFerie: 0.5,    // non cumulable avec la nuit : le taux le plus élevé s'applique
+      heureNuitDebut: 20, heureNuitFin: 8,
+      heuresMin: 1,
+      rayonKm: 15,
+      minutesParKm: 3,                 // estimation du trajet en ville
+      maxSollicites: 3,                // la demande part aux 3 professionnels les plus rapides ; le premier qui accepte l'obtient
+      seuilDevisEcrit: 150,            // au-delà, devis écrit signé avant travaux (arrêté du 24 janvier 2017)
+    },
+    coupon: {
+      montants: [25, 50, 100, 150, 200],
+      min: 20, max: 500,
+      validiteMois: 12,
+      fraisAcheteur: 0,
+    },
+  });
+
+  /** Lundi de Pâques et jours fériés français (métropole) d'une année. */
+  function joursFeries(annee) {
+    const a = annee % 19, b = Math.floor(annee / 100), c = annee % 100, d = Math.floor(b / 4), e = b % 4;
+    const f = Math.floor((b + 8) / 25), g = Math.floor((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30;
+    const i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7, m = Math.floor((a + 11 * h + 22 * l) / 451);
+    const mois = Math.floor((h + l - 7 * m + 114) / 31), jour = ((h + l - 7 * m + 114) % 31) + 1;
+    const paques = Date.UTC(annee, mois - 1, jour), j = (n) => new Date(paques + n * 864e5).toISOString().slice(0, 10);
+    const fixes = ['01-01', '05-01', '05-08', '07-14', '08-15', '11-01', '11-11', '12-25'].map((x) => `${annee}-${x}`);
+    return fixes.concat([j(1), j(39), j(50)]).sort();   // lundi de Pâques, Ascension, lundi de Pentecôte
+  }
+
+  /** Majoration d'une intervention urgente selon la date et l'heure locales « AAAA-MM-JJTHH:MM ». */
+  function majorationUrgence(dateHeure) {
+    const U = REGLES.urgence;
+    const [jour, hm] = String(dateHeure).split('T'); const heure = Number((hm || '12').slice(0, 2));
+    const nuit = heure >= U.heureNuitDebut || heure < U.heureNuitFin;
+    const dim = new Date(`${jour}T12:00:00Z`).getUTCDay() === 0;
+    const ferie = joursFeries(Number(jour.slice(0, 4))).includes(jour);
+    const tauxNuit = nuit ? U.majorationNuit : 0, tauxJour = dim || ferie ? U.majorationDimancheFerie : 0;
+    const taux = Math.max(tauxNuit, tauxJour);
+    const motif = !taux ? 'tarif de jour' : tauxNuit >= tauxJour ? 'nuit (20 h – 8 h)' : ferie ? 'jour férié' : 'dimanche';
+    return { taux, motif };
+  }
+
+  /** Prix annoncé avant le déplacement : déplacement + main-d'œuvre, majoration comprise, frais de service. */
+  function devisUrgence(artisan, dateHeure, heures) {
+    const U = REGLES.urgence;
+    const h = Math.max(U.heuresMin, Math.ceil(Number(heures) || U.heuresMin));
+    const maj = majorationUrgence(dateHeure);
+    const deplacement = U.forfaitDeplacement;
+    const mainOeuvre = arrondi(artisan.tarifHoraire * h);
+    const majoration = arrondi((deplacement + mainOeuvre) * maj.taux);
+    const sousTotal = arrondi(deplacement + mainOeuvre + majoration);
+    const fraisService = arrondi(sousTotal * REGLES.service.fraisClient);
+    const total = arrondi(sousTotal + fraisService);
+    return { heures: h, deplacement, mainOeuvre, majoration, tauxMajoration: maj.taux, motif: maj.motif, fraisService, total,
+      devisEcritObligatoire: total > U.seuilDevisEcrit, heureSupplementaire: arrondi(artisan.tarifHoraire * (1 + maj.taux)) };
+  }
+
+  /** Professionnels d'urgence : SIRET, assurés, du bon métier, qui se déplacent jusqu'au client ; classés par délai d'arrivée. */
+  function artisansUrgence(client, artisans, metier) {
+    const U = REGLES.urgence;
+    return artisans
+      .filter((a) => a.urgence && a.siret && a.metiers.includes(metier))
+      .map((a) => { const km = distanceKm(client, a); return { artisan: a, km, minutes: Math.round(a.urgence.delaiMin + km * U.minutesParKm) }; })
+      .filter((x) => x.km <= Math.min(U.rayonKm, x.artisan.rayonKm))
+      .sort((x, y) => x.minutes - y.minutes || y.artisan.note - x.artisan.note);
+  }
+
+  /* =====================================================================
+     COUPONS DE TRAVAUX : un bon cadeau payé sur ZETools, offert à un proche
+     ===================================================================== */
+  const ALPHABET_COUPON = '23456789ABCDEFGHJKMNPQRSTUVWXYZ';   // sans 0, O, 1, I ni L : rien à confondre
+  function cleCoupon(corps) {
+    let t = 0; [...corps].forEach((c, i) => { t += (ALPHABET_COUPON.indexOf(c) + 1) * (i + 2); });
+    return ALPHABET_COUPON[t % ALPHABET_COUPON.length];
+  }
+  /** Code « ZT-XXXX-XXXX » ; le dernier caractère est une clé de contrôle (faute de frappe détectée). */
+  function genererCodeCoupon(alea) {
+    const r = alea || Math.random;
+    let corps = ''; for (let i = 0; i < 7; i++) corps += ALPHABET_COUPON[Math.floor(r() * ALPHABET_COUPON.length)];
+    const c = corps + cleCoupon(corps);
+    return `ZT-${c.slice(0, 4)}-${c.slice(4)}`;
+  }
+  function normaliserCode(code) { return String(code || '').toUpperCase().replace(/[^0-9A-Z]/g, '').replace(/^ZT/, ''); }
+  function verifierCodeCoupon(code) {
+    const c = normaliserCode(code);
+    if (c.length !== 8 || [...c].some((x) => !ALPHABET_COUPON.includes(x))) return false;
+    return cleCoupon(c.slice(0, 7)) === c[7];
+  }
+  function formaterCode(code) { const c = normaliserCode(code); return `ZT-${c.slice(0, 4)}-${c.slice(4)}`; }
+  function ajouterMois(jour, n) {
+    const [a, m, j] = jour.split('-').map(Number);
+    const fin = new Date(Date.UTC(a, m - 1 + n + 1, 0)).getUTCDate();
+    return new Date(Date.UTC(a, m - 1 + n, Math.min(j, fin))).toISOString().slice(0, 10);
+  }
+
+  /** Vérifie la commande d'un coupon : montant, destinataire, date d'envoi. */
+  function verifierCoupon(c, aujourdHui) {
+    const C = REGLES.coupon, erreurs = [];
+    const m = Number(c.montant);
+    if (!Number.isFinite(m) || m < C.min || m > C.max) erreurs.push(`Le montant doit être compris entre ${C.min} € et ${C.max} €.`);
+    else if (Math.round(m) !== m) erreurs.push('Choisissez un montant en euros entiers.');
+    if (!c.destinataire || !String(c.destinataire.prenom || '').trim()) erreurs.push('Indiquez le prénom de la personne à qui vous l’offrez.');
+    if (c.envoi && c.envoi.mode === 'email') {
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(c.envoi.email || ''))) erreurs.push('Indiquez une adresse électronique valide pour l’envoi.');
+      if (c.envoi.date && c.envoi.date < aujourdHui) erreurs.push('La date d’envoi ne peut pas être passée.');
+      if (c.envoi.date && c.envoi.date > ajouterMois(aujourdHui, 12)) erreurs.push('La date d’envoi doit être dans les 12 prochains mois.');
+    }
+    if (String(c.message || '').length > 300) erreurs.push('Le message est limité à 300 caractères.');
+    return { ok: !erreurs.length, erreurs };
+  }
+
+  /** Crée le coupon une fois le paiement accepté. La validité court à partir de la date d'envoi. */
+  function creerCoupon(c, aujourdHui, alea) {
+    const v = verifierCoupon(c, aujourdHui); if (!v.ok) throw new Error(v.erreurs[0]);
+    const envoi = (c.envoi && c.envoi.date) || aujourdHui;
+    return { code: genererCodeCoupon(alea), montant: Number(c.montant), solde: Number(c.montant), theme: c.theme || 'libre',
+      de: c.de || '', destinataire: c.destinataire, message: c.message || '', envoi: Object.assign({ mode: 'pdf' }, c.envoi || {}, { date: envoi }),
+      achete: aujourdHui, expire: ajouterMois(envoi, REGLES.coupon.validiteMois), utilisations: [] };
+  }
+
+  function couponExpire(coupon, aujourdHui) { return aujourdHui > coupon.expire; }
+
+  /** Utilise tout ou partie du coupon pour payer des travaux ; le reste demeure sur le coupon. */
+  function utiliserCoupon(coupon, montantDu, aujourdHui, objet) {
+    if (couponExpire(coupon, aujourdHui)) return { ok: false, raison: `Ce coupon a expiré le ${formatDate(coupon.expire)}.` };
+    if (coupon.solde <= 0) return { ok: false, raison: 'Ce coupon est entièrement utilisé.' };
+    const debit = arrondi(Math.min(coupon.solde, Math.max(0, Number(montantDu) || 0)));
+    const solde = arrondi(coupon.solde - debit);
+    const c = Object.assign({}, coupon, { solde, utilisations: coupon.utilisations.concat([{ date: aujourdHui, montant: debit, objet: objet || '' }]) });
+    return { ok: true, debit, resteAPayer: arrondi(montantDu - debit), coupon: c };
+  }
+
   const ZT = {
     REGLES, MASQUE, nbJours, tauxRemise, tauxCommission, devisLocation, devisVente,
     verifierDisponibilite, joursOccupes, masquerCoordonnees, filtrer, formatDate, euros, versTexte, versDate,
@@ -493,6 +630,8 @@
     estReglemente, verifierService, devisService, couvertureService, filtrerServices,
     verifierOffre, creerOffre, offreExpiree, repondreOffre, reponseVendeurDemo, appliquerOffres,
     creneauxJour, avancer, verifierProposition, confirmerRdv, annulationGratuite, versIcs,
+    joursFeries, majorationUrgence, devisUrgence, artisansUrgence,
+    genererCodeCoupon, verifierCodeCoupon, formaterCode, ajouterMois, verifierCoupon, creerCoupon, couponExpire, utiliserCoupon,
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = ZT;
   else racine.ZT = ZT;

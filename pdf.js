@@ -177,14 +177,18 @@
       pied(`Page ${i + 1} / ${pages.length}`, 22);
     });
 
-    // assemblage des objets
+    return assemblerPdf(pages, { titre: f.titre, auteur: soc.nom + ' SAS', sujet: 'Fiche technique de bricolage' });
+  }
+  /** Octets du fichier (le PDF produit est entièrement en ASCII). */
+  /** Assemble les pages (listes d'opérations de dessin) en un fichier PDF 1.4 complet. */
+  function assemblerPdf(pages, info) {
     const objets = [];
     const kids = pages.map((_, i) => `${6 + 2 * i} 0 R`).join(' ');
     objets[1] = '<< /Type /Catalog /Pages 2 0 R >>';
     objets[2] = `<< /Type /Pages /Kids [${kids}] /Count ${pages.length} >>`;
     objets[3] = '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>';
     objets[4] = '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>';
-    objets[5] = `<< /Title ${chaine(f.titre)} /Author ${chaine(soc.nom + ' SAS')} /Subject ${chaine('Fiche technique de bricolage')} /Producer ${chaine('ZETools')} >>`;
+    objets[5] = `<< /Title ${chaine(info.titre)} /Author ${chaine(info.auteur)} /Subject ${chaine(info.sujet)} /Producer ${chaine('ZETools')} >>`;
     pages.forEach((p, i) => {
       const flux = p.join('\n');
       objets[6 + 2 * i] = `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${L} ${H}] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents ${7 + 2 * i} 0 R >>`;
@@ -197,11 +201,66 @@
     pdf += `trailer\n<< /Size ${objets.length} /Root 1 0 R /Info 5 0 R >>\nstartxref\n${xref}\n%%EOF\n`;
     return pdf;
   }
-  /** Octets du fichier (le PDF produit est entièrement en ASCII). */
+
+  /** Bon cadeau « coupon de travaux » : une page A4 à imprimer ou à envoyer, avec code et QR code. */
+  function bonCadeauPdf(c, societe, options) {
+    const soc = societe || { nom: 'ZETools', siege: '58 rue de Ponthieu, 75008 Paris' };
+    const opt = options || {};
+    const ops = []; const n = (v) => Number(v.toFixed(2));
+    const texte = (t, x, y, taille, gras, rgb) => ops.push(`BT /${gras ? 'F2' : 'F1'} ${taille} Tf ${rgb || '0.11 0.13 0.15'} rg ${n(x)} ${n(y)} Td ${chaine(t)} Tj ET`);
+    const centre = (t, y, taille, gras, rgb) => texte(t, (L - largeur(t, taille, gras)) / 2, y, taille, gras, rgb);
+    const rect = (x, y, w, h, rgb) => ops.push(`${rgb} rg ${n(x)} ${n(y)} ${n(w)} ${n(h)} re f`);
+    const chemin = (liste, x0, haut, e) => liste.map((p, i) => `${n(x0 + p[0] * e)} ${n(haut - p[1] * e)} ${i ? 'l' : 'm'}`).join(' ') + ' h';
+    const logo = (x0, haut, taille) => { const e = taille / 100;
+      ops.push(`q 0.96 0.72 0 rg 0.96 0.72 0 RG ${n(8 * e)} w 1 j ${chemin(LOGO.hexagone, x0, haut, e)} B 0.137 0.153 0.169 rg ${chemin(LOGO.z, x0, haut, e)} f Q`); };
+    const jj = (d) => d.split('-').reverse().join('/');
+
+    // cadre de la carte : bande anthracite, logo, montant dans un écusson jaune
+    rect(0, 0, L, H, '1 1 1');
+    rect(40, 300, L - 80, 500, '0.137 0.153 0.169');
+    rect(40, 300, L - 80, 6, '0.96 0.72 0');
+    logo(70, 772, 44);
+    texte('ZE', 124, 742, 26, true, '0.96 0.72 0'); texte('TOOLS', 124 + largeur('ZE', 26, true) + 1, 742, 26, true, '1 1 1');
+    const etiquette = 'BON CADEAU TRAVAUX'; texte(etiquette, L - 70 - largeur(etiquette, 11, true), 750, 11, true, '0.96 0.72 0');
+    centre(`Pour ${c.destinataire.prenom}`, 660, 30, true, '1 1 1');
+    if (c.de) centre(`de la part de ${c.de}`, 632, 13, false, '0.85 0.86 0.88');
+    rect(L / 2 - 110, 520, 220, 86, '0.96 0.72 0');
+    const montant = `${String(c.montant).replace('.', ',')} €`;
+    centre(montant, 548, 44, true, '0.137 0.153 0.169');
+    centre(c.themeNom || 'Travaux au choix', 494, 14, true, '1 1 1');
+    if (c.message) {
+      const lignes = couper(`« ${c.message} »`, 12, false, L - 180).slice(0, 4);
+      lignes.forEach((l, i) => centre(l, 462 - i * 17, 12, false, '0.92 0.93 0.94'));
+    }
+    centre('Des travaux faits par un voisin ou un professionnel, près de chez vous.', 330, 10, false, '0.75 0.77 0.8');
+
+    // code et QR code
+    texte('Votre code', 60, 262, 11, false, '0.35 0.38 0.42');
+    texte(c.code, 60, 230, 26, true);
+    texte(`Valable jusqu’au ${jj(c.expire)}, en une ou plusieurs fois.`, 60, 204, 10.5, false);
+    const etapes = ['1. Rendez-vous sur ZETools, rubrique « Offrir des travaux ».', '2. Saisissez votre code dans « Utiliser un coupon ».', '3. Réservez un service ou un artisan : le montant est déduit.'];
+    etapes.forEach((t, i) => texte(t, 60, 176 - i * 16, 10, false, '0.17 0.37 0.23'));
+    const QR = racine.ZT_QR || (typeof require === 'function' ? require('./qr.js') : null);
+    if (QR && opt.url) {
+      const m = QR.qrMatrice(opt.url), cote = 116, s = cote / (m.length + 8), x0 = L - 60 - cote, y0 = 272;
+      rect(x0, y0 - cote, cote, cote, '1 1 1');
+      const mods = []; m.forEach((l, r) => l.forEach((v, k) => { if (v) mods.push(`${n(x0 + (k + 4) * s)} ${n(y0 - (r + 5) * s)} ${n(s)} ${n(s)} re`); }));
+      ops.push(`q 0 0 0 rg ${mods.join(' ')} f Q`);
+      const sc = 'Scannez pour l’utiliser'; texte(sc, x0 + (cote - largeur(sc, 8.5, false)) / 2, y0 - cote - 12, 8.5, false, '0.35 0.38 0.42');
+    }
+    // conditions et pied
+    ops.push(`0.87 0.88 0.9 rg 60 96 ${L - 120} 0.7 re f`);
+    couper(`Coupon non remboursable et non échangeable contre des espèces. Utilisable sur ZETools pour les services entre membres et les travaux d’artisans, dans la limite de son solde. Le solde restant reste disponible jusqu’à la date de validité. Conditions complètes : conditions générales d’utilisation, article « Coupons de travaux ».`, 8, false, L - 120)
+      .forEach((l, i) => texte(l, 60, 82 - i * 11, 8, false, '0.35 0.38 0.42'));
+    texte(`${soc.nom} SAS · ${soc.siege}`, 60, 30, 7.5, false, '0.35 0.38 0.42');
+    return assemblerPdf([ops], { titre: `Bon cadeau travaux ${c.code}`, auteur: soc.nom + ' SAS', sujet: 'Coupon de travaux à offrir' });
+  }
+  const nomFichierCoupon = (c) => `ZETools-bon-cadeau-${c.code}.pdf`;
+
   function octets(pdf) { const o = new Uint8Array(pdf.length); for (let i = 0; i < pdf.length; i++) o[i] = pdf.charCodeAt(i) & 0xFF; return o; }
   const nomFichier = (f) => 'zetools-fiche-' + String(f.titre).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60) + '.pdf';
 
-  const ZT_PDF = { fichePdf, octets, nomFichier, largeur, couper, PICTOS, pictoSvg, logoSvg };
+  const ZT_PDF = { fichePdf, bonCadeauPdf, nomFichierCoupon, assemblerPdf, octets, nomFichier, largeur, couper, PICTOS, pictoSvg, logoSvg };
   if (typeof module !== 'undefined' && module.exports) module.exports = ZT_PDF;
   else racine.ZT_PDF = ZT_PDF;
 })(typeof window !== 'undefined' ? window : globalThis);

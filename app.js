@@ -12,7 +12,7 @@
     reservations: [],
     favoris: [],
     annonces: [],
-    lots: [], stocks: {}, retraits: [], enseigne: null, services: [],
+    lots: [], stocks: {}, retraits: [], enseigne: null, services: [], coupons: [], urgences: [],
     rdv: window.ZT_DONNEES.RDV_DEMO.map((r) => Object.assign({}, r)),
     offres: window.ZT_DONNEES.OFFRES_DEMO.map((o) => Object.assign({}, o)),
     conversations: [
@@ -153,6 +153,14 @@
     <section class="bloc" style="padding-top:0"><div class="conteneur">
       <div class="titre-section"><div><div class="surtitre">Services</div><h2>Quelqu’un pour le faire à votre place</h2><p>Montage, fixations, jardinage, cours de bricolage : réservez un voisin ou un professionnel, à l’heure ou au forfait.</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn btn-contour" href="#/services">Tous les services</a><a class="btn btn-cta" href="#/proposer-service">Proposer mes services</a></div></div>
       <div class="grille">${tousServices().slice(0, 4).map(carteService).join('')}</div>
+    </div></section>
+
+    <section class="bloc" style="padding-top:0"><div class="conteneur">
+      <div class="trois-espaces">
+        <a class="espace-tuile tuile-urgence" href="#/urgence"><span class="ico">🚨</span><b>Urgence travaux</b><span>Fuite, panne, porte claquée : un pro vérifié, son délai et son prix ferme avant le déplacement.</span><em>Trouver un pro maintenant →</em></a>
+        <a class="espace-tuile tuile-videos" href="#/videos"><span class="ico">🎬</span><b>Vidéothèque</b><span>Des tutoriels à regarder ici même : montage, perçage, peinture, outils, jardin.</span><em>Regarder les vidéos →</em></a>
+        <a class="espace-tuile tuile-cadeau" href="#/offrir"><span class="ico">🎁</span><b>Offrir des travaux</b><span>Un bon cadeau de 20 à 500 € pour un parent, un enfant, un ami, un collègue.</span><em>Offrir un bon cadeau →</em></a>
+      </div>
     </div></section>
 
     <section class="bloc" style="padding-top:0"><div class="conteneur">
@@ -473,6 +481,8 @@
       ${mesRes.length ? `<table class="tableau"><thead><tr><th>Outil</th><th>Du</th><th>Au</th><th>Total payé</th><th>Caution bloquée</th><th>Statut</th></tr></thead><tbody>${mesRes.sort((x, y) => x.debut.localeCompare(y.debut)).map((r) => { const a = annonce(r.outilId); return `<tr><td><a href="#/annonce/${a.id}">${esc(a.titre)}</a></td><td>${Z.formatDate(r.debut)}</td><td>${Z.formatDate(r.fin)}</td><td>${r.total ? Z.euros(r.total) : '—'}</td><td>${Z.euros(r.caution ?? a.caution)}</td><td><span class="statut">${esc(r.statut)}</span></td></tr>`; }).join('')}</tbody></table>` : '<div class="vide">Aucune location pour l’instant.</div>'}
       <h3 style="margin-top:32px">Mes services proposés</h3>
       ${etat.services.length ? `<div class="grille">${etat.services.map(carteService).join('')}</div>` : '<div class="vide">Vous savez monter un meuble, tailler une haie, poser une étagère ? <a href="#/proposer-service">Proposez vos services</a>.</div>'}
+      <h3 style="margin-top:32px">Mes bons cadeaux</h3>
+      <div class="panneau bandeau-action"><div>${etat.coupons.length ? `${etat.coupons.length} bon(s) · solde disponible ${Z.euros(etat.coupons.filter((c) => !Z.couponExpire(c, AUJOURDHUI)).reduce((t, c) => t + c.solde, 0))}.` : 'Offrez des travaux à un proche, ou saisissez le code d’un bon reçu.'}</div><a class="btn btn-contour" href="#/offrir">🎁 Offrir ou utiliser un bon</a></div>
       <h3 style="margin-top:32px">Mes offres de prix</h3>
       <div class="panneau bandeau-action"><div>${etat.offres.filter((o) => o.sens === 'recue' && o.statut === 'en attente').length} offre(s) reçue(s) à traiter · ${etat.offres.filter((o) => o.sens === 'envoyee').length} envoyée(s).</div><a class="btn btn-contour" href="#/offres">🤝 Voir les offres</a></div>
       <h3 style="margin-top:32px">Mes rendez-vous</h3>
@@ -1234,15 +1244,20 @@
         <div class="alerte ${d.couverture.assure ? 'alerte-ok' : 'alerte-erreur'}" style="text-transform:none">${d.couverture.assure ? '🛡️' : '⚠️'} ${esc(d.couverture.message)}${selService.assurance ? '' : ' L’assurance dommages ZETools couvre les dégâts causés chez vous pendant la prestation.'}</div>
         <div class="ligne total"><span>Total</span><span>${Z.euros(d.total)}</span></div>
         <div class="ligne discret"><span>Payé au prestataire une fois le service rendu</span><span>${Z.euros(d.versementPrestataire)}</span></div>
-        <button class="btn btn-cta" style="width:100%;margin-top:10px" data-action="reserver-service">Réserver et payer ${Z.euros(d.total)}</button>` : ''}
+        ${blocCouponPaiement(d.total, selService.coupon, 'id="coupon-svc"')}
+        <button class="btn btn-cta" style="width:100%;margin-top:10px" data-action="reserver-service">Réserver et payer ${Z.euros(resteService(d.total))}</button>` : ''}
       ${blocOffre(s, 'service')}
       <a class="btn btn-contour" style="width:100%;margin-top:10px" href="#/rendez-vous?type=service&avec=${s.membre}&objet=${encodeURIComponent(s.titre)}">📅 Proposer plusieurs créneaux au prestataire</a>`;
+  }
+  function resteService(total) {
+    const c = couponsUtilisables().find((x) => x.code === selService.coupon);
+    return c ? Z.utiliserCoupon(c, total, AUJOURDHUI, '').resteAPayer : total;
   }
   function vueService(id) {
     const s = Z.appliquerOffres(service(id), etat.offres, maintenant());
     if (!s) return '<div class="page"><div class="conteneur vide">Service introuvable. <a href="#/services">Retour aux services</a></div></div>';
     const m = membre(s.membre);
-    if (selService.id !== id) selService = { id, mois: AUJOURDHUI.slice(0, 7), jour: '', creneau: '', heures: s.dureeMin || 1, assurance: false };
+    if (selService.id !== id) selService = { id, mois: AUJOURDHUI.slice(0, 7), jour: '', creneau: '', heures: s.dureeMin || 1, assurance: false, coupon: '' };
     return `<div class="page"><div class="conteneur">
       <div class="fil"><a href="#/">Accueil</a> › <a href="#/services">Services</a> › ${esc(s.titre)}</div>
       <div class="fiche">
@@ -1277,6 +1292,7 @@
     zone.addEventListener('change', (e) => {
       if (e.target.id === 'heures-svc') { selService.heures = Number(e.target.value); rafraichir(); }
       if (e.target.id === 'assurance-svc') { selService.assurance = e.target.checked; rafraichir(); }
+      if (e.target.id === 'coupon-svc') { selService.coupon = e.target.value; rafraichir(); }
     });
     zone.addEventListener('click', (e) => {
       const b = e.target.closest('button'); if (!b) return;
@@ -1297,8 +1313,16 @@
           lieu: 'À mon domicile (adresse transmise après réservation)', statut: 'proposé', montant: d.total, message: '' };
         const v = Z.verifierProposition(rdv, maintenant()); if (!v.ok) return toast(v.erreurs[0]);
         const c = Z.confirmerRdv(rdv, selService.creneau, etat.rdv); if (!c.ok) return toast(c.raison);
+        let mot = '';
+        if (selService.coupon) {
+          const i = etat.coupons.findIndex((x) => x.code === selService.coupon);
+          const u = i >= 0 ? Z.utiliserCoupon(etat.coupons[i], d.total, AUJOURDHUI, s.titre) : { ok: false, raison: 'Bon cadeau introuvable.' };
+          if (!u.ok) return toast(u.raison);
+          etat.coupons[i] = u.coupon; c.rdv.coupon = { code: u.coupon.code, debit: u.debit };
+          mot = ` dont ${Z.euros(u.debit)} par bon cadeau (solde restant ${Z.euros(u.coupon.solde)})`;
+        }
         etat.rdv.push(c.rdv); deverrouillerConversation(s.id); sauver();
-        toast(`Prestation réservée (simulation) : ${Z.euros(d.total)} payés et conservés jusqu’à la fin du service${selService.assurance ? ', assurance dommages incluse' : ''}.`);
+        toast(`Prestation réservée (simulation) : ${Z.euros(d.total)} payés${mot} et conservés jusqu’à la fin du service${selService.assurance ? ', assurance dommages incluse' : ''}.`);
         selService = { id: null }; aller('#/agenda');
       }
     });
@@ -1380,7 +1404,7 @@
   }
   function vueFiches() {
     return `<div class="page"><div class="conteneur">
-      <div class="titre-section"><div><div class="surtitre">L’Atelier · fiches techniques</div><h2>Apprenez à le faire vous-même</h2><p>Des fiches pas à pas, gratuites, à télécharger en PDF et à imprimer : outils, fournitures, étapes, sécurité. Chaque outil cité se loue ou s’achète d’occasion sur ZETools.</p></div><a class="btn btn-contour" href="#/atelier">Les articles de L’Atelier</a></div>
+      <div class="titre-section"><div><div class="surtitre">L’Atelier · fiches techniques</div><h2>Apprenez à le faire vous-même</h2><p>Des fiches pas à pas, gratuites, à télécharger en PDF et à imprimer : outils, fournitures, étapes, sécurité. Chaque outil cité se loue ou s’achète d’occasion sur ZETools.</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn btn-cta" href="#/videos">🎬 La vidéothèque</a><a class="btn btn-contour" href="#/atelier">Les articles de L’Atelier</a></div></div>
       <div class="grille">${FICHES.map(carteFiche).join('')}</div>
       <div class="panneau bandeau-action"><div><b>Pas envie de le faire vous-même ?</b><br>Un voisin ou un professionnel s’en charge, à l’heure ou au forfait.</div><a class="btn btn-cta" href="#/services">Voir les services</a></div>
     </div></div>`;
@@ -1466,6 +1490,361 @@
     });
   }
 
+  /* =====================================================================
+     VIDÉOTHÈQUE : regarder les tutoriels sur ZETools, sans quitter le site
+     ===================================================================== */
+  const { TYPES_URGENCE, THEMES_VIDEO, VIDEOS_TUTOS, THEME_FICHE, THEMES_COUPON, PROCHES } = window.ZT_DONNEES;
+  let consentementYt = false;   // en mémoire seulement : redemandé à chaque visite
+  const iframeYt = (v, auto) => `<iframe src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(v.yt)}?rel=0${auto ? '&autoplay=1' : ''}" title="${esc(v.titre)} · ${esc(v.chaine)}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
+  function toutesVideos() {
+    const vus = new Set(), liste = [];
+    FICHES.forEach((f) => (f.videos || []).forEach((v) => { if (!vus.has(v.yt)) { vus.add(v.yt); liste.push(Object.assign({ theme: THEME_FICHE[f.id] || 'montage', fiche: f }, v)); } }));
+    VIDEOS_TUTOS.forEach((v) => { if (!vus.has(v.yt)) { vus.add(v.yt); liste.push(Object.assign({}, v)); } });
+    return liste;
+  }
+  const themeVideo = (id) => THEMES_VIDEO.find((t) => t.id === id) || { nom: '', icone: '▶' };
+  let selVideo = { theme: '', yt: '' };
+  function vueVideos(params) {
+    if (params.get('theme') !== null) selVideo.theme = params.get('theme');
+    if (params.get('v')) selVideo.yt = params.get('v');
+    const toutes = toutesVideos();
+    const liste = toutes.filter((v) => !selVideo.theme || v.theme === selVideo.theme);
+    const v = toutes.find((x) => x.yt === selVideo.yt) || liste[0] || toutes[0];
+    selVideo.yt = v.yt;
+    const tuile = (x) => `<button class="tuile-video${x.yt === v.yt ? ' en-cours' : ''}" data-video="${esc(x.yt)}" aria-label="Regarder : ${esc(x.titre)}">
+        <span class="tuile-visuel"><span class="tuile-ico">${themeVideo(x.theme).icone}</span><span class="tuile-play">▶</span>${x.duree ? `<span class="tuile-duree">${esc(x.duree)}</span>` : ''}</span>
+        <span class="tuile-texte"><b>${esc(x.titre)}</b><span>${esc(x.chaine)}${x.fiche ? ' · fiche PDF' : ''}</span></span></button>`;
+    return `<section class="hero hero-court" style="background:var(--anthracite)"><div class="conteneur">
+        <div class="surtitre" style="color:var(--jaune)">Vidéothèque ZETOOLS</div>
+        <h1>Regardez, <em>puis faites-le</em> vous-même.</h1>
+        <p class="sous">${toutes.length} tutoriels choisis sur des chaînes reconnues, à regarder ici même : montage, perçage, peinture, entretien des outils, jardin et bons gestes d’urgence.</p>
+      </div></section>
+      <div class="page"><div class="conteneur">
+        <div class="filtres-videos" role="group" aria-label="Thèmes">
+          <button class="puce${selVideo.theme ? '' : ' active'}" data-theme-video="">Toutes (${toutes.length})</button>
+          ${THEMES_VIDEO.map((t) => `<button class="puce${selVideo.theme === t.id ? ' active' : ''}" data-theme-video="${t.id}">${t.icone} ${esc(t.nom)} (${toutes.filter((x) => x.theme === t.id).length})</button>`).join('')}
+        </div>
+        <div class="videotheque">
+          <div class="lecteur-colonne">
+            <div class="video-cadre" id="lecteur">${consentementYt ? iframeYt(v, false) : facadeVideo(v)}</div>
+            <div class="panneau lecteur-infos">
+              <div class="surtitre">${themeVideo(v.theme).icone} ${esc(themeVideo(v.theme).nom)}</div>
+              <h2 style="margin:4px 0 6px">${esc(v.titre)}</h2>
+              <p class="discret" style="margin:0 0 10px">${esc(v.chaine)}${v.duree ? ` · ${esc(v.duree)}` : ''} · vidéo YouTube intégrée, non produite par ZETools</p>
+              <div class="actions-rdv">
+                ${v.fiche ? `<a class="btn btn-cta" href="#/fiche-technique/${v.fiche.id}">📄 La fiche pas à pas : ${esc(v.fiche.titre)}</a>` : ''}
+                ${v.urgence ? `<a class="btn btn-cta" href="#/urgence?type=${v.urgence}">🚨 Trouver un professionnel d’urgence</a>` : ''}
+                <a class="btn btn-contour" href="#/services">Le faire faire par un prestataire</a>
+                <a class="btn btn-contour" href="https://www.youtube.com/watch?v=${esc(v.yt)}" target="_blank" rel="noopener">Ouvrir sur YouTube ↗</a>
+              </div>
+            </div>
+          </div>
+          <div class="liste-videos">${liste.map(tuile).join('') || '<div class="vide">Aucune vidéo dans ce thème.</div>'}</div>
+        </div>
+        <p class="note-legale">Les vidéos sont hébergées par YouTube (Google) et intégrées en mode « confidentialité renforcée » : rien n’est chargé avant votre premier clic sur « Lire ». Les vignettes ci-dessus sont dessinées par ZETools, sans appel à YouTube. <a href="#/legal/confidentialite">En savoir plus</a></p>
+      </div></div>`;
+  }
+  function brancherVideos() {
+    const cadre = document.getElementById('lecteur'); if (!cadre) return;
+    const redessiner = (lire) => {
+      vue.innerHTML = vueVideos(new URLSearchParams()); brancherVideos();
+      const v = toutesVideos().find((x) => x.yt === selVideo.yt);
+      const c = document.getElementById('lecteur');
+      if (lire && consentementYt) c.innerHTML = iframeYt(v, true);
+      return c;
+    };
+    vue.querySelector('.filtres-videos').addEventListener('click', (e) => {
+      const b = e.target.closest('[data-theme-video]'); if (!b) return;
+      selVideo.theme = b.dataset.themeVideo; selVideo.yt = ''; redessiner(false);
+    });
+    vue.querySelector('.videotheque').addEventListener('click', (e) => {
+      const lire = e.target.closest('[data-lire]');
+      if (lire) { consentementYt = true; const v = toutesVideos().find((x) => x.yt === lire.dataset.lire); cadre.innerHTML = iframeYt(v, true); return; }
+      const t = e.target.closest('[data-video]'); if (!t) return;
+      selVideo.yt = t.dataset.video;
+      redessiner(true).scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+  }
+
+  /* =====================================================================
+     URGENCE TRAVAUX : un professionnel d'astreinte, le prix affiché avant le déplacement
+     ===================================================================== */
+  etat.urgences = etat.urgences || [];
+  etat.coupons = etat.coupons || [];
+  let selUrg = { type: '', artisan: 'premier', coupon: '' };
+  const typeUrg = (id) => TYPES_URGENCE.find((t) => t.id === id);
+  const couponsUtilisables = () => etat.coupons.filter((c) => c.solde > 0 && !Z.couponExpire(c, AUJOURDHUI));
+  function blocCouponPaiement(montant, choisi, attribut) {
+    const cs = couponsUtilisables(); if (!cs.length) return '';
+    const c = cs.find((x) => x.code === choisi);
+    const u = c ? Z.utiliserCoupon(c, montant, AUJOURDHUI, '') : null;
+    return `<label class="ligne coupon-paiement"><span>🎁 Payer avec un bon cadeau</span><select ${attribut}><option value="">Non merci</option>${cs.map((x) => `<option value="${x.code}" ${x.code === choisi ? 'selected' : ''}>${x.code} · solde ${Z.euros(x.solde)}</option>`).join('')}</select></label>
+      ${u ? `<div class="ligne"><span>Bon cadeau ${esc(c.code)}</span><span>− ${Z.euros(u.debit)}</span></div><div class="ligne total"><span>Reste à payer</span><span>${Z.euros(u.resteAPayer)}</span></div>` : ''}`;
+  }
+  function vueUrgence(params) {
+    if (params.get('type') !== null) { selUrg.type = params.get('type'); selUrg.artisan = 'premier'; }
+    const t = typeUrg(selUrg.type);
+    const enCours = etat.urgences.filter((u) => u.statut !== 'terminée').slice(-1)[0];
+    const M = maintenant();
+    const res = t && !t.danger && posClient ? Z.artisansUrgence(posClient, artisansAbonnes(), t.metier) : [];
+    if (selUrg.artisan !== 'premier' && !res.some((x) => x.artisan.id === selUrg.artisan)) selUrg.artisan = 'premier';
+    const sollicites = res.slice(0, Z.REGLES.urgence.maxSollicites);
+    const videoGeste = t ? VIDEOS_TUTOS.find((v) => v.urgence === t.id) : null;
+    const maj = Z.majorationUrgence(M);
+    const carteUrg = (x) => {
+      const a = x.artisan, d = Z.devisUrgence(a, M, 1);
+      return `<div class="artisan-carte urgence-carte${selUrg.artisan === a.id ? ' choisi' : ''}">
+        <div class="vendeur"><div class="avatar">${initiales(a.nom)}</div><div style="flex:1"><b>${esc(a.nom)}</b> <span class="badge badge-echange">Pro vérifié</span><br>
+          <span class="verifie">✔ SIRET${a.decennale ? ' · ✔ Décennale' : ''}</span> · ★ ${a.note.toFixed(1)} (${a.avis})</div>
+          <div class="eta"><b>~ ${x.minutes} min</b><span>${Z.formatDistance(x.km)}</span></div></div>
+        <div class="discret" style="margin:6px 0">Astreinte ${esc(a.urgence.horaires)}</div>
+        <div class="ligne"><span>Déplacement</span><span>${Z.euros(d.deplacement)}</span></div>
+        <div class="ligne"><span>Main-d’œuvre, 1re heure</span><span>${Z.euros(d.mainOeuvre)}</span></div>
+        ${d.majoration ? `<div class="ligne"><span>Majoration ${esc(d.motif)} (+${Math.round(d.tauxMajoration * 100)} %)</span><span>${Z.euros(d.majoration)}</span></div>` : ''}
+        <div class="ligne"><span>Frais de service</span><span>${Z.euros(d.fraisService)}</span></div>
+        <div class="ligne total"><span>Prix ferme, 1re heure</span><span>${Z.euros(d.total)}</span></div>
+        <div class="ligne discret"><span>Heure suivante, si nécessaire</span><span>${Z.euros(d.heureSupplementaire)}</span></div>
+        <button class="btn ${selUrg.artisan === a.id ? 'btn-sombre' : 'btn-contour'}" data-choisir-urg="${a.id}" style="width:100%;margin-top:6px">${selUrg.artisan === a.id ? '✔ Professionnel choisi' : 'Choisir ce professionnel'}</button>
+      </div>`;
+    };
+    const suivi = (u) => { const a = artisan(u.artisan); return `<div class="panneau suivi-urgence">
+        <div class="surtitre" style="color:#a52714">Intervention en cours</div>
+        <h2 style="margin:4px 0">${esc(a.nom)} est en route</h2>
+        <p><b>Arrivée estimée vers ${u.arrivee.slice(11).replace(':', ' h ')}</b> · ${esc(typeUrg(u.type).nom)} · prix ferme de la 1re heure : <b>${Z.euros(u.devis.total)}</b>${u.coupon ? ` (dont ${Z.euros(u.coupon.debit)} réglés par le bon cadeau ${esc(u.coupon.code)})` : ''}.</p>
+        <ul class="liste-avantages">
+          <li>Le professionnel se présente avec son nom et sa carte ZETools : vérifiez-les avant de le faire entrer.</li>
+          <li>Il constate la panne et vous confirme le prix <b>avant</b> de commencer. Tout supplément doit être écrit et accepté par vous dans l’application.</li>
+          <li>Ne payez rien sur place, ni en espèces ni par chèque : le paiement passe par ZETools, une fois l’intervention validée.</li>
+        </ul>
+        <div class="actions-rdv"><button class="btn btn-vert" data-terminer-urg="${u.id}">✔ Démo : intervention terminée</button><a class="btn btn-contour" href="#/agenda">Voir dans mon agenda</a></div>
+      </div>`; };
+    return `<section class="hero hero-court hero-urgence"><div class="conteneur">
+        <div class="surtitre" style="color:#ffd7cf">Urgence travaux · 7 j/7</div>
+        <h1>Fuite, panne, porte claquée ? <em>Un pro vérifié, vite.</em></h1>
+        <p class="sous">Les professionnels d’astreinte les plus proches, leur délai d’arrivée et leur <b>prix ferme affiché avant le déplacement</b>. Paiement par ZETools uniquement : jamais d’espèces, jamais de surprise.</p>
+      </div></section>
+      <div class="page"><div class="conteneur">
+        <div class="alerte alerte-erreur bandeau-secours"><b>Danger immédiat ?</b> Incendie, personne blessée, forte odeur de gaz : appelez le <a href="tel:18">18</a> ou le <a href="tel:112">112</a>. Urgence médicale : <a href="tel:15">15</a>. Odeur de gaz : Urgence Sécurité Gaz <a href="tel:0800473333">0 800 47 33 33</a>.</div>
+        ${enCours ? suivi(enCours) : ''}
+        <h2>1. Quelle est l’urgence ?</h2>
+        <div class="types-urgence">${TYPES_URGENCE.map((x) => `<button class="type-urgence${x.id === selUrg.type ? ' choisi' : ''}${x.danger ? ' danger' : ''}" data-type-urg="${x.id}"><span>${x.icone}</span>${esc(x.nom)}</button>`).join('')}</div>
+        ${t ? `<div class="urgence-gestes ${t.danger ? 'gestes-danger' : ''}">
+            <div class="panneau"><h3 style="margin-top:0">${t.danger ? '⚠️ Mettez-vous en sécurité, maintenant' : '🧯 En attendant le professionnel'}</h3><ol class="liste-fiche">${t.gestes.map((g) => `<li>${esc(g)}</li>`).join('')}</ol>
+              ${t.danger ? '<p><b>ZETools n’envoie pas d’artisan pour une odeur de gaz.</b> Seuls les services de sécurité gaz et les pompiers interviennent : appelez-les depuis l’extérieur.</p>' : ''}</div>
+            ${videoGeste ? `<div class="panneau"><h3 style="margin-top:0">▶ Le bon geste en vidéo</h3><div class="video-cadre" data-cadre-urg>${facadeVideo(videoGeste)}</div><p class="discret" style="margin:8px 0 0">${esc(videoGeste.chaine)} · ${esc(videoGeste.duree)}</p></div>` : ''}
+          </div>` : ''}
+        ${t && !t.danger ? `<h2>2. Où êtes-vous ?</h2>
+          <div class="panneau"><div class="localisation">
+            <button class="btn btn-sombre" id="geoloc-urg">📍 Me localiser</button><span style="color:var(--texte-doux)">ou</span>
+            <form id="form-cp-urg" style="display:flex;gap:8px"><input id="cp-urg" inputmode="numeric" maxlength="5" placeholder="Code postal" value="${esc(posClient && posClient.cp ? posClient.cp : '')}" style="width:130px;border:1px solid var(--bord);border-radius:8px;padding:10px"><button class="btn btn-contour">Valider</button></form>
+          </div>
+          <div id="etat-geo-urg" class="alerte ${posClient ? 'alerte-ok' : 'alerte-info'}" style="margin-top:10px">${posClient ? `Position : ${esc(posClient.libelle)}. Votre adresse exacte n’est transmise qu’au professionnel qui intervient.` : 'Indiquez où vous êtes pour voir les professionnels disponibles et leur délai.'}</div></div>
+          ${posClient ? `<h2>3. Les professionnels disponibles <span class="discret" style="font-size:1rem">${maj.taux ? `· tarif ${esc(maj.motif)} en ce moment` : '· tarif de jour'}</span></h2>
+            ${res.length ? `<div class="grille-urgence">${res.map(carteUrg).join('')}</div>
+            <form class="panneau form-espace" id="form-urgence">
+              <h3 style="margin-top:0">4. Envoyer ma demande</h3>
+              <label class="ligne" style="cursor:pointer"><span><input type="radio" name="qui" value="premier" ${selUrg.artisan === 'premier' ? 'checked' : ''}> <b>Le premier disponible</b> (recommandé) : la demande part aux ${sollicites.length} plus proches, le premier qui accepte intervient</span></label>
+              ${selUrg.artisan !== 'premier' ? `<label class="ligne" style="cursor:pointer"><span><input type="radio" name="qui" value="${selUrg.artisan}" checked> Seulement <b>${esc(artisan(selUrg.artisan).nom)}</b></span></label>` : ''}
+              <label>Ce qui se passe <span class="discret">(facultatif)</span><textarea name="details" maxlength="300" rows="2" placeholder="Ex. : l’eau coule sous l’évier, j’ai coupé l’arrivée générale"></textarea></label>
+              <label>Adresse de l’intervention<input name="adresse" required autocomplete="street-address" placeholder="N°, rue, étage, code d’accès"></label>
+              <p class="discret" style="margin:0">L’adresse n’est transmise qu’au professionnel qui accepte, et n’est pas conservée par cette démonstration.</p>
+              <div id="paiement-urg">${blocCouponPaiement(Z.devisUrgence(selUrg.artisan === 'premier' ? res[0].artisan : artisan(selUrg.artisan), M, 1).total, selUrg.coupon, 'id="coupon-urg"')}</div>
+              <label class="case-legale"><input type="checkbox" name="expresse" required> Je demande expressément une intervention urgente à mon domicile. J’ai noté que, pour les travaux strictement nécessaires à l’urgence, il n’y a pas de droit de rétractation, et qu’un devis écrit m’est remis avant tout travail au-delà de 150 € TTC.</label>
+              <button class="btn btn-cta btn-urgence" style="width:100%">🚨 Envoyer ma demande d’urgence</button>
+              <p class="discret" style="margin:8px 0 0">Une empreinte bancaire du prix ferme est prise ; vous n’êtes débité qu’après avoir validé l’intervention (simulation dans la maquette).</p>
+            </form>` : `<div class="vide">Aucun professionnel d’astreinte à moins de ${Z.REGLES.urgence.rayonKm} km pour ce type d’urgence. Essayez <a href="#/travaux?metier=${t.metier}">la recherche d’artisans</a> et appliquez les gestes ci-dessus.</div>`}` : ''}` : ''}
+        <div class="panneau bandeau-action" style="margin-top:24px"><div><b>Les arnaques au dépannage existent.</b> Sur ZETools : professionnels vérifiés (SIRET, assurance), prix affiché avant le déplacement, majorations de nuit et du dimanche annoncées, paiement uniquement par la plateforme.</div><a class="btn btn-contour" href="#/legal/cgu">Nos conditions</a></div>
+      </div></div>`;
+  }
+  function brancherUrgence() {
+    const rafraichir = () => { const y = window.scrollY; vue.innerHTML = vueUrgence(new URLSearchParams()); brancherUrgence(); window.scrollTo(0, y); };
+    vue.querySelectorAll('[data-type-urg]').forEach((b) => b.addEventListener('click', () => { selUrg.type = b.dataset.typeUrg; selUrg.artisan = 'premier'; rafraichir(); }));
+    const cadre = vue.querySelector('[data-cadre-urg]');
+    if (cadre) cadre.addEventListener('click', (e) => { const b = e.target.closest('[data-lire]'); if (!b) return; consentementYt = true; cadre.innerHTML = iframeYt(VIDEOS_TUTOS.find((v) => v.yt === b.dataset.lire), true); });
+    const geo = document.getElementById('geoloc-urg');
+    if (geo) geo.addEventListener('click', () => {
+      const etatGeo = document.getElementById('etat-geo-urg');
+      if (!navigator.geolocation) { etatGeo.textContent = 'Localisation indisponible : saisissez votre code postal.'; return; }
+      etatGeo.textContent = 'Recherche de votre position…';
+      navigator.geolocation.getCurrentPosition((g) => {
+        const p = { lat: g.coords.latitude, lon: g.coords.longitude };
+        if (Z.distanceKm(p, { lat: 48.8566, lon: 2.3522 }) > 80) { etatGeo.className = 'alerte alerte-erreur'; etatGeo.textContent = 'Vous êtes hors de la zone pilote (Île-de-France) : saisissez votre code postal.'; return; }
+        posClient = Object.assign(Z.positionApprochee(p), { libelle: 'votre position', source: 'GPS, arrondie à 1 km' }); rafraichir();
+      }, () => { etatGeo.className = 'alerte alerte-erreur'; etatGeo.textContent = 'Localisation refusée ou impossible : saisissez votre code postal.'; },
+      { enableHighAccuracy: false, timeout: 8000, maximumAge: 600000 });
+    });
+    const fcp = document.getElementById('form-cp-urg');
+    if (fcp) fcp.addEventListener('submit', (e) => {
+      e.preventDefault(); const cp = document.getElementById('cp-urg').value.trim(); const p = Z.positionCodePostal(cp);
+      if (!p) return toast('Code postal hors de la zone pilote Île-de-France.');
+      posClient = { lat: p.lat, lon: p.lon, libelle: `${p.libelle} (${cp})`, source: `code postal, précision ${p.precision}`, cp }; rafraichir();
+    });
+    vue.querySelectorAll('[data-choisir-urg]').forEach((b) => b.addEventListener('click', () => { selUrg.artisan = selUrg.artisan === b.dataset.choisirUrg ? 'premier' : b.dataset.choisirUrg; rafraichir(); }));
+    const cu = document.getElementById('coupon-urg');
+    if (cu) cu.addEventListener('change', () => { selUrg.coupon = cu.value; rafraichir(); });
+    vue.querySelectorAll('[data-terminer-urg]').forEach((b) => b.addEventListener('click', () => {
+      const u = etat.urgences.find((x) => x.id === b.dataset.terminerUrg); if (u) u.statut = 'terminée';
+      sauver(); toast('Intervention validée : le professionnel est payé, vous pouvez laisser un avis.'); rafraichir();
+    }));
+    const f = document.getElementById('form-urgence');
+    if (f) f.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const fd = new FormData(f), t = typeUrg(selUrg.type), M = maintenant();
+      const res = Z.artisansUrgence(posClient, artisansAbonnes(), t.metier);
+      const qui = fd.get('qui') || 'premier';
+      const x = qui === 'premier' ? res[0] : res.find((y) => y.artisan.id === qui); if (!x) return toast('Ce professionnel n’est plus disponible.');
+      const devis = Z.devisUrgence(x.artisan, M, 1);
+      let coupon = null;
+      if (selUrg.coupon) {
+        const i = etat.coupons.findIndex((c) => c.code === selUrg.coupon);
+        const u = i >= 0 ? Z.utiliserCoupon(etat.coupons[i], devis.total, AUJOURDHUI, `Urgence : ${t.nom}`) : { ok: false, raison: 'Bon cadeau introuvable.' };
+        if (!u.ok) return toast(u.raison);
+        etat.coupons[i] = u.coupon; coupon = { code: u.coupon.code, debit: u.debit };
+      }
+      const d = new Date(Date.now() + x.minutes * 60000), p = (n) => String(n).padStart(2, '0');
+      const arrivee = `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
+      const id = 'u' + Date.now();
+      etat.urgences.push({ id, type: t.id, artisan: x.artisan.id, devis, demande: M, arrivee, statut: 'en route', coupon });
+      etat.rdv.push({ id, sens: 'envoye', type: 'travaux', avec: x.artisan.id, objet: `🚨 Urgence · ${t.nom}`, creneaux: [arrivee], creneau: arrivee, dureeHeures: 1,
+        lieu: 'À mon domicile', statut: 'confirmé', montant: devis.total, message: String(fd.get('details') || '').slice(0, 300) });
+      selUrg.coupon = ''; sauver();
+      toast(`${x.artisan.nom} a accepté${qui === 'premier' ? ' le premier' : ''} : arrivée dans ~${x.minutes} min (simulation).`);
+      rafraichir(); window.scrollTo(0, 0);
+    });
+  }
+
+  /* =====================================================================
+     OFFRIR DES TRAVAUX : un bon cadeau payé sur ZETools, offert à un proche
+     ===================================================================== */
+  const urlCoupon = (c) => `${SITE_PUBLIC}#/offrir?code=${c.code}`;
+  const themeCoupon = (id) => THEMES_COUPON.find((t) => t.id === id) || THEMES_COUPON[0];
+  let selCadeau = { lien: 'parent', theme: 'libre', montant: 50, autre: '', pour: '', de: '', message: '', mode: 'pdf', email: '', date: '' };
+  let codeSaisi = '';
+  function apercuCoupon(c) {
+    const t = themeCoupon(c.theme);
+    return `<div class="carte-cadeau">
+      <div class="cc-tete"><span class="cc-logo">${window.ZT_PDF.logoSvg(26)}<b><span class="marque-ze">ZE</span>TOOLS</b></span><span class="cc-etiquette">BON CADEAU TRAVAUX</span></div>
+      <div class="cc-pour">Pour ${esc((c.destinataire && c.destinataire.prenom) || c.pour || '…')}</div>
+      ${c.de ? `<div class="cc-de">de la part de ${esc(c.de)}</div>` : ''}
+      <div class="cc-montant">${Number.isFinite(c.montant) && c.montant > 0 ? `${c.montant} €` : '— €'}</div>
+      <div class="cc-theme">${t.icone} ${esc(t.nom)}</div>
+      ${c.message ? `<div class="cc-message">« ${esc(c.message)} »</div>` : ''}
+      ${c.code ? `<div class="cc-code">${esc(c.code)}<span>valable jusqu’au ${Z.formatDate(c.expire)}</span></div>` : ''}
+    </div>`;
+  }
+  function telechargerCoupon(code) {
+    const c = etat.coupons.find((x) => x.code === code); if (!c) return;
+    const P = window.ZT_PDF, J = window.ZT_JURIDIQUE;
+    const lien = document.createElement('a');
+    lien.href = URL.createObjectURL(new Blob([P.octets(P.bonCadeauPdf(Object.assign({ themeNom: themeCoupon(c.theme).nom }, c), J && J.SOCIETE, { url: urlCoupon(c) }))], { type: 'application/pdf' }));
+    lien.download = P.nomFichierCoupon(c); document.body.appendChild(lien); lien.click(); lien.remove();
+    toast('Bon cadeau téléchargé en PDF.');
+  }
+  function vueOffrir(params) {
+    if (params.get('code')) codeSaisi = Z.formaterCode(params.get('code'));
+    const C = Z.REGLES.coupon;
+    const montant = selCadeau.autre !== '' ? Number(selCadeau.autre) : selCadeau.montant;
+    const dernier = etat.coupons.find((c) => c.nouveau);
+    const trouve = codeSaisi ? etat.coupons.find((c) => c.code === codeSaisi) : null;
+    const codeOk = codeSaisi ? Z.verifierCodeCoupon(codeSaisi) : false;
+    const ligneCoupon = (c) => `<tr><td><b>${esc(c.code)}</b><br><span class="discret">pour ${esc(c.destinataire.prenom)}</span></td><td>${esc(themeCoupon(c.theme).nom)}</td><td>${Z.euros(c.montant)}</td><td><b>${Z.euros(c.solde)}</b></td><td>${Z.couponExpire(c, AUJOURDHUI) ? '<span class="statut" style="background:#fdecea;color:#a52714">expiré</span>' : Z.formatDate(c.expire)}</td><td><button class="btn btn-contour" data-pdf-coupon="${c.code}">📄 PDF</button></td></tr>`;
+    return `<section class="hero hero-court hero-cadeau"><div class="conteneur">
+        <div class="surtitre" style="color:var(--anthracite)">Offrir des travaux</div>
+        <h1>Offrez un coup de main, <em>pas un objet de plus.</em></h1>
+        <p class="sous">Un bon cadeau de ${C.min} à ${C.max} €, à utiliser pour les services et les interventions des artisans de ZETools : montage de meubles, peinture, jardin, petits dépannages. Pour un parent, un enfant, un ami, un collègue.</p>
+      </div></section>
+      <div class="page"><div class="conteneur">
+      ${dernier ? `<div class="panneau confirmation-cadeau"><div class="surtitre">Paiement accepté (simulation)</div><h2 style="margin:4px 0 14px">Votre bon cadeau pour ${esc(dernier.destinataire.prenom)} est prêt</h2>
+          <div class="cadeau-recap">${apercuCoupon(dernier)}<div>
+            <p>Code : <b>${esc(dernier.code)}</b> · ${Z.euros(dernier.montant)} · valable jusqu’au ${Z.formatDate(dernier.expire)}, en une ou plusieurs fois.</p>
+            ${dernier.envoi.mode === 'email' ? `<p>ZETools l’enverra par e-mail le <b>${Z.formatDate(dernier.envoi.date)}</b> à <b>${esc(dernier.envoi.email)}</b>. <span class="discret">(Dans la maquette, aucun e-mail n’est réellement envoyé.)</span></p>` : '<p>Imprimez-le ou transmettez le PDF vous-même : il contient le code et un QR code pour l’utiliser.</p>'}
+            <div class="actions-rdv"><button class="btn btn-cta" data-pdf-coupon="${dernier.code}">📄 Télécharger le bon cadeau (PDF)</button><button class="btn btn-contour" data-fermer-confirmation>Offrir un autre bon</button></div>
+          </div></div></div>` : ''}
+      <div class="offrir">
+        <form class="panneau form-espace" id="form-cadeau" novalidate>
+          <h2 style="margin-top:0">1. À qui l’offrez-vous ?</h2>
+          <div class="choix-proches">${PROCHES.map((p) => `<button type="button" class="puce${selCadeau.lien === p.id ? ' active' : ''}" data-lien="${p.id}">${p.icone} ${esc(p.nom)}</button>`).join('')}</div>
+          <div class="deux-colonnes"><label>Son prénom<input name="pour" maxlength="40" value="${esc(selCadeau.pour)}" placeholder="Maman, Léa, Karim…"></label>
+          <label>De la part de<input name="de" maxlength="40" value="${esc(selCadeau.de)}" placeholder="Votre prénom"></label></div>
+          <h2>2. Quelle idée de travaux ?</h2>
+          <div class="themes-cadeau">${THEMES_COUPON.map((t) => `<button type="button" class="theme-cadeau${selCadeau.theme === t.id ? ' choisi' : ''}" data-theme-cadeau="${t.id}"><span>${t.icone}</span><b>${esc(t.nom)}</b><small>${esc(t.idee)}</small></button>`).join('')}</div>
+          <p class="discret" style="margin:6px 0 0">Le thème figure sur le bon ; le bon reste utilisable pour tous les services et interventions de ZETools.</p>
+          <h2>3. Quel montant ?</h2>
+          <div class="choix-proches">${C.montants.map((m) => `<button type="button" class="puce${selCadeau.autre === '' && selCadeau.montant === m ? ' active' : ''}" data-montant="${m}">${m} €</button>`).join('')}
+            <label class="montant-libre">Autre <input name="autre" type="number" min="${C.min}" max="${C.max}" step="1" value="${esc(selCadeau.autre)}" placeholder="${C.min}–${C.max}"> €</label></div>
+          <h2>4. Un petit mot ?</h2>
+          <textarea name="message" maxlength="300" rows="3" placeholder="Pour ton nouvel appartement : quelqu’un viendra monter les meubles !">${esc(selCadeau.message)}</textarea>
+          <div class="discret" style="text-align:right"><span id="compteur-cadeau">${selCadeau.message.length}</span> / 300</div>
+          <h2>5. Comment le remettre ?</h2>
+          <label class="ligne" style="cursor:pointer"><span><input type="radio" name="mode" value="pdf" ${selCadeau.mode === 'pdf' ? 'checked' : ''}> <b>Je l’imprime ou je l’envoie moi-même</b> (PDF avec QR code)</span></label>
+          <label class="ligne" style="cursor:pointer"><span><input type="radio" name="mode" value="email" ${selCadeau.mode === 'email' ? 'checked' : ''}> <b>ZETools l’envoie par e-mail</b>, le jour choisi</span></label>
+          ${selCadeau.mode === 'email' ? `<div class="deux-colonnes"><label>Son adresse e-mail<input name="email" type="email" value="${esc(selCadeau.email)}" placeholder="prenom@exemple.fr"></label>
+            <label>Date d’envoi<input name="date" type="date" min="${AUJOURDHUI}" max="${Z.ajouterMois(AUJOURDHUI, 12)}" value="${esc(selCadeau.date || AUJOURDHUI)}"></label></div>` : ''}
+          <div class="ligne total" style="margin-top:14px"><span>À payer</span><span id="a-payer">${Number.isFinite(montant) && montant > 0 ? Z.euros(montant) : '—'}</span></div>
+          <p class="discret" style="margin:0 0 10px">Sans frais. Valable 12 mois à partir de sa remise, utilisable en plusieurs fois. Non remboursable en espèces.</p>
+          <button class="btn btn-cta" style="width:100%">🎁 Payer et offrir</button>
+          <p class="discret" style="margin:8px 0 0">Paiement sécurisé (simulé dans la maquette : aucune carte n’est demandée ni débitée).</p>
+        </form>
+        <aside class="apercu-cadeau"><div class="surtitre">Aperçu</div><div id="apercu-carte">${apercuCoupon({ pour: selCadeau.pour, de: selCadeau.de, montant, theme: selCadeau.theme, message: selCadeau.message })}</div>
+          <p class="discret">Le PDF reprend cette carte, avec le code, la date de validité et un QR code qui ouvre directement ZETools.</p></aside>
+      </div>
+
+      <div class="panneau" id="utiliser-coupon" style="margin-top:28px">
+        <h2 style="margin-top:0">🎟️ Vous avez reçu un bon cadeau ?</h2>
+        <form id="form-code" class="localisation"><input id="code-coupon" value="${esc(codeSaisi)}" placeholder="ZT-XXXX-XXXX" autocomplete="off" spellcheck="false" aria-label="Code du bon cadeau" style="text-transform:uppercase;letter-spacing:1px;border:1px solid var(--bord);border-radius:8px;padding:10px;width:200px"><button class="btn btn-sombre">Vérifier</button></form>
+        ${codeSaisi ? (!codeOk ? '<div class="alerte alerte-erreur" style="margin-top:10px">Ce code n’existe pas : vérifiez chaque caractère (il n’y a ni 0, ni O, ni 1, ni I, ni L).</div>'
+          : trouve ? `<div class="alerte ${Z.couponExpire(trouve, AUJOURDHUI) ? 'alerte-erreur' : 'alerte-ok'}" style="margin-top:10px">${Z.couponExpire(trouve, AUJOURDHUI) ? `Ce bon a expiré le ${Z.formatDate(trouve.expire)}.` : `Bon cadeau de ${Z.euros(trouve.montant)} pour ${esc(trouve.destinataire.prenom)} : <b>solde ${Z.euros(trouve.solde)}</b>, valable jusqu’au ${Z.formatDate(trouve.expire)}. Il vous sera proposé au moment de payer un service ou une intervention.`}</div>
+              <div class="actions-rdv"><a class="btn btn-cta" href="#/services">Choisir un service</a><a class="btn btn-contour" href="#/urgence">Urgence travaux</a></div>`
+          : '<div class="alerte alerte-info" style="margin-top:10px">Code au bon format, mais inconnu de cette démonstration : les bons de la maquette sont enregistrés dans ce navigateur seulement.</div>') : '<p class="discret" style="margin:8px 0 0">Saisissez le code imprimé sur le bon, ou scannez son QR code.</p>'}
+      </div>
+
+      <h3 style="margin-top:28px">Mes bons cadeaux</h3>
+      ${etat.coupons.length ? `<div class="defile-tableau"><table class="tableau"><thead><tr><th>Code</th><th>Thème</th><th>Montant</th><th>Solde</th><th>Valable jusqu’au</th><th></th></tr></thead><tbody>${etat.coupons.slice().reverse().map(ligneCoupon).join('')}</tbody></table></div>` : '<div class="vide">Aucun bon cadeau pour l’instant.</div>'}
+      </div></div>`;
+  }
+  function brancherOffrir() {
+    const f = document.getElementById('form-cadeau'); if (!f) return;
+    const lire = () => { const fd = new FormData(f); ['pour', 'de', 'message', 'autre', 'email', 'date'].forEach((k) => { if (fd.has(k)) selCadeau[k] = String(fd.get(k)); }); selCadeau.mode = fd.get('mode') || 'pdf'; };
+    const redessiner = () => { const y = window.scrollY; vue.innerHTML = vueOffrir(new URLSearchParams()); brancherOffrir(); window.scrollTo(0, y); };
+    const apercu = () => {
+      lire(); const m = selCadeau.autre !== '' ? Number(selCadeau.autre) : selCadeau.montant;
+      document.getElementById('apercu-carte').innerHTML = apercuCoupon({ pour: selCadeau.pour, de: selCadeau.de, montant: m, theme: selCadeau.theme, message: selCadeau.message });
+      document.getElementById('compteur-cadeau').textContent = selCadeau.message.length;
+      document.getElementById('a-payer').textContent = Number.isFinite(m) && m > 0 ? Z.euros(m) : '—';
+      if (f.querySelector('[name=autre]').value !== '') f.querySelectorAll('[data-montant]').forEach((b) => b.classList.remove('active'));
+    };
+    f.addEventListener('input', apercu);
+    f.addEventListener('change', (e) => { if (e.target.name === 'mode') { lire(); redessiner(); } });
+    f.addEventListener('click', (e) => {
+      const b = e.target.closest('button[type=button]'); if (!b) return;
+      lire();
+      if (b.dataset.lien) selCadeau.lien = b.dataset.lien;
+      if (b.dataset.themeCadeau) selCadeau.theme = b.dataset.themeCadeau;
+      if (b.dataset.montant) { selCadeau.montant = Number(b.dataset.montant); selCadeau.autre = ''; }
+      redessiner();
+    });
+    f.addEventListener('submit', (e) => {
+      e.preventDefault(); lire();
+      const demande = { montant: selCadeau.autre !== '' ? Number(selCadeau.autre) : selCadeau.montant, theme: selCadeau.theme, de: selCadeau.de.trim(),
+        destinataire: { prenom: selCadeau.pour.trim(), lien: selCadeau.lien }, message: selCadeau.message.trim(),
+        envoi: selCadeau.mode === 'email' ? { mode: 'email', email: selCadeau.email.trim(), date: selCadeau.date || AUJOURDHUI } : { mode: 'pdf' } };
+      const v = Z.verifierCoupon(demande, AUJOURDHUI); if (!v.ok) return toast(v.erreurs[0]);
+      etat.coupons.forEach((c) => { delete c.nouveau; });
+      const c = Object.assign(Z.creerCoupon(demande, AUJOURDHUI), { nouveau: true });
+      etat.coupons.push(c); sauver();
+      selCadeau = Object.assign({}, selCadeau, { pour: '', message: '', autre: '', email: '', date: '' });
+      toast(`Paiement de ${Z.euros(c.montant)} accepté (simulation). Bon cadeau ${c.code} créé.`);
+      vue.innerHTML = vueOffrir(new URLSearchParams()); brancherOffrir(); window.scrollTo(0, 0);
+    });
+    vue.querySelectorAll('[data-pdf-coupon]').forEach((b) => b.addEventListener('click', () => telechargerCoupon(b.dataset.pdfCoupon)));
+    const fermer = vue.querySelector('[data-fermer-confirmation]');
+    if (fermer) fermer.addEventListener('click', () => { etat.coupons.forEach((c) => { delete c.nouveau; }); sauver(); redessiner(); });
+    document.getElementById('form-code').addEventListener('submit', (e) => {
+      e.preventDefault(); lire(); const brut = document.getElementById('code-coupon').value.trim(); codeSaisi = brut ? Z.formaterCode(brut) : '';
+      vue.innerHTML = vueOffrir(new URLSearchParams()); brancherOffrir(); document.getElementById('utiliser-coupon').scrollIntoView();
+    });
+  }
+
   /* ---------- routeur ---------- */
   function router() {
     const [chemin, qs] = (location.hash.slice(1) || '/').split('?');
@@ -1494,6 +1873,9 @@
       case 'service': html = vueService(seg[1]); apres = () => brancherService(seg[1]); break;
       case 'proposer-service': html = vueProposerService(); apres = brancherProposerService; break;
       case 'fiches': html = vueFiches(); break;
+      case 'videos': html = vueVideos(params); apres = brancherVideos; break;
+      case 'urgence': html = vueUrgence(params); apres = brancherUrgence; break;
+      case 'offrir': html = vueOffrir(params); apres = brancherOffrir; break;
       case 'fiche-technique': html = vueFicheTechnique(seg[1]); apres = brancherFicheTechnique; break;
       case 'securite': html = vueLegal('securite'); break;
       case 'atelier': html = vueAtelier(); break;
