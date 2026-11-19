@@ -67,6 +67,17 @@
   function ico(nom, taille, plein) {
     return `<svg class="icone" viewBox="0 0 24 24" width="${taille || 20}" height="${taille || 20}" fill="${plein ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${TRACES[nom]}</svg>`;
   }
+  /* Lecteur vidéo intégré. YouTube refuse la lecture sans page d'origine identifiée (« Erreur 153 ») :
+     c'est le cas quand la maquette est ouverte en fichier local. On passe alors par le relais hébergé lecteur.html. */
+  const RELAIS_VIDEO = 'https://nouarideba-bit.github.io/zetools/lecteur.html';
+  function srcVideo(id, auto, debut) {
+    const yt = encodeURIComponent(id), d = Number(debut) > 0 ? Math.floor(debut) : 0;
+    if (/^https?:$/.test(location.protocol)) return `https://www.youtube-nocookie.com/embed/${yt}?rel=0&playsinline=1${auto ? '&autoplay=1' : ''}${d ? `&start=${d}` : ''}`;
+    return `${RELAIS_VIDEO}?v=${yt}${auto ? '&auto=1' : ''}${d ? `&start=${d}` : ''}`;
+  }
+  function iframeYt(v, auto, debut) {
+    return `<iframe src="${srcVideo(v.yt, auto, debut)}" title="${esc(v.titre)} · ${esc(v.chaine)}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
+  }
   // Charte : aucun émoji pictographique dans les pages (rendu peu professionnel). On garde ★ des notes, ©, ® et ™.
   const PICTO = /(?:[\u{1F1E6}-\u{1F1FF}]{2}|(?![★©®™])\p{Extended_Pictographic}(?:️|⃣|[\u{1F3FB}-\u{1F3FF}]|‍\p{Extended_Pictographic}️?)*)️? ?/gu;
   const sansPictos = (html) => String(html).replace(PICTO, '').replace(/<(span|div) class="ico">\s*<\/\1>/g, '');
@@ -1474,7 +1485,7 @@
     const cadre = art.querySelector('[data-cadre]'); if (!f || !cadre) return;
     const lire = (yt, debut) => {
       const v = f.videos.find((x) => x.yt === yt) || f.videos[0];
-      cadre.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(v.yt)}?rel=0&autoplay=1${debut ? `&start=${debut}` : ''}" title="${esc(v.titre)} · ${esc(v.chaine)}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
+      cadre.innerHTML = iframeYt(v, true, debut);
       cadre.scrollIntoView({ behavior: 'smooth', block: 'center' });
     };
     art.addEventListener('click', (e) => {   // l'article est recréé à chaque affichage : pas d'écouteur en double
@@ -1530,7 +1541,6 @@
      ===================================================================== */
   const { TYPES_URGENCE, THEMES_VIDEO, VIDEOS_TUTOS, THEME_FICHE, THEMES_COUPON, PROCHES } = window.ZT_DONNEES;
   let consentementYt = false;   // en mémoire seulement : redemandé à chaque visite
-  const iframeYt = (v, auto) => `<iframe src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(v.yt)}?rel=0${auto ? '&autoplay=1' : ''}" title="${esc(v.titre)} · ${esc(v.chaine)}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
   function toutesVideos() {
     const vus = new Set(), liste = [];
     FICHES.forEach((f) => (f.videos || []).forEach((v) => { if (!vus.has(v.yt)) { vus.add(v.yt); liste.push(Object.assign({ theme: THEME_FICHE[f.id] || 'montage', fiche: f }, v)); } }));
