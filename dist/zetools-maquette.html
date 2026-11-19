@@ -442,7 +442,7 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
 .entete .lien-urgence { background: #c92a2a; color: #fff; }
 .entete .lien-urgence:hover { background: #a61e1e; color: #fff; }
 @media (max-width: 1400px) { .entete .lien-secondaire { display: none; } }
-@media (max-width: 1080px) { .entete .lien-entete.lien-urgence { display: inline-block; } }
+@media (max-width: 1080px) { .entete .lien-entete.lien-urgence, .entete .lien-entete.lien-offre { display: inline-block; } }
 
 /* ---------- accueil : trois espaces ---------- */
 .trois-espaces { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
@@ -559,6 +559,20 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
 @media (max-width: 1320px) { .entete .lien-niveau3 { display: none; } }
 @media (max-width: 760px) { .entete .recherche-entete { min-width: 0; } }
 
+/* page Notre offre */
+.tableau-offre { background: var(--carte); border-radius: var(--rayon); box-shadow: var(--ombre); overflow: hidden; }
+.to-ligne { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 16px; padding: 14px 20px; border-top: 1px solid rgba(0,0,0,.07); color: inherit; text-decoration: none; align-items: center; }
+.to-ligne:hover { background: rgba(245,183,0,.08); }
+.to-ligne small { display: block; color: var(--texte-doux); font-size: .85rem; margin-top: 2px; }
+.to-tete { background: var(--anthracite); color: #fff; font-weight: 700; border-top: 0; }
+.to-tete:hover { background: var(--anthracite); }
+@media (max-width: 760px) {
+  .to-ligne { grid-template-columns: 1fr; gap: 4px; }
+  .to-tete { display: none; }
+  .to-ligne span[data-t]::before { content: attr(data-t) " : "; font-weight: 600; }
+}
+@media (max-width: 520px) { .entete .actions-entete { flex-wrap: wrap; row-gap: 6px; max-width: 100%; } }
+
 </style>
 </head>
 <body>
@@ -571,6 +585,7 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
         <button type="submit">Chercher</button>
       </form>
       <nav class="actions-entete" aria-label="Mon compte">
+        <a class="lien-entete lien-offre" href="#/offre" title="Notre offre : services et tarifs">💼 Offre</a>
         <a class="lien-entete lien-urgence" href="#/urgence" title="Urgence travaux : un professionnel vérifié, vite">🚨 Urgence</a>
         <a class="lien-entete lien-niveau3" href="#/travaux" title="Trouver un artisan près de chez moi">📍 Artisans</a>
         <a class="lien-entete lien-niveau2" href="#/services" title="Services : réserver un voisin ou un professionnel">🙋 Services</a>
@@ -598,7 +613,7 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
           <p>Le bon outil, au bon moment, à deux rues de chez vous. Moins d’achats inutiles, plus d’outils qui servent.</p>
           <div class="reseaux"><a href="#/" title="Instagram">IG</a><a href="#/" title="Facebook">f</a><a href="#/" title="YouTube">▶</a><a href="#/" title="LinkedIn">in</a></div>
         </div>
-        <div><h4>Plateforme</h4><a href="#/annonces?mode=vente">Acheter</a><a href="#/annonces?mode=location">Louer</a><a href="#/annonces?mode=echange">Échanger</a><a href="#/deposer">Déposer une annonce</a><a href="#/services">Services</a><a href="#/proposer-service">Proposer mes services</a><a href="#/urgence">Urgence travaux</a><a href="#/offrir">Offrir des travaux (bon cadeau)</a><a href="#/travaux">Trouver un artisan</a><a href="#/reparer">Outils à réparer</a><a href="#/espace-artisan">Espace artisan abonné</a><a href="#/destockage">Déstockage des enseignes</a><a href="#/offres">Offres de prix</a><a href="#/agenda">Agenda et rendez-vous</a></div>
+        <div><h4>Plateforme</h4><a href="#/offre">Notre offre et nos tarifs</a><a href="#/annonces?mode=vente">Acheter</a><a href="#/annonces?mode=location">Louer</a><a href="#/annonces?mode=echange">Échanger</a><a href="#/deposer">Déposer une annonce</a><a href="#/services">Services</a><a href="#/proposer-service">Proposer mes services</a><a href="#/urgence">Urgence travaux</a><a href="#/offrir">Offrir des travaux (bon cadeau)</a><a href="#/travaux">Trouver un artisan</a><a href="#/reparer">Outils à réparer</a><a href="#/espace-artisan">Espace artisan abonné</a><a href="#/destockage">Déstockage des enseignes</a><a href="#/offres">Offres de prix</a><a href="#/agenda">Agenda et rendez-vous</a></div>
         <div><h4>Ressources</h4><a href="#/atelier">L’Atelier · guide du bon bricoleur</a><a href="#/fiches">Fiches techniques en PDF</a><a href="#/videos">Vidéothèque</a><a href="#/aide">FAQ</a><a href="#/legal/securite">Sécurité et caution</a><a href="#/legal/prix">Règles de prix</a><a href="#/pros">Offres professionnelles</a><a href="#/espace-enseigne">Espace enseigne (privé)</a></div>
         <div><h4>Légal</h4><a href="#/legal/cgu">Conditions générales</a><a href="#/legal/pros">Conditions professionnels et enseignes</a><a href="#/legal/mentions">Mentions légales</a><a href="#/legal/confidentialite">Confidentialité et cookies</a><a href="#/credits">Crédits photos et vidéos</a></div>
         <div><h4>Zone pilote</h4><p style="font-size:.92rem;margin:0">Île-de-France · lancement 2027.<br>Électroportatif et jardinage d’abord.</p></div>
@@ -1343,7 +1358,7 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
       indispo: [] },
     { id: 'a10', titre: 'Servante d’atelier garnie 120 pièces', marque: 'Facom', categorie: 'meca', etat: 'Bon état',
       modes: ['vente', 'location'], prixNeuf: 650, prixJour: 10, prixVente: 229, caution: 200, ville: 'Saint-Maur-des-Fossés', cp: '94100', membre: 'm4',
-      photo: U('1540104539488-92a51bbc0410'), description: 'Servante 6 tiroirs : douilles, clés mixtes, tournevis, pinces. Pour une révision moto ou une vidange.',
+      photo: U('1530124566582-a618bc2615dc'), description: 'Servante 6 tiroirs : douilles, clés mixtes, tournevis, pinces. Pour une révision moto ou une vidange.',
       indispo: [] },
     { id: 'a11', titre: 'Visseuse 18 V : batterie HS, pour bricoleur', marque: 'Makita', categorie: 'electro', etat: 'À réparer',
       modes: ['vente', 'echange'], prixNeuf: 120, prixJour: null, prixVente: 15, caution: 0, ville: 'Vincennes', cp: '94300', membre: 'm2',
@@ -1353,6 +1368,51 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
       modes: ['vente'], prixNeuf: 100, prixJour: null, prixVente: 10, caution: 0, ville: 'Nogent-sur-Marne', cp: '94130', membre: 'm5',
       photo: U('1774365294150-5d6051b6c53a'), description: 'Râteaux et outils de jardin anciens : manches à changer, métal sain. Pour amateur de restauration.',
       panne: 'Manches cassés, rouille de surface', indispo: [] },
+    // Mécanique auto / moto, thermique et électrique
+    { id: 'a13', titre: 'Cric rouleur 2 t et deux chandelles', marque: 'Mecafer', categorie: 'meca', etat: 'Très bon état',
+      modes: ['location', 'vente'], prixNeuf: 180, prixJour: 6, prixVente: 85, caution: 80, ville: 'Montreuil', cp: '93100', membre: 'm1',
+      photo: U('1578583444045-69c6e71c520b'), description: 'Cric bas pour citadine, SUV ou utilitaire léger, livré avec deux chandelles 3 t. Ne travaillez jamais sous une voiture tenue par le seul cric.',
+      indispo: [] },
+    { id: 'a14', titre: 'Clé à chocs sans fil 18 V et douilles de roue', marque: 'Milwaukee', categorie: 'meca', etat: 'Bon état',
+      modes: ['location'], prixNeuf: 420, prixJour: 14, prixVente: null, caution: 150, ville: 'Boulogne-Billancourt', cp: '92100', membre: 'm3',
+      photo: U('1764015805414-df7de89d405b'), description: 'Carré 1/2", 2 batteries, douilles 17-19-21 mm. Changement de pneus hiver / été en dix minutes. Resserrez ensuite à la clé dynamométrique.',
+      indispo: [] },
+    { id: 'a15', titre: 'Coffret de douilles 1/4" et 1/2", 94 pièces', marque: 'Facom', categorie: 'meca', etat: 'Très bon état',
+      modes: ['vente', 'location'], prixNeuf: 300, prixJour: 8, prixVente: 139, caution: 100, ville: 'Boulogne-Billancourt', cp: '92100', membre: 'm3',
+      photo: U('1637640125496-31852f042a60'), description: 'Douilles 6 pans, cliquets, rallonges, embouts Torx et Allen. Couvre l’essentiel d’une révision auto ou moto.',
+      indispo: [] },
+    { id: 'a16', titre: 'Valise de diagnostic OBD2 multimarque', marque: 'Autel', categorie: 'meca', etat: 'Très bon état',
+      modes: ['location', 'vente'], prixNeuf: 450, prixJour: 15, prixVente: 199, caution: 150, ville: 'Nogent-sur-Marne', cp: '94130', membre: 'm5',
+      photo: U('1727893380169-4dda123e19f7'), description: 'Lecture et effacement des codes défaut, données moteur en direct, état de la batterie. Thermique, hybride et électrique (lecture seule sur la batterie de traction).',
+      indispo: [] },
+    { id: 'a17', titre: 'Booster de démarrage 12 V lithium', marque: 'Noco', categorie: 'meca', etat: 'Bon état',
+      modes: ['location', 'vente', 'echange'], prixNeuf: 200, prixJour: 6, prixVente: 75, caution: 60, ville: 'Saint-Maur-des-Fossés', cp: '94100', membre: 'm4',
+      photo: U('1676337167752-2062c6ca7366'), description: 'Redémarre une voiture, une moto ou un utilitaire batterie à plat, sans seconde voiture. Pinces protégées contre l’inversion.',
+      echangeContre: 'Chargeur de batterie', indispo: [] },
+    { id: 'a18', titre: 'Câble de recharge Type 2, 7 m, 22 kW', marque: 'Green Motion', categorie: 'meca', etat: 'Très bon état',
+      modes: ['vente', 'location'], prixNeuf: 250, prixJour: 5, prixVente: 119, caution: 80, ville: 'Montreuil', cp: '93100', membre: 'm1',
+      photo: U('1593941707874-ef25b8b4a92b'), description: 'Pour bornes publiques et wallbox, voitures électriques et hybrides rechargeables. Triphasé 32 A, avec sac de rangement.',
+      indispo: [] },
+    { id: 'a19', titre: 'Chargeur portable VE sur prise domestique', marque: 'Juice Booster', categorie: 'meca', etat: 'Bon état',
+      modes: ['location'], prixNeuf: 380, prixJour: 9, prixVente: null, caution: 150, ville: 'Boulogne-Billancourt', cp: '92100', membre: 'm3',
+      photo: U('1704475336842-0ab3798abf0e'), description: 'Recharge une voiture électrique sur prise renforcée ou classique (8 à 16 A). Pratique en vacances ou en attendant la pose d’une borne. Faites vérifier votre installation électrique.',
+      indispo: [] },
+    { id: 'a20', titre: 'Multimètre et testeur de batterie 12 V', marque: 'Fluke', categorie: 'meca', etat: 'Très bon état',
+      modes: ['location', 'vente'], prixNeuf: 160, prixJour: 4, prixVente: 75, caution: 50, ville: 'Nogent-sur-Marne', cp: '94130', membre: 'm5',
+      photo: U('1777042510267-2c0543a0d715'), description: 'Tension, charge, alternateur, fusibles : trouvez la panne électrique d’une moto ou d’une voiture. Réseau 12 V seulement : la batterie haute tension d’un véhicule électrique exige une habilitation électrique.',
+      indispo: [] },
+    { id: 'a21', titre: 'Béquille d’atelier moto avant / arrière', marque: 'Oxford', categorie: 'meca', etat: 'Bon état',
+      modes: ['location', 'echange'], prixNeuf: 140, prixJour: 4, prixVente: null, caution: 50, ville: 'Saint-Maur-des-Fossés', cp: '94100', membre: 'm4',
+      photo: U('1636761358757-0a616eb9e17e'), description: 'Lève la moto pour graisser la chaîne, changer une roue ou passer l’hiver sans plat sur les pneus. Thermique ou électrique.',
+      echangeContre: 'Démonte-pneu moto', indispo: [] },
+    { id: 'a22', titre: 'Jeu de clés mixtes 8 à 24 mm', marque: 'Stahlwille', categorie: 'meca', etat: 'État correct',
+      modes: ['vente', 'echange'], prixNeuf: 110, prixJour: null, prixVente: 30, caution: 0, ville: 'Montreuil', cp: '93100', membre: 'm1',
+      photo: U('1581085271555-d32ebe05933a'), description: 'Douze clés plates et à œil, traces d’usage mais aucune tête abîmée.',
+      echangeContre: 'Clé à bougie', indispo: [] },
+    { id: 'a23', titre: 'Kit changement de roue : clé en croix et cales', marque: 'Hazet', categorie: 'meca', etat: 'Bon état',
+      modes: ['location'], prixNeuf: 90, prixJour: 3, prixVente: null, caution: 30, ville: 'Vincennes', cp: '94300', membre: 'm2',
+      photo: U('1645445522156-9ac06bc7a767'), description: 'Clé en croix 17-19-21-23 mm, rallonge et deux cales de roue. Le minimum pour changer une roue sans forcer.',
+      indispo: [] },
   ];
 
   // réservations déjà présentes (fictives) pour colorer les calendriers
@@ -1376,7 +1436,18 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
     ['Perceuse-visseuse', 'Syed Hussaini', '1572981779307-38b8cabb2407'],
     ['Perforateur', 'contributeur Unsplash', '1585201731775-0597e1be4bfb'],
     ['Visseuse à chocs', 'contributeur Unsplash', '1623161551706-318825cd18ef'],
-    ['Servante d’atelier', 'contributeur Unsplash', '1540104539488-92a51bbc0410'],
+    ['Outils de mécanique', 'heyquilia', '1530124566582-a618bc2615dc'],
+    ['Cric rouleur', 'sincerelymedia', '1578583444045-69c6e71c520b'],
+    ['Clé à chocs sur roue', 'lex_living', '1764015805414-df7de89d405b'],
+    ['Coffret de douilles', 'kronemberger', '1637640125496-31852f042a60'],
+    ['Diagnostic automobile', 'mtonuk', '1727893380169-4dda123e19f7'],
+    ['Batterie et pinces', 'newpowa', '1676337167752-2062c6ca7366'],
+    ['Câble de recharge', 'chuttersnap', '1593941707874-ef25b8b4a92b'],
+    ['Recharge de voiture électrique', 'zaptec', '1704475336842-0ab3798abf0e'],
+    ['Multimètre sur batterie de moto', 'thecurlyone', '1777042510267-2c0543a0d715'],
+    ['Mécanique moto', '_ks_', '1636761358757-0a616eb9e17e'],
+    ['Clés plates', 'tekton_tools', '1581085271555-d32ebe05933a'],
+    ['Changement de roue', 'jimmynilssonmasth', '1645445522156-9ac06bc7a767'],
     ['Taille de haie', 'Crystal Jo', '1617576683096-00fc8eecb3af'],
     ['Sécateur et gants', 'Eco Warrior Princess', '1523301551780-cd17359a95d0'],
     ['Brouette au jardin', 'Annie Spratt', '1621272156568-7306716648df'],
@@ -1558,7 +1629,7 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
     { id: 'l3', enseigne: 'e2', titre: 'Brouette de chantier 100 L, roue gonflée', categorie: 'chantier', photo: U('1621272156506-cdbdb6a47243'),
       prixReference: 89, prixDestockage: 39, motif: 'Surstock', fin: '2027-01-15',
       magasins: [{ nom: 'Matériaux du Val Vitry', cp: '94400', stock: 40 }, { nom: 'Matériaux du Val Ivry', cp: '94200', stock: 18 }] },
-    { id: 'l4', enseigne: 'e3', titre: 'Servante d’atelier 7 tiroirs garnie 150 pièces', categorie: 'meca', photo: U('1540104539488-92a51bbc0410'),
+    { id: 'l4', enseigne: 'e3', titre: 'Servante d’atelier 7 tiroirs garnie 150 pièces', categorie: 'meca', photo: U('1530124566582-a618bc2615dc'),
       prixReference: 699, prixDestockage: 349, motif: 'Emballage abîmé, produit neuf', fin: '2026-12-15',
       magasins: [{ nom: 'Forgeval, dépôt usine Gennevilliers', cp: '92230', stock: 6 }] },
     { id: 'l5', enseigne: 'e4', titre: 'Perforateur SDS+ 800 W, sorti du parc de location, révisé', categorie: 'electro', photo: U('1585201731775-0597e1be4bfb'),
@@ -2473,7 +2544,7 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
     <section class="hero hero-video" style="background-image:url('${PHOTOS.hero}')">
       ${videoFond(VIDEOS.accueil)}
       <div class="conteneur">
-        <h1>Vos outils méritent <em>une seconde vie</em>. Les vôtres aussi.</h1>
+        <h1>Le bon outil, <em>près de chez vous</em>.</h1>
         <p class="sous">Achetez à prix réduit, louez à deux rues de chez vous ou troquez ce qui dort au garage. Paiement sécurisé, caution protégée, profils vérifiés.</p>
         <div class="onglets-mode" id="onglets-hero">
           <button data-mode="" class="actif">Tout</button><button data-mode="vente">Acheter</button><button data-mode="location">Louer</button><button data-mode="echange">Échanger</button>
@@ -4202,6 +4273,40 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
     });
   }
 
+
+  /* ---------- Notre offre : tout ce que propose ZETools, et ce que cela coûte ---------- */
+  function vueOffre() {
+    const R = Z.REGLES, pc = (x) => `${Math.round(x * 1000) / 10} %`.replace('.', ','), AB = R.abonnementArtisan;
+    const pal = R.paliersCommission.map((p) => pc(p.taux)).join(', puis ');
+    const lignes = [
+      ['🛒', 'Acheter un outil', 'Prix plafonnés : jamais plus de 70 % du neuf', 'Aucun frais : vous payez le prix affiché', `Vendeur : ${pc(R.commissionVente)} sur la vente`, '#/annonces?mode=vente'],
+      ['📅', 'Louer un outil', 'À la journée, remise dès 3 et 7 jours', `Frais de service ${pc(R.fraisServiceLocataire)} · assurance casse optionnelle ${pc(R.assuranceTaux)} (${R.assuranceMin} € min.)`, `Propriétaire : ${pal} selon le nombre de locations`, '#/annonces?mode=location'],
+      ['🔁', 'Échanger', 'Troc d’outil contre outil, caution croisée possible', `${Z.euros(R.fraisEchange)} de mise en relation`, `${Z.euros(R.fraisEchange)} de mise en relation`, '#/annonces?mode=echange'],
+      ['🙋', 'Réserver un service', 'Un voisin ou un pro, à l’heure ou au forfait', `Frais de service ${pc(R.service.fraisClient)} · assurance optionnelle ${pc(R.service.assuranceClientTaux)}`, `Prestataire : ${pc(R.service.commission)} sur la prestation`, '#/services'],
+      ['🚨', 'Urgence travaux', 'Un professionnel vérifié, au plus vite', `Déplacement ${Z.euros(R.urgence.forfaitDeplacement)} · +${pc(R.urgence.majorationNuit)} la nuit, le dimanche et les jours fériés`, `Devis écrit au-delà de ${Z.euros(R.urgence.seuilDevisEcrit)}`, '#/urgence'],
+      ['🎁', 'Offrir des travaux', `Bon cadeau de ${R.coupon.min} à ${R.coupon.max} €, valable ${R.coupon.validiteMois} mois`, 'Aucun frais : le bon vaut ce que vous payez', 'Utilisable en plusieurs fois', '#/offrir'],
+      ['🏷️', 'Déstockage des enseignes', 'Du neuf en fin de série, retrait en magasin', 'Aucun frais pour l’acheteur', `Enseigne : ${pc(R.commissionDestockage)} par vente`, '#/destockage'],
+      ['🎬', 'Vidéos et fiches techniques', 'Tutoriels et pas-à-pas en PDF', 'Gratuit', 'Gratuit', '#/videos'],
+    ];
+    return `<div class="page"><div class="conteneur">
+      <div class="titre-section"><div><div class="surtitre">Notre offre</div><h2>Tout ce que fait ZETools, et ce que cela coûte</h2><p>L’inscription est gratuite. Vous ne payez que lorsqu’une transaction aboutit, et chaque frais est affiché avant le paiement.</p></div></div>
+
+      <div class="offres">
+        <div class="offre phare"><h3>Particuliers</h3><div class="tarif">0 € <small style="font-size:1rem">pour s’inscrire</small></div><ul><li>Annonces illimitées : vente, location, échange</li><li>Services entre voisins, urgence travaux, bons cadeaux</li><li>Paiement sécurisé, caution protégée, messagerie protégée</li><li>Prix plafonnés sous le prix du magasin</li></ul><a class="btn btn-cta" href="#/deposer">Déposer une annonce</a></div>
+        <div class="offre"><h3>Artisans</h3><div class="tarif">${AB.mensuel} € <small style="font-size:1rem">/ mois HT</small></div><ul><li>Toutes les demandes de travaux de votre zone</li><li>0 % de commission, 0 € par contact</li><li>Interventions d’urgence pour les pros assurés</li><li>${AB.annuel} € / an · ${AB.essaiJours} jours d’essai</li></ul><a class="btn btn-cta" href="#/espace-artisan">Ouvrir mon espace artisan</a></div>
+        <div class="offre"><h3>Enseignes</h3><div class="tarif">${pc(R.commissionDestockage)} <small style="font-size:1rem">par vente</small></div><ul><li>Grandes surfaces, négoces, fabricants, loueurs</li><li>Fins de série et surstocks, stock par magasin</li><li>0 € d’abonnement pendant le pilote</li></ul><a class="btn btn-cta" href="#/espace-enseigne">Espace enseigne</a></div>
+      </div>
+
+      <div class="titre-section" style="margin-top:44px"><div><div class="surtitre">Service par service</div><h2>Qui paie quoi</h2></div></div>
+      <div class="tableau-offre" role="table" aria-label="Tarifs par service">
+        <div class="to-ligne to-tete" role="row"><span role="columnheader">Service</span><span role="columnheader">Vous payez</span><span role="columnheader">L’autre partie</span></div>
+        ${lignes.map(([ic, t, d, client, autre, lien]) => `<a class="to-ligne" role="row" href="${lien}"><span role="cell"><b>${ic} ${t}</b><small>${d}</small></span><span role="cell" data-t="Vous payez">${client}</span><span role="cell" data-t="L’autre partie">${autre}</span></a>`).join('')}
+      </div>
+      <p class="note-legale">Prix TTC pour les particuliers, HT pour les professionnels. Les assurances restent facultatives et ne sont jamais cochées d’avance. Détail : <a href="#/legal/cgu">conditions générales</a> · <a href="#/legal/pros">conditions professionnels et enseignes</a> · <a href="#/legal/prix">règles de prix</a> · <a href="#/pros">offres professionnelles</a>.</p>
+      ${blocReassurance().replace('class="bloc reassurance"', 'class="bloc reassurance" style="margin-top:40px;border-radius:16px"')}
+    </div></div>`;
+  }
+
   /* ---------- routeur ---------- */
   function router() {
     const [chemin, qs] = (location.hash.slice(1) || '/').split('?');
@@ -4217,6 +4322,7 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
       case 'favoris': html = vueMonEspace(); apres = () => { brancherEspace(); const h = [...document.querySelectorAll('h3')].find((x) => x.textContent === 'Mes favoris'); if (h) h.scrollIntoView(); }; break;
       case 'deposer': html = vueDeposer(params); apres = brancherDeposer; break;
       case 'pros': html = vuePros(); break;
+      case 'offre': html = vueOffre(); break;
       case 'travaux': if (params.get('metier') !== null) { filtreTravaux.metier = params.get('metier'); filtreTravaux.vise = ''; } html = vueTravaux(); apres = brancherTravaux; break;
       case 'espace-artisan': html = vueEspaceArtisan(); apres = brancherEspaceArtisan; break;
       case 'reparer': html = vueReparer(); break;
