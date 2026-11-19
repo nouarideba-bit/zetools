@@ -1,0 +1,1652 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ZETOOLS · Achetez, louez, échangez vos outils entre voisins</title>
+  <meta name="description" content="La plateforme communautaire et sécurisée pour donner une seconde vie aux outils : achat, location et troc entre particuliers et professionnels en Île-de-France.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <style>
+/* ZETOOLS · charte : anthracite / acier, jaune chantier pour l'action, vert forêt pour la seconde main */
+:root {
+  --anthracite: #23272b;
+  --anthracite-2: #2f3439;
+  --acier: #6b7480;
+  --acier-clair: #c9cfd6;
+  --fond: #f4f5f6;
+  --carte: #ffffff;
+  --texte: #1d2125;
+  --texte-doux: #5a626b;
+  --jaune: #f5b700;
+  --jaune-fonce: #d99e00;
+  --orange: #e8590c;
+  --vert: #2b5f3a;
+  --vert-clair: #e5efe7;
+  --bord: #dde1e5;
+  --rayon: 12px;
+  --ombre: 0 1px 2px rgba(20, 24, 28, .06), 0 6px 18px rgba(20, 24, 28, .06);
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: var(--texte);
+  background: var(--fond);
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--fond); line-height: 1.5; }
+a { color: inherit; }
+img { display: block; max-width: 100%; }
+button, input, select, textarea { font: inherit; }
+.conteneur { max-width: 1200px; margin: 0 auto; padding: 0 16px; }
+
+/* --- En-tête --- */
+.entete { position: sticky; top: 0; z-index: 20; background: var(--anthracite); color: #fff; }
+.entete .conteneur { display: flex; align-items: center; gap: 16px; height: 68px; }
+.logo { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 1.35rem; letter-spacing: .5px; text-decoration: none; }
+.logo .marque-ze { color: var(--jaune); }
+.logo .pastille { width: 30px; height: 30px; border-radius: 8px; background: var(--jaune); display: grid; place-items: center; color: var(--anthracite); font-size: 18px; }
+.recherche-entete { flex: 1; display: flex; max-width: 520px; background: #fff; border-radius: 999px; overflow: hidden; }
+.recherche-entete input { flex: 1; border: 0; padding: 10px 16px; outline: none; color: var(--texte); min-width: 0; }
+.recherche-entete button { border: 0; background: var(--jaune); padding: 0 16px; cursor: pointer; font-weight: 600; }
+.actions-entete { display: flex; align-items: center; gap: 6px; }
+.icone-btn { position: relative; background: transparent; border: 0; color: #fff; padding: 8px; border-radius: 8px; cursor: pointer; font-size: 1.15rem; text-decoration: none; }
+.icone-btn:hover { background: var(--anthracite-2); }
+.icone-btn .bulle { position: absolute; top: 2px; right: 0; background: var(--orange); color: #fff; font-size: .65rem; border-radius: 999px; padding: 0 5px; font-weight: 700; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 0; border-radius: 10px; padding: 11px 18px; font-weight: 700; cursor: pointer; text-decoration: none; transition: background .15s, transform .05s; }
+.btn:active { transform: translateY(1px); }
+.btn-cta { background: var(--jaune); color: var(--anthracite); }
+.btn-cta:hover { background: var(--jaune-fonce); }
+.btn-sombre { background: var(--anthracite); color: #fff; }
+.btn-sombre:hover { background: var(--anthracite-2); }
+.btn-contour { background: transparent; border: 2px solid var(--anthracite); color: var(--anthracite); }
+.btn-vert { background: var(--vert); color: #fff; }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+
+/* --- Héro --- */
+.hero { position: relative; color: #fff; background: var(--anthracite) center/cover no-repeat; }
+.hero::before { content: ""; position: absolute; inset: 0; background: linear-gradient(100deg, rgba(25,28,31,.92) 0%, rgba(25,28,31,.75) 45%, rgba(25,28,31,.25) 100%); }
+.hero .conteneur { position: relative; padding: 72px 16px 88px; }
+.hero h1 { font-size: clamp(2rem, 4.5vw, 3.3rem); line-height: 1.1; margin: 0 0 14px; max-width: 680px; }
+.hero h1 em { font-style: normal; color: var(--jaune); }
+.hero p.sous { font-size: 1.15rem; max-width: 600px; color: #e7eaee; margin: 0 0 28px; }
+.moteur { background: #fff; border-radius: 14px; padding: 10px; display: grid; grid-template-columns: 1.2fr 1fr 1fr auto; gap: 8px; max-width: 880px; box-shadow: var(--ombre); }
+.moteur select, .moteur input { border: 1px solid var(--bord); border-radius: 10px; padding: 12px; color: var(--texte); background: #fff; min-width: 0; }
+.onglets-mode { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
+.onglets-mode button { border: 1px solid rgba(255,255,255,.35); background: rgba(255,255,255,.08); color: #fff; padding: 7px 14px; border-radius: 999px; cursor: pointer; font-weight: 600; }
+.onglets-mode button.actif { background: var(--jaune); border-color: var(--jaune); color: var(--anthracite); }
+.chiffres-hero { display: flex; gap: 28px; margin-top: 28px; flex-wrap: wrap; color: #cfd5db; font-size: .95rem; }
+.chiffres-hero b { color: #fff; font-size: 1.25rem; display: block; }
+
+/* --- Sections --- */
+section.bloc { padding: 56px 0; }
+.titre-section { display: flex; justify-content: space-between; align-items: end; gap: 16px; margin-bottom: 22px; flex-wrap: wrap; }
+.titre-section h2 { margin: 0; font-size: 1.7rem; }
+.titre-section p { margin: 4px 0 0; color: var(--texte-doux); }
+.surtitre { text-transform: uppercase; letter-spacing: 1.5px; font-size: .75rem; font-weight: 700; color: var(--vert); }
+
+.modes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.mode { background: var(--carte); border-radius: var(--rayon); overflow: hidden; box-shadow: var(--ombre); display: flex; flex-direction: column; }
+.mode img { height: 190px; width: 100%; object-fit: cover; }
+.mode .corps { padding: 18px 20px 22px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+.mode h3 { margin: 0; font-size: 1.2rem; }
+.mode p { margin: 0; color: var(--texte-doux); flex: 1; }
+.mode .lien { font-weight: 700; color: var(--anthracite); text-decoration: none; border-bottom: 2px solid var(--jaune); align-self: start; }
+
+.categories { display: grid; grid-template-columns: repeat(7, 1fr); gap: 12px; }
+.categorie { background: var(--carte); border: 1px solid var(--bord); border-radius: var(--rayon); padding: 18px 10px; text-align: center; cursor: pointer; text-decoration: none; transition: border-color .15s, transform .15s; }
+.categorie:hover { border-color: var(--jaune); transform: translateY(-2px); }
+.categorie .ico { font-size: 1.9rem; width: 56px; height: 56px; margin: 0 auto 8px; border-radius: 14px; background: var(--fond); display: grid; place-items: center; }
+.categorie span { font-weight: 600; font-size: .9rem; }
+
+.grille { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 18px; }
+.carte { background: var(--carte); border-radius: var(--rayon); overflow: hidden; box-shadow: var(--ombre); text-decoration: none; display: flex; flex-direction: column; transition: transform .15s; }
+.carte:hover { transform: translateY(-3px); }
+.carte .visuel { position: relative; aspect-ratio: 4 / 3; background: var(--acier-clair); overflow: hidden; }
+.carte .visuel img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.carte .badges { z-index: 1; position: absolute; top: 10px; left: 10px; display: flex; gap: 6px; flex-wrap: wrap; }
+.badge { font-size: .75rem; font-weight: 700; padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
+.badge-vente { background: var(--anthracite); color: #fff; }
+.badge-location { background: var(--jaune); color: var(--anthracite); }
+.badge-echange { background: var(--vert); color: #fff; }
+.badge-etat { background: var(--vert-clair); color: var(--vert); }
+.coeur { position: absolute; top: 8px; right: 8px; background: rgba(255,255,255,.92); border: 0; width: 34px; height: 34px; border-radius: 50%; cursor: pointer; font-size: 1rem; }
+.carte .infos { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+.carte h3 { margin: 0; font-size: 1rem; line-height: 1.3; }
+.carte .prix { font-weight: 800; font-size: 1.05rem; }
+.carte .prix small { font-weight: 500; color: var(--texte-doux); }
+.carte .meta { display: flex; justify-content: space-between; color: var(--texte-doux); font-size: .85rem; margin-top: auto; }
+
+.reassurance { background: var(--anthracite); color: #fff; }
+.reassurance .titre-section p { color: #b9c0c7; }
+.reassurance .surtitre { color: var(--jaune); }
+.garanties { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
+.garantie { background: var(--anthracite-2); border-radius: var(--rayon); padding: 20px; }
+.garantie .ico { font-size: 1.6rem; }
+.garantie h3 { margin: 10px 0 6px; font-size: 1.02rem; }
+.garantie p { margin: 0; color: #b9c0c7; font-size: .92rem; }
+
+.etapes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; counter-reset: etape; }
+.etape { background: var(--carte); border-radius: var(--rayon); padding: 20px; border-top: 4px solid var(--jaune); }
+.etape::before { counter-increment: etape; content: counter(etape); display: inline-grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--anthracite); color: #fff; font-weight: 700; margin-bottom: 8px; }
+.etape h3 { margin: 4px 0; font-size: 1rem; }
+.etape p { margin: 0; color: var(--texte-doux); font-size: .92rem; }
+
+.bandeau-pro { display: grid; grid-template-columns: 1.1fr 1fr; background: var(--vert); color: #fff; border-radius: 16px; overflow: hidden; }
+.bandeau-pro .texte { padding: 36px; }
+.bandeau-pro h2 { margin: 0 0 10px; }
+.bandeau-pro img { height: 100%; width: 100%; object-fit: cover; min-height: 240px; }
+
+/* --- Pied de page --- */
+.pied { background: #1a1d20; color: #aab2ba; padding: 48px 0 24px; margin-top: 40px; }
+.pied .colonnes { display: grid; grid-template-columns: 1.4fr repeat(4, 1fr); gap: 24px; }
+.pied h4 { color: #fff; margin: 0 0 10px; }
+.pied a { display: block; text-decoration: none; padding: 3px 0; font-size: .92rem; }
+.pied a:hover { color: var(--jaune); }
+.pied .bas { border-top: 1px solid #2c3136; margin-top: 32px; padding-top: 18px; font-size: .82rem; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.reseaux { display: flex; gap: 10px; margin-top: 12px; }
+.reseaux a { display: inline-grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: #2c3136; color: #fff; padding: 0; }
+
+/* --- Pages intérieures --- */
+.page { padding: 32px 0 48px; }
+.fil { color: var(--texte-doux); font-size: .9rem; margin-bottom: 16px; }
+.fil a { text-decoration: none; }
+.mise-en-page { display: grid; grid-template-columns: 250px 1fr; gap: 24px; align-items: start; }
+.filtres { background: var(--carte); border-radius: var(--rayon); padding: 18px; box-shadow: var(--ombre); display: flex; flex-direction: column; gap: 14px; position: sticky; top: 84px; }
+.filtres label { font-weight: 600; font-size: .9rem; display: flex; flex-direction: column; gap: 6px; }
+.filtres select, .filtres input { border: 1px solid var(--bord); border-radius: 8px; padding: 9px; font-weight: 400; }
+.vide { background: var(--carte); border-radius: var(--rayon); padding: 40px; text-align: center; color: var(--texte-doux); }
+
+.fiche { display: grid; grid-template-columns: 1.25fr 1fr; gap: 28px; align-items: start; }
+.fiche .photo-principale { border-radius: var(--rayon); overflow: hidden; aspect-ratio: 4/3; background: var(--acier-clair); }
+.fiche .photo-principale img { width: 100%; height: 100%; object-fit: cover; }
+.panneau { background: var(--carte); border-radius: var(--rayon); padding: 22px; box-shadow: var(--ombre); }
+.panneau + .panneau { margin-top: 16px; }
+.fiche h1 { margin: 6px 0 4px; font-size: 1.6rem; }
+.vendeur { display: flex; gap: 12px; align-items: center; }
+.avatar { width: 46px; height: 46px; border-radius: 50%; background: var(--anthracite); color: var(--jaune); display: grid; place-items: center; font-weight: 800; }
+.verifie { color: var(--vert); font-weight: 600; font-size: .85rem; }
+.onglets { display: flex; gap: 6px; margin: 14px 0; flex-wrap: wrap; }
+.onglets button { flex: 1; border: 1px solid var(--bord); background: #fff; padding: 9px; border-radius: 8px; font-weight: 700; cursor: pointer; }
+.onglets button.actif { background: var(--anthracite); color: #fff; border-color: var(--anthracite); }
+.ligne { display: flex; justify-content: space-between; padding: 6px 0; font-size: .95rem; }
+.ligne.total { border-top: 2px solid var(--anthracite); margin-top: 6px; padding-top: 10px; font-weight: 800; font-size: 1.05rem; }
+.ligne.discret { color: var(--texte-doux); font-size: .85rem; }
+.alerte { padding: 10px 12px; border-radius: 8px; font-size: .9rem; margin: 10px 0; }
+.alerte-erreur { background: #fdecea; color: #a52714; }
+.alerte-ok { background: var(--vert-clair); color: var(--vert); }
+.alerte-info { background: #fff6d6; color: #6b5200; }
+
+.calendrier { user-select: none; }
+.calendrier .tete { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-weight: 700; text-transform: capitalize; }
+.calendrier .tete button { border: 1px solid var(--bord); background: #fff; border-radius: 8px; width: 34px; height: 34px; cursor: pointer; }
+.calendrier .jours { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.calendrier .jours span { text-align: center; font-size: .75rem; color: var(--texte-doux); font-weight: 600; }
+.calendrier .jours button { aspect-ratio: 1; border: 0; border-radius: 8px; background: var(--fond); cursor: pointer; font-size: .88rem; }
+.calendrier .jours button:hover:not(:disabled) { outline: 2px solid var(--jaune); }
+.calendrier .jours button.occupe { background: #f2d4cc; color: #9a3412; text-decoration: line-through; cursor: not-allowed; }
+.calendrier .jours button.passe { color: #b6bcc2; background: transparent; cursor: not-allowed; }
+.calendrier .jours button.choisi { background: var(--jaune); font-weight: 800; }
+.calendrier .jours button.entre { background: #ffe9a8; }
+.legende { display: flex; gap: 14px; font-size: .8rem; color: var(--texte-doux); margin-top: 8px; flex-wrap: wrap; }
+.legende i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 4px; vertical-align: -1px; }
+
+.messagerie { display: grid; grid-template-columns: 280px 1fr; background: var(--carte); border-radius: var(--rayon); box-shadow: var(--ombre); min-height: 520px; overflow: hidden; }
+.conversations { border-right: 1px solid var(--bord); }
+.conversation { padding: 14px 16px; border-bottom: 1px solid var(--bord); cursor: pointer; }
+.conversation.actif { background: var(--fond); border-left: 4px solid var(--jaune); }
+.conversation small { color: var(--texte-doux); display: block; }
+.fil-messages { display: flex; flex-direction: column; }
+.fil-messages .messages { flex: 1; padding: 18px; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; max-height: 440px; }
+.msg { max-width: 75%; padding: 10px 14px; border-radius: 14px; background: var(--fond); }
+.msg.moi { align-self: flex-end; background: var(--anthracite); color: #fff; }
+.msg .masque { background: rgba(245,183,0,.25); border-radius: 4px; padding: 0 3px; font-weight: 600; }
+.saisie { display: flex; gap: 8px; padding: 12px; border-top: 1px solid var(--bord); }
+.saisie input { flex: 1; border: 1px solid var(--bord); border-radius: 10px; padding: 10px 12px; }
+
+.formulaire { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.formulaire label { display: flex; flex-direction: column; gap: 6px; font-weight: 600; font-size: .92rem; }
+.formulaire .large { grid-column: 1 / -1; }
+.formulaire input, .formulaire select, .formulaire textarea { border: 1px solid var(--bord); border-radius: 8px; padding: 10px; font-weight: 400; }
+.cases { display: flex; gap: 16px; flex-wrap: wrap; font-weight: 400; }
+.cases label { flex-direction: row; align-items: center; font-weight: 500; }
+
+table.tableau { width: 100%; border-collapse: collapse; background: var(--carte); border-radius: var(--rayon); overflow: hidden; box-shadow: var(--ombre); }
+.tableau th, .tableau td { text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--bord); font-size: .92rem; }
+.tableau th { background: var(--anthracite); color: #fff; font-weight: 600; }
+.statut { font-weight: 700; font-size: .8rem; padding: 2px 8px; border-radius: 999px; background: var(--vert-clair); color: var(--vert); }
+
+.offres { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+.offre { background: var(--carte); border-radius: var(--rayon); padding: 24px; box-shadow: var(--ombre); border-top: 5px solid var(--acier-clair); }
+.offre.phare { border-top-color: var(--jaune); }
+.offre .tarif { font-size: 1.8rem; font-weight: 800; }
+.offre ul { padding-left: 18px; color: var(--texte-doux); }
+
+.articles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+.article { background: var(--carte); border-radius: var(--rayon); overflow: hidden; box-shadow: var(--ombre); }
+.article img { height: 170px; width: 100%; object-fit: cover; }
+.article .corps { padding: 16px; }
+.article h3 { margin: 0 0 6px; font-size: 1.05rem; }
+.article p { margin: 0; color: var(--texte-doux); font-size: .92rem; }
+
+.toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--anthracite); color: #fff; padding: 12px 18px; border-radius: 10px; box-shadow: var(--ombre); z-index: 50; max-width: 90vw; }
+.maquette { background: var(--jaune); color: var(--anthracite); text-align: center; font-size: .8rem; font-weight: 600; padding: 5px 16px; }
+
+
+/* --- Artisans géolocalisés et réparation --- */
+.lien-entete { font-weight: 600; font-size: .9rem; color: var(--anthracite); padding: 6px 8px; border-radius: 8px; white-space: nowrap; }
+.lien-entete:hover { background: var(--vert-clair); color: var(--vert); }
+.hero-court { min-height: 0; padding: 56px 0; }
+.localisation { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; background: var(--carte); padding: 16px; border-radius: var(--rayon); box-shadow: var(--ombre); margin-bottom: 20px; }
+.localisation label { display: flex; flex-direction: column; font-size: .82rem; font-weight: 600; gap: 4px; }
+.localisation input, .localisation select { padding: 9px 10px; border: 1px solid var(--bord); border-radius: 8px; font: inherit; }
+.travaux-grille { display: grid; grid-template-columns: 1.15fr 1fr; gap: 22px; align-items: start; }
+.carte-geo { height: 380px; border-radius: var(--rayon); overflow: hidden; background: var(--vert-clair); box-shadow: var(--ombre); position: relative; z-index: 0; }
+.carte-geo > svg { width: 100%; height: 100%; display: block; }
+.liste-artisans { display: grid; gap: 12px; }
+.liste-artisans.deux-colonnes { grid-template-columns: 1fr 1fr; }
+.artisan-carte { background: var(--carte); border-radius: var(--rayon); padding: 16px; box-shadow: var(--ombre); display: grid; gap: 8px; }
+.artisan-carte h3 { margin: 0; font-size: 1.05rem; }
+.distance { display: inline-block; background: var(--anthracite); color: #fff; font-weight: 700; font-size: .78rem; padding: 3px 9px; border-radius: 999px; }
+.puces { display: flex; flex-wrap: wrap; gap: 6px; }
+.puce { background: var(--vert-clair); color: var(--vert); font-size: .78rem; font-weight: 600; padding: 3px 9px; border-radius: 999px; }
+.discret { color: var(--texte-doux); font-size: .88rem; }
+.floute { filter: blur(4px); pointer-events: none; user-select: none; }
+.abonnement { background: var(--carte); border-radius: var(--rayon); padding: 20px; box-shadow: var(--ombre); border-left: 6px solid var(--acier-clair); margin-bottom: 20px; }
+.abonnement.actif { border-left-color: var(--vert); }
+.chiffre { font-size: 1.8rem; font-weight: 800; color: var(--anthracite); }
+.reponse { background: var(--vert-clair); border-radius: 10px; padding: 12px; margin-top: 8px; }
+.form-reponse { display: grid; gap: 8px; margin-top: 10px; }
+.form-reponse textarea, .form-reponse input { padding: 9px 10px; border: 1px solid var(--bord); border-radius: 8px; font: inherit; }
+
+/* --- Adaptation mobile --- */
+@media (max-width: 1000px) {
+  .categories { grid-template-columns: repeat(4, 1fr); }
+  .garanties { grid-template-columns: repeat(2, 1fr); }
+  .etapes { grid-template-columns: repeat(2, 1fr); }
+  .pied .colonnes { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 760px) {
+  .entete .conteneur { height: auto; flex-wrap: wrap; padding-top: 10px; padding-bottom: 10px; }
+  .recherche-entete { order: 3; max-width: none; flex-basis: 100%; }
+  .btn-deposer-texte { display: none; }
+  .moteur { grid-template-columns: 1fr; }
+  .modes, .articles, .offres, .fiche, .mise-en-page, .bandeau-pro, .formulaire, .messagerie { grid-template-columns: 1fr; }
+  .categories { grid-template-columns: repeat(2, 1fr); }
+  .garanties, .etapes { grid-template-columns: 1fr; }
+  .filtres { position: static; }
+  .conversations { border-right: 0; border-bottom: 1px solid var(--bord); }
+  .tableau { display: block; overflow-x: auto; }
+  .travaux-grille, .liste-artisans.deux-colonnes { grid-template-columns: 1fr; }
+  .lien-entete { display: none; }
+  .carte-geo { height: 300px; }
+}
+
+</style>
+</head>
+<body>
+  <div class="maquette">Maquette phase 1 · paiements et comptes simulés · données fictives</div>
+  <header class="entete">
+    <div class="conteneur">
+      <a class="logo" href="#/"><span class="pastille">⚒</span><span><span class="marque-ze">ZE</span>TOOLS</span></a>
+      <form class="recherche-entete" id="recherche-entete" role="search">
+        <input id="q-entete" type="search" placeholder="Outil, marque ou code postal…" aria-label="Rechercher">
+        <button type="submit">Chercher</button>
+      </form>
+      <nav class="actions-entete" aria-label="Mon compte">
+        <a class="lien-entete" href="#/travaux" title="Trouver un artisan près de chez moi">📍 Artisans</a>
+        <a class="lien-entete" href="#/reparer" title="Outils à réparer">🪛 Réparer</a>
+        <a class="icone-btn" href="#/messages" title="Messagerie">💬<span class="bulle" id="bulle-msg">2</span></a>
+        <a class="icone-btn" href="#/favoris" title="Favoris">♡</a>
+        <a class="icone-btn" href="#/mon-espace" title="Mon espace">👤</a>
+        <a class="btn btn-cta" href="#/deposer">＋ <span class="btn-deposer-texte">Déposer une annonce</span></a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="vue"></main>
+
+  <footer class="pied">
+    <div class="conteneur">
+      <div class="colonnes">
+        <div>
+          <a class="logo" href="#/" style="color:#fff"><span class="pastille">⚒</span><span><span class="marque-ze">ZE</span>TOOLS</span></a>
+          <p>Le bon outil, au bon moment, à deux rues de chez vous. Moins d’achats inutiles, plus d’outils qui servent.</p>
+          <div class="reseaux"><a href="#/" title="Instagram">IG</a><a href="#/" title="Facebook">f</a><a href="#/" title="YouTube">▶</a><a href="#/" title="LinkedIn">in</a></div>
+        </div>
+        <div><h4>Plateforme</h4><a href="#/annonces?mode=vente">Acheter</a><a href="#/annonces?mode=location">Louer</a><a href="#/annonces?mode=echange">Échanger</a><a href="#/deposer">Déposer une annonce</a><a href="#/travaux">Trouver un artisan</a><a href="#/reparer">Outils à réparer</a><a href="#/espace-artisan">Espace artisan abonné</a></div>
+        <div><h4>Ressources</h4><a href="#/atelier">L’Atelier · guide du bon bricoleur</a><a href="#/aide">FAQ</a><a href="#/securite">Sécurité et caution</a><a href="#/pros">Offres professionnelles</a></div>
+        <div><h4>Légal</h4><a href="#/legal">Conditions générales</a><a href="#/legal">Mentions légales</a><a href="#/legal">Confidentialité</a><a href="#/credits">Crédits photos</a></div>
+        <div><h4>Zone pilote</h4><p style="font-size:.92rem;margin:0">Île-de-France · lancement 2027.<br>Électroportatif et jardinage d’abord.</p></div>
+      </div>
+      <div class="bas"><span>© 2026 ZETOOLS · maquette non contractuelle</span><span>Paiements opérés à terme par un prestataire agréé (Stripe Connect ou Mangopay)</span></div>
+    </div>
+  </footer>
+
+  <script>
+/* ZETOOLS · logique métier de la maquette phase 1 (prix, réservations, masquage).
+   Fonctionne dans le navigateur (window.ZT) et sous Node (module.exports) pour les tests. */
+(function (racine) {
+  'use strict';
+
+  const REGLES = {
+    fraisServiceLocataire: 0.08,          // frais de service payés par le locataire
+    commissionVente: 0.08,                // commission sur une vente (séquestre)
+    fraisEchange: 2.9,                    // frais fixes de mise en relation d'un troc, par partie
+    // commission dégressive côté propriétaire, selon le nombre de locations déjà faites
+    paliersCommission: [
+      { aPartirDe: 0, taux: 0.15 },
+      { aPartirDe: 5, taux: 0.12 },
+      { aPartirDe: 20, taux: 0.10 },
+    ],
+    // remise longue durée sur le tarif journalier
+    remises: [
+      { aPartirDe: 7, taux: 0.20 },
+      { aPartirDe: 3, taux: 0.10 },
+    ],
+    assuranceTaux: 0.07,                  // garantie casse / vol optionnelle, en % de la location
+    assuranceMin: 3,                      // € minimum
+    dureeMax: 30,
+    // abonnement artisan : accès à toutes les demandes de travaux, sans commission ni frais par contact
+    abonnementArtisan: { mensuel: 39, annuel: 390, essaiJours: 30 },
+    tailles: { petit: 'Petits travaux', moyen: 'Travaux moyens', gros: 'Gros travaux' },
+  };
+
+  const arrondi = (x) => Math.round(x * 100) / 100;
+  const JOUR = 86400000;
+
+  function versDate(d) {
+    if (d instanceof Date) return new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+    const [a, m, j] = String(d).split('-').map(Number);
+    return new Date(Date.UTC(a, m - 1, j));
+  }
+  function versTexte(d) { return d.toISOString().slice(0, 10); }
+
+  /** Nombre de jours facturés, bornes incluses (du 3 au 5 = 3 jours). */
+  function nbJours(debut, fin) {
+    return Math.round((versDate(fin) - versDate(debut)) / JOUR) + 1;
+  }
+
+  function tauxRemise(jours) {
+    for (const r of REGLES.remises) if (jours >= r.aPartirDe) return r.taux;
+    return 0;
+  }
+
+  function tauxCommission(locationsFaites) {
+    let t = REGLES.paliersCommission[0].taux;
+    for (const p of REGLES.paliersCommission) if (locationsFaites >= p.aPartirDe) t = p.taux;
+    return t;
+  }
+
+  /** Décompte complet d'une location. */
+  function devisLocation(outil, debut, fin, opts = {}) {
+    const jours = nbJours(debut, fin);
+    if (!(jours >= 1)) throw new Error('Dates invalides : la fin précède le début.');
+    const brut = arrondi(outil.prixJour * jours);
+    const remise = arrondi(brut * tauxRemise(jours));
+    const location = arrondi(brut - remise);
+    const assurance = opts.assurance === false ? 0
+      : arrondi(Math.max(REGLES.assuranceMin, location * REGLES.assuranceTaux));
+    const fraisService = arrondi(location * REGLES.fraisServiceLocataire);
+    const totalLocataire = arrondi(location + assurance + fraisService);
+    const taux = tauxCommission(opts.locationsProprietaire || 0);
+    const commission = arrondi(location * taux);
+    const versementProprietaire = arrondi(location - commission);
+    return {
+      jours, brut, remise, location, assurance, fraisService, totalLocataire,
+      caution: outil.caution, // bloquée (empreinte bancaire), jamais encaissée sauf litige
+      tauxCommission: taux, commission, versementProprietaire,
+      margePlateforme: arrondi(commission + fraisService),
+    };
+  }
+
+  function devisVente(outil) {
+    const commission = arrondi(outil.prixVente * REGLES.commissionVente);
+    return { prix: outil.prixVente, commission, versementVendeur: arrondi(outil.prixVente - commission) };
+  }
+
+  /** Vérifie qu'une période est réservable. Renvoie { ok, raison }. */
+  function verifierDisponibilite(outil, reservations, debut, fin, aujourdHui) {
+    if (!debut || !fin) return { ok: false, raison: 'Choisissez une date de début et de fin.' };
+    const d = versDate(debut), f = versDate(fin);
+    if (isNaN(d) || isNaN(f)) return { ok: false, raison: 'Dates invalides.' };
+    if (f < d) return { ok: false, raison: 'La date de fin précède la date de début.' };
+    if (aujourdHui && d < versDate(aujourdHui)) return { ok: false, raison: 'La date de début est passée.' };
+    if (nbJours(debut, fin) > REGLES.dureeMax) return { ok: false, raison: `Location limitée à ${REGLES.dureeMax} jours.` };
+    for (const r of reservations) {
+      if (r.outilId !== outil.id || r.statut === 'annulée') continue;
+      const rd = versDate(r.debut), rf = versDate(r.fin);
+      if (d <= rf && rd <= f) {
+        return { ok: false, raison: `Déjà réservé du ${formatDate(r.debut)} au ${formatDate(r.fin)}.` };
+      }
+    }
+    for (const b of (outil.indispo || [])) {
+      if (d <= versDate(b.fin) && versDate(b.debut) <= f) return { ok: false, raison: 'Le propriétaire a bloqué ces dates.' };
+    }
+    return { ok: true };
+  }
+
+  /** Jours occupés d'un outil (texte AAAA-MM-JJ) pour colorer le calendrier. */
+  function joursOccupes(outil, reservations) {
+    const res = new Set();
+    const ajouter = (a, b) => {
+      for (let t = versDate(a).getTime(); t <= versDate(b).getTime(); t += JOUR) res.add(versTexte(new Date(t)));
+    };
+    reservations.filter((r) => r.outilId === outil.id && r.statut !== 'annulée').forEach((r) => ajouter(r.debut, r.fin));
+    (outil.indispo || []).forEach((b) => ajouter(b.debut, b.fin));
+    return res;
+  }
+
+  /* --- Masquage des coordonnées dans la messagerie (anti-contournement) --- */
+  const MASQUE = '[coordonnées masquées · visibles après la transaction]';
+  const MOTIFS = [
+    // e-mails, y compris « arobase » / « (at) » et « point » écrits en toutes lettres
+    /[\w.+-]+\s*(?:@|\(at\)|\[at\]|\barobase\b)\s*[\w-]+\s*(?:\.|\bpoint\b)\s*[a-z]{2,}/gi,
+    // IBAN (FR76 ...)
+    /\b[A-Z]{2}\d{2}(?:[ ]?[A-Z0-9]{4}){3,7}(?:[ ]?[A-Z0-9]{1,3})?\b/g,
+    // téléphones : +33 6 12 34 56 78, 0033..., 06 12 34 56 78, 06.12.34.56.78, 0612345678
+    /(?:\+|\b00)\s*33\s*\(?0?\)?\s*[1-9](?:[\s.-]*\d{2}){4}/g,
+    /\b0[1-9](?:[\s.-]*\d{2}){4}\b/g,
+    // suite de 9 chiffres ou plus, même séparés (tentative de contournement)
+    /\b\d(?:[\s.-]?\d){8,}\b/g,
+    // numéros écrits en lettres : « zéro six douze ... »
+    /\bz[ée]ro\s+(?:un|deux|trois|quatre|cinq|six|sept|huit|neuf)\b[^.!?\n]*/gi,
+    // adresses postales : « 12 rue ... », « 3 bis avenue ... »
+    /\b\d{1,4}\s*(?:bis|ter)?\s*,?\s*(?:rue|avenue|av\.|boulevard|bd|chemin|allée|impasse|place|route|quai|cours)\s+[A-Za-zÀ-ÿ'’ -]{2,40}/gi,
+    // liens et messageries externes
+    /\b(?:https?:\/\/|www\.)\S+/gi,
+    /\b(?:whatsapp|whats app|telegram|signal|messenger|snapchat|instagram|insta)\b[^.!?\n]*/gi,
+  ];
+
+  /** Renvoie { texte, masque } : le texte avec les coordonnées remplacées. */
+  function masquerCoordonnees(texte, transactionConfirmee) {
+    if (transactionConfirmee) return { texte, masque: false };
+    let sortie = texte, masque = false;
+    for (const m of MOTIFS) {
+      sortie = sortie.replace(m, () => { masque = true; return MASQUE; });
+    }
+    return { texte: sortie, masque };
+  }
+
+  /** Recherche et filtres du catalogue. */
+  function filtrer(annonces, f = {}) {
+    const q = (f.q || '').trim().toLowerCase();
+    return annonces.filter((a) => {
+      if (f.mode && !a.modes.includes(f.mode)) return false;
+      if (f.categorie && a.categorie !== f.categorie) return false;
+      if (f.lieu) {
+        const l = f.lieu.trim().toLowerCase();
+        if (l && !(a.ville.toLowerCase().includes(l) || a.cp.startsWith(l))) return false;
+      }
+      if (q) {
+        const texte = `${a.titre} ${a.marque} ${a.description} ${a.ville} ${a.cp}`.toLowerCase();
+        if (!q.split(/\s+/).every((mot) => texte.includes(mot))) return false;
+      }
+      return true;
+    });
+  }
+
+  /* --- Géolocalisation et mise en relation avec les artisans (petits travaux) --- */
+  // Centres approximatifs de communes d'Île-de-France (zone pilote), puis repli par département.
+  const COMMUNES = {
+    '75011': ['Paris 11e', 48.8590, 2.3800], '75015': ['Paris 15e', 48.8417, 2.2999], '75018': ['Paris 18e', 48.8925, 2.3444],
+    '75020': ['Paris 20e', 48.8634, 2.3984], '93100': ['Montreuil', 48.8638, 2.4485], '94300': ['Vincennes', 48.8474, 2.4392],
+    '92100': ['Boulogne-Billancourt', 48.8397, 2.2399], '94100': ['Saint-Maur-des-Fossés', 48.7994, 2.4997],
+    '94130': ['Nogent-sur-Marne', 48.8370, 2.4827], '93200': ['Saint-Denis', 48.9362, 2.3574], '92200': ['Neuilly-sur-Seine', 48.8846, 2.2697],
+    '94200': ['Ivry-sur-Seine', 48.8131, 2.3847], '92130': ['Issy-les-Moulineaux', 48.8245, 2.2738], '93300': ['Aubervilliers', 48.9146, 2.3821],
+    '94000': ['Créteil', 48.7904, 2.4556], '92000': ['Nanterre', 48.8924, 2.2071], '78000': ['Versailles', 48.8049, 2.1204],
+    '91300': ['Massy', 48.7309, 2.2713], '95100': ['Argenteuil', 48.9472, 2.2467], '93160': ['Noisy-le-Grand', 48.8486, 2.5528],
+    '94400': ['Vitry-sur-Seine', 48.7875, 2.3928], '77420': ['Champs-sur-Marne', 48.8526, 2.6024],
+  };
+  const DEPARTEMENTS = {
+    '75': ['Paris', 48.8566, 2.3522], '92': ['Hauts-de-Seine', 48.8500, 2.2400], '93': ['Seine-Saint-Denis', 48.9100, 2.4800],
+    '94': ['Val-de-Marne', 48.7800, 2.4700], '77': ['Seine-et-Marne', 48.6000, 2.9000], '78': ['Yvelines', 48.8000, 1.9800],
+    '91': ['Essonne', 48.6000, 2.2500], '95': ['Val-d’Oise', 49.0500, 2.1000],
+  };
+
+  /** Position approximative d'un code postal d'Île-de-France, ou null hors zone. */
+  function positionCodePostal(cp) {
+    const c = String(cp || '').trim();
+    if (!/^\d{5}$/.test(c)) return null;
+    const v = COMMUNES[c] || DEPARTEMENTS[c.slice(0, 2)];
+    if (!v) return null;
+    return { lat: v[1], lon: v[2], libelle: v[0], precision: COMMUNES[c] ? 'commune' : 'département' };
+  }
+
+  /** Distance à vol d'oiseau en km (formule de haversine). */
+  function distanceKm(a, b) {
+    const R = 6371, rad = (x) => (x * Math.PI) / 180;
+    const dLat = rad(b.lat - a.lat), dLon = rad(b.lon - a.lon);
+    const h = Math.sin(dLat / 2) ** 2 + Math.cos(rad(a.lat)) * Math.cos(rad(b.lat)) * Math.sin(dLon / 2) ** 2;
+    return 2 * R * Math.asin(Math.min(1, Math.sqrt(h)));
+  }
+
+  /** Position floutée (~1 km) : seule montrée aux autres membres avant acceptation du devis. */
+  function positionApprochee(p) {
+    return { lat: Math.round(p.lat * 100) / 100, lon: Math.round(p.lon * 100) / 100 };
+  }
+
+  function formatDistance(km) {
+    if (km < 1) return 'moins de 1 km';
+    return `${km < 10 ? km.toFixed(1).replace('.', ',') : Math.round(km)} km`;
+  }
+
+  /** Artisans qui peuvent intervenir chez le client : dans le rayon de recherche du client
+      ET dans leur propre rayon d'intervention, triés du plus proche au plus loin. */
+  function artisansProches(client, artisans, opts = {}) {
+    const rayon = opts.rayonKm || 10;
+    return artisans
+      .filter((a) => !opts.metier || a.metiers.includes(opts.metier))
+      .map((a) => ({ artisan: a, km: distanceKm(client, a) }))
+      .filter((x) => x.km <= rayon && x.km <= x.artisan.rayonKm)
+      .sort((x, y) => x.km - y.km || y.artisan.note - x.artisan.note);
+  }
+
+  /** Demandes visibles par un artisan : dans son rayon, de ses métiers, encore ouvertes. */
+  function demandesPourArtisan(artisan, demandes) {
+    return demandes
+      .filter((d) => d.statut === 'ouverte' && artisan.metiers.includes(d.metier))
+      .map((d) => ({ demande: d, km: distanceKm(artisan, d) }))
+      .filter((x) => x.km <= artisan.rayonKm)
+      .sort((x, y) => x.km - y.km);
+  }
+
+  /* --- Abonnement artisan : un forfait mensuel, accès illimité aux demandes, aucune commission --- */
+  function abonnementActif(artisan, aujourdHui) {
+    const ab = artisan.abonnement;
+    if (!ab || !ab.finPeriode) return false;
+    return versDate(ab.finPeriode) >= versDate(aujourdHui);
+  }
+
+  /** Prix d'un abonnement selon la périodicité, avec l'économie sur un an. */
+  function coutAbonnement(periodicite) {
+    const f = REGLES.abonnementArtisan;
+    if (periodicite === 'annuel') {
+      return { prix: f.annuel, periode: 'an', parMois: arrondi(f.annuel / 12), economieAn: arrondi(f.mensuel * 12 - f.annuel) };
+    }
+    return { prix: f.mensuel, periode: 'mois', parMois: f.mensuel, economieAn: 0 };
+  }
+
+  /** Un artisan peut-il répondre à une demande ? Renvoie { ok, raison }. */
+  function peutRepondre(artisan, demande, aujourdHui) {
+    if (!abonnementActif(artisan, aujourdHui)) return { ok: false, raison: 'Abonnement artisan requis pour répondre aux clients.' };
+    if (demande.statut !== 'ouverte') return { ok: false, raison: 'Cette demande n’est plus ouverte.' };
+    if (!artisan.metiers.includes(demande.metier)) return { ok: false, raison: 'Ce métier ne figure pas sur votre profil.' };
+    if (distanceKm(artisan, demande) > artisan.rayonKm) return { ok: false, raison: 'Chantier hors de votre zone d’intervention.' };
+    if (demande.taille === 'gros' && !artisan.decennale) return { ok: false, raison: 'Les gros travaux exigent une assurance décennale vérifiée.' };
+    if ((demande.reponses || []).some((r) => r.artisanId === artisan.id)) return { ok: false, raison: 'Vous avez déjà répondu à cette demande.' };
+    return { ok: true };
+  }
+
+  function formatDate(t) {
+    const [a, m, j] = String(t).split('-');
+    return `${j}/${m}/${a}`;
+  }
+  function euros(x) {
+    return Number(x).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' });
+  }
+
+  const ZT = {
+    REGLES, MASQUE, nbJours, tauxRemise, tauxCommission, devisLocation, devisVente,
+    verifierDisponibilite, joursOccupes, masquerCoordonnees, filtrer, formatDate, euros, versTexte, versDate,
+    positionCodePostal, distanceKm, positionApprochee, formatDistance, artisansProches, demandesPourArtisan, abonnementActif, coutAbonnement, peutRepondre,
+  };
+  if (typeof module !== 'undefined' && module.exports) module.exports = ZT;
+  else racine.ZT = ZT;
+})(typeof window !== 'undefined' ? window : globalThis);
+
+</script>
+  <script>
+/* ZETOOLS · données fictives de la maquette (aucune personne réelle).
+   Photos : Unsplash, licence Unsplash (usage commercial gratuit, sans attribution obligatoire).
+   Les images sont appelées depuis images.unsplash.com, rien n'est téléchargé. */
+(function (racine) {
+  'use strict';
+  const U = (id, w = 900) => `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=${w}&q=70`;
+
+  const PHOTOS = {
+    hero: U('1504148455328-c376907d081c', 1800),
+    vente: U('1572981779307-38b8cabb2407'),
+    location: U('1617576683096-00fc8eecb3af'),
+    echange: U('1621272156568-7306716648df'),
+    atelier: U('1774963711952-713bb7a52c4e', 1400),
+  };
+
+  const CATEGORIES = [
+    { id: 'electro', nom: 'Électroportatif', icone: '⚡' },
+    { id: 'main', nom: 'Outillage à main', icone: '🔧' },
+    { id: 'meca', nom: 'Mécanique auto/moto', icone: '🔩' },
+    { id: 'jardin', nom: 'Jardinage & Motoculture', icone: '🌿' },
+    { id: 'chantier', nom: 'Gros œuvre & Chantier', icone: '🧱' },
+    { id: 'atelier', nom: 'Atelier & Rangement', icone: '🗄️' },
+    { id: 'epi', nom: 'Équipements de protection', icone: '🦺' },
+  ];
+
+  const MEMBRES = {
+    m1: { id: 'm1', nom: 'Karim B.', ville: 'Montreuil', note: 4.9, avis: 37, verifie: true, pro: false, locations: 23, depuis: '2026' },
+    m2: { id: 'm2', nom: 'Atelier Duval', ville: 'Vincennes', note: 4.8, avis: 112, verifie: true, pro: true, locations: 64, depuis: '2026' },
+    m3: { id: 'm3', nom: 'Sophie L.', ville: 'Boulogne-Billancourt', note: 4.7, avis: 15, verifie: true, pro: false, locations: 6, depuis: '2026' },
+    m4: { id: 'm4', nom: 'Thomas R.', ville: 'Saint-Maur-des-Fossés', note: 5.0, avis: 8, verifie: true, pro: false, locations: 2, depuis: '2026' },
+    m5: { id: 'm5', nom: 'Jardins de l’Est', ville: 'Nogent-sur-Marne', note: 4.6, avis: 54, verifie: true, pro: true, locations: 31, depuis: '2026' },
+  };
+
+  // modes : 'vente' | 'location' | 'echange' (une annonce peut en cumuler plusieurs)
+  const ANNONCES = [
+    { id: 'a1', titre: 'Perceuse-visseuse 18 V + 2 batteries', marque: 'DeWalt', categorie: 'electro', etat: 'Très bon état',
+      modes: ['location', 'vente'], prixJour: 9, prixVente: 145, caution: 120, ville: 'Montreuil', cp: '93100', membre: 'm1',
+      photo: U('1572981779307-38b8cabb2407'), description: 'Perceuse-visseuse sans fil, mandrin 13 mm, 2 batteries 2 Ah et chargeur rapide. Idéale montage de meubles, fixations murales, perçage bois et métal.',
+      indispo: [] },
+    { id: 'a2', titre: 'Perforateur SDS+ 800 W avec coffret de forets', marque: 'Bosch', categorie: 'electro', etat: 'Bon état',
+      modes: ['location'], prixJour: 14, prixVente: null, caution: 200, ville: 'Vincennes', cp: '94300', membre: 'm2',
+      photo: U('1585201731775-0597e1be4bfb'), description: 'Perforateur burineur pour béton et parpaing. Livré avec 6 forets SDS+ et burin plat. Parfait pour un week-end de travaux.',
+      indispo: [{ debut: '2026-12-24', fin: '2026-12-26' }] },
+    { id: 'a3', titre: 'Visseuse à chocs 18 V compacte', marque: 'Milwaukee', categorie: 'electro', etat: 'Très bon état',
+      modes: ['location', 'echange'], prixJour: 8, prixVente: null, caution: 110, ville: 'Boulogne-Billancourt', cp: '92100', membre: 'm3',
+      photo: U('1623161551706-318825cd18ef'), description: 'Visseuse à chocs pour vis longues et terrasses bois. Recherche en échange : ponceuse excentrique.',
+      echangeContre: 'Ponceuse excentrique', indispo: [] },
+    { id: 'a4', titre: 'Sécateur de précision + gants', marque: 'Felco', categorie: 'jardin', etat: 'Neuf',
+      modes: ['vente', 'echange'], prixJour: null, prixVente: 38, caution: 0, ville: 'Nogent-sur-Marne', cp: '94130', membre: 'm5',
+      photo: U('1523301551780-cd17359a95d0'), description: 'Sécateur à lame forgée, jamais utilisé, avec gants de jardinage taille 9.',
+      echangeContre: 'Cisaille à haies manuelle', indispo: [] },
+    { id: 'a5', titre: 'Brouette renforcée 100 L', marque: 'Haemmerlin', categorie: 'chantier', etat: 'Bon état',
+      modes: ['location', 'vente'], prixJour: 5, prixVente: 45, caution: 40, ville: 'Saint-Maur-des-Fossés', cp: '94100', membre: 'm4',
+      photo: U('1621272156506-cdbdb6a47243'), description: 'Brouette de chantier, roue gonflée neuve. Pratique pour un déménagement de terre ou un petit chantier de maçonnerie.',
+      indispo: [] },
+    { id: 'a6', titre: 'Lot de 4 outils de jardin à main', marque: 'Fiskars', categorie: 'jardin', etat: 'Très bon état',
+      modes: ['vente'], prixJour: null, prixVente: 25, caution: 0, ville: 'Montreuil', cp: '93100', membre: 'm1',
+      photo: U('1526381805515-3fec2d69e7cc'), description: 'Transplantoir, griffe, binette et serfouette. Manches bois, rangement mural inclus.',
+      indispo: [] },
+    { id: 'a7', titre: 'Pelles et bêches de terrassement (×3)', marque: 'Leborgne', categorie: 'chantier', etat: 'Bon état',
+      modes: ['location'], prixJour: 6, prixVente: null, caution: 50, ville: 'Nogent-sur-Marne', cp: '94130', membre: 'm5',
+      photo: U('1537877853655-34bdcda5e833'), description: 'Une pelle ronde, une pelle carrée et une bêche. Pour une plantation de haie ou une tranchée.',
+      indispo: [] },
+    { id: 'a8', titre: 'Coffret d’outils d’ébéniste anciens', marque: 'Peugeot Frères', categorie: 'main', etat: 'Bon état',
+      modes: ['echange', 'vente'], prixJour: null, prixVente: 90, caution: 0, ville: 'Vincennes', cp: '94300', membre: 'm2',
+      photo: U('1774963711952-713bb7a52c4e'), description: 'Rabots, ciseaux à bois et vilebrequin restaurés. Échange possible contre une scie sur table.',
+      echangeContre: 'Scie sur table', indispo: [] },
+    { id: 'a9', titre: 'Taille-haie / élagage : kit de taille', marque: 'Wolf-Garten', categorie: 'jardin', etat: 'Très bon état',
+      modes: ['location'], prixJour: 7, prixVente: null, caution: 60, ville: 'Boulogne-Billancourt', cp: '92100', membre: 'm3',
+      photo: U('1617576683096-00fc8eecb3af'), description: 'Cisaille à haies, sécateur de force et gants. La bonne trousse pour la taille d’automne.',
+      indispo: [] },
+    { id: 'a10', titre: 'Servante d’atelier garnie 120 pièces', marque: 'Facom', categorie: 'meca', etat: 'Bon état',
+      modes: ['vente', 'location'], prixJour: 12, prixVente: 390, caution: 300, ville: 'Saint-Maur-des-Fossés', cp: '94100', membre: 'm4',
+      photo: U('1540104539488-92a51bbc0410'), description: 'Servante 6 tiroirs : douilles, clés mixtes, tournevis, pinces. Pour une révision moto ou une vidange.',
+      indispo: [] },
+    { id: 'a11', titre: 'Visseuse 18 V : batterie HS, pour bricoleur', marque: 'Makita', categorie: 'electro', etat: 'À réparer',
+      modes: ['vente', 'echange'], prixJour: null, prixVente: 25, caution: 0, ville: 'Vincennes', cp: '94300', membre: 'm2',
+      photo: U('1623161551727-54c918bdcec1'), description: 'Moteur et mandrin OK, la batterie ne tient plus la charge. Idéal pour qui a déjà des batteries Makita 18 V.',
+      panne: 'Batterie à remplacer', echangeContre: 'Batterie 18 V', indispo: [] },
+    { id: 'a12', titre: 'Lot d’outils anciens à restaurer', marque: 'Divers', categorie: 'main', etat: 'À réparer',
+      modes: ['vente'], prixJour: null, prixVente: 15, caution: 0, ville: 'Nogent-sur-Marne', cp: '94130', membre: 'm5',
+      photo: U('1774365294150-5d6051b6c53a'), description: 'Râteaux et outils de jardin anciens : manches à changer, métal sain. Pour amateur de restauration.',
+      panne: 'Manches cassés, rouille de surface', indispo: [] },
+  ];
+
+  // réservations déjà présentes (fictives) pour colorer les calendriers
+  const RESERVATIONS = [
+    { id: 'r1', outilId: 'a1', debut: '2026-11-27', fin: '2026-11-29', statut: 'confirmée', locataire: 'Vous' },
+    { id: 'r2', outilId: 'a2', debut: '2026-12-05', fin: '2026-12-07', statut: 'confirmée', locataire: 'Inès M.' },
+    { id: 'r3', outilId: 'a7', debut: '2026-11-21', fin: '2026-11-22', statut: 'confirmée', locataire: 'Paul D.' },
+  ];
+
+  const ARTICLES = [
+    { id: 'l1', titre: 'Perceuse ou perforateur : lequel louer pour votre mur ?', duree: '4 min', photo: U('1585201731775-0597e1be4bfb', 700),
+      chapo: 'Placo, brique, béton : la bonne machine selon le support, et pourquoi louer coûte moins cher qu’acheter pour trois trous par an.' },
+    { id: 'l2', titre: 'Tailler sa haie en novembre : le guide express', duree: '5 min', photo: U('1617576683096-00fc8eecb3af', 700),
+      chapo: 'Les gestes, le calendrier et le matériel à emprunter à un voisin plutôt qu’à stocker au garage.' },
+    { id: 'l3', titre: 'Bien rendre un outil loué : la check-list', duree: '3 min', photo: U('1526381805515-3fec2d69e7cc', 700),
+      chapo: 'Nettoyage, batteries, photos de restitution : comment récupérer votre caution sans discussion.' },
+  ];
+
+  const CREDITS = [
+    ['Atelier, outils sur établi', 'Barn Images', '1504148455328-c376907d081c'],
+    ['Perceuse-visseuse', 'Syed Hussaini', '1572981779307-38b8cabb2407'],
+    ['Perforateur', 'contributeur Unsplash', '1585201731775-0597e1be4bfb'],
+    ['Visseuse à chocs', 'contributeur Unsplash', '1623161551706-318825cd18ef'],
+    ['Servante d’atelier', 'contributeur Unsplash', '1540104539488-92a51bbc0410'],
+    ['Taille de haie', 'Crystal Jo', '1617576683096-00fc8eecb3af'],
+    ['Sécateur et gants', 'Eco Warrior Princess', '1523301551780-cd17359a95d0'],
+    ['Brouette au jardin', 'Annie Spratt', '1621272156568-7306716648df'],
+    ['Brouette sur terre', 'Annie Spratt', '1621272156506-cdbdb6a47243'],
+    ['Outils de jardin à main', 'Annie Spratt', '1526381805515-3fec2d69e7cc'],
+    ['Pelles sur l’herbe', 'dylan nolte', '1537877853655-34bdcda5e833'],
+    ['Outils d’ébéniste anciens', 'Fer Troulik', '1774963711952-713bb7a52c4e'],
+    ['Visseuse à réparer', 'contributeur Unsplash', '1623161551727-54c918bdcec1'],
+    ['Râteaux anciens', 'Giovanni L.', '1774365294150-5d6051b6c53a'],
+    ['Artisan au travail', 'contributeur Unsplash', '1621905251918-48416bd8575a'],
+  ];
+
+  /* --- Artisans abonnés (fictifs) et demandes de travaux de clients --- */
+  const METIERS = [
+    { id: 'bricolage', nom: 'Petits travaux & bricolage', icone: '🔨' },
+    { id: 'plomberie', nom: 'Plomberie', icone: '🚰' },
+    { id: 'electricite', nom: 'Électricité', icone: '💡' },
+    { id: 'peinture', nom: 'Peinture & revêtements', icone: '🖌️' },
+    { id: 'menuiserie', nom: 'Menuiserie & montage', icone: '🪚' },
+    { id: 'jardin', nom: 'Jardinage & élagage', icone: '🌳' },
+    { id: 'maconnerie', nom: 'Maçonnerie & gros œuvre', icone: '🧱' },
+    { id: 'reparation', nom: 'Réparation d’outillage', icone: '🪛' },
+  ];
+
+  // position = siège ou domicile de l'artisan ; rayonKm = zone d'intervention qu'il a choisie
+  const ARTISANS = [
+    { id: 'p1', nom: 'Atelier Duval', ville: 'Vincennes', lat: 48.8474, lon: 2.4392, rayonKm: 12, metiers: ['menuiserie', 'bricolage'],
+      tarifHoraire: 45, note: 4.8, avis: 112, siret: true, decennale: true, delai: 'sous 48 h', outils: true,
+      presentation: 'Menuisier agenceur, 15 ans d’expérience. Pose de cuisines, dressings, parquets et petites réparations.',
+      abonnement: { formule: 'annuel', finPeriode: '2027-06-30' } },
+    { id: 'p2', nom: 'Karim Services', ville: 'Montreuil', lat: 48.8638, lon: 2.4485, rayonKm: 8, metiers: ['bricolage', 'peinture', 'menuiserie'],
+      tarifHoraire: 35, note: 4.9, avis: 64, siret: true, decennale: false, delai: 'dès demain', outils: true,
+      presentation: 'Auto-entrepreneur multiservice : montage de meubles, fixations, peinture, petits dépannages.',
+      abonnement: { formule: 'mensuel', finPeriode: '2026-12-15' } },
+    { id: 'p3', nom: 'Plomberie Lemaire', ville: 'Saint-Maur-des-Fossés', lat: 48.7994, lon: 2.4997, rayonKm: 15, metiers: ['plomberie'],
+      tarifHoraire: 55, note: 4.7, avis: 89, siret: true, decennale: true, delai: 'urgences 7j/7', outils: true,
+      presentation: 'Fuites, chauffe-eau, remplacement de sanitaires, rénovation de salle de bains.',
+      abonnement: { formule: 'mensuel', finPeriode: '2026-12-03' } },
+    { id: 'p4', nom: 'Élec Nogent', ville: 'Nogent-sur-Marne', lat: 48.8370, lon: 2.4827, rayonKm: 10, metiers: ['electricite'],
+      tarifHoraire: 50, note: 4.6, avis: 41, siret: true, decennale: true, delai: 'sous 3 jours', outils: true,
+      presentation: 'Mise aux normes, tableaux électriques, prises et éclairages, bornes de recharge.',
+      abonnement: { formule: 'annuel', finPeriode: '2027-03-31' } },
+    { id: 'p5', nom: 'Jardins de l’Est', ville: 'Nogent-sur-Marne', lat: 48.8395, lon: 2.4790, rayonKm: 20, metiers: ['jardin'],
+      tarifHoraire: 38, note: 4.6, avis: 54, siret: true, decennale: false, delai: 'sous 1 semaine', outils: true,
+      presentation: 'Taille de haies, élagage, entretien de jardins, évacuation des déchets verts.',
+      abonnement: { formule: 'mensuel', finPeriode: '2026-12-20' } },
+    { id: 'p6', nom: 'Bâti Rénov 92', ville: 'Boulogne-Billancourt', lat: 48.8397, lon: 2.2399, rayonKm: 25, metiers: ['maconnerie', 'peinture'],
+      tarifHoraire: 48, note: 4.5, avis: 27, siret: true, decennale: true, delai: 'sous 2 semaines', outils: true,
+      presentation: 'Ouverture de murs porteurs, dalles, ravalement, rénovation complète.',
+      abonnement: { formule: 'annuel', finPeriode: '2027-09-30' } },
+    { id: 'p7', nom: 'Thomas Bricole', ville: 'Ivry-sur-Seine', lat: 48.8131, lon: 2.3847, rayonKm: 6, metiers: ['bricolage'],
+      tarifHoraire: 30, note: 4.4, avis: 9, siret: true, decennale: false, delai: 'le week-end', outils: false,
+      presentation: 'Petits travaux le week-end ; je loue les outils sur ZETOOLS si besoin.',
+      abonnement: null },
+    { id: 'p8', nom: 'Répar’Outils 93', ville: 'Montreuil', lat: 48.8610, lon: 2.4420, rayonKm: 15, metiers: ['reparation'],
+      tarifHoraire: 40, note: 4.9, avis: 73, siret: true, decennale: false, delai: 'diagnostic sous 48 h', outils: true,
+      presentation: 'Réparation d’électroportatif et de motoculture toutes marques : charbons, interrupteurs, batteries, carburateurs, affûtage.',
+      abonnement: { formule: 'annuel', finPeriode: '2027-08-31' } },
+    { id: 'p9', nom: 'Atelier Moteur Créteil', ville: 'Créteil', lat: 48.7904, lon: 2.4556, rayonKm: 20, metiers: ['reparation', 'jardin'],
+      tarifHoraire: 42, note: 4.7, avis: 38, siret: true, decennale: false, delai: 'sous 1 semaine', outils: true,
+      presentation: 'Tondeuses, débroussailleuses, tronçonneuses : révision, réparation et remise en route avant la saison.',
+      abonnement: { formule: 'mensuel', finPeriode: '2026-12-28' } },
+  ];
+
+  // demandes de clients : position déjà floutée à ~1 km, adresse exacte jamais publiée
+  const DEMANDES = [
+    { id: 'd1', metier: 'menuiserie', taille: 'petit', titre: 'Monter une cuisine IKEA (6 caissons)', ville: 'Vincennes', cp: '94300', lat: 48.85, lon: 2.44,
+      budget: '300 à 500 €', quand: 'Avant le 15 décembre', outilsClient: false, statut: 'ouverte', publiee: '2026-11-18', reponses: [] },
+    { id: 'd2', metier: 'plomberie', taille: 'petit', titre: 'Fuite sous l’évier de la cuisine', ville: 'Saint-Mandé', cp: '94160', lat: 48.84, lon: 2.42,
+      budget: 'Moins de 150 €', quand: 'Urgent', outilsClient: false, statut: 'ouverte', publiee: '2026-11-19', reponses: [] },
+    { id: 'd3', metier: 'peinture', taille: 'moyen', titre: 'Repeindre un séjour de 25 m² (murs et plafond)', ville: 'Montreuil', cp: '93100', lat: 48.86, lon: 2.45,
+      budget: '800 à 1 200 €', quand: 'Janvier 2027', outilsClient: false, statut: 'ouverte', publiee: '2026-11-17', reponses: [] },
+    { id: 'd4', metier: 'maconnerie', taille: 'gros', titre: 'Ouvrir un mur porteur entre cuisine et salon', ville: 'Issy-les-Moulineaux', cp: '92130', lat: 48.82, lon: 2.27,
+      budget: '5 000 à 9 000 €', quand: 'Printemps 2027', outilsClient: false, statut: 'ouverte', publiee: '2026-11-15', reponses: [] },
+    { id: 'd5', metier: 'jardin', taille: 'petit', titre: 'Tailler 20 m de haie de thuyas', ville: 'Le Perreux-sur-Marne', cp: '94170', lat: 48.84, lon: 2.50,
+      budget: '200 à 300 €', quand: 'Ce mois-ci', outilsClient: true, statut: 'ouverte', publiee: '2026-11-19', reponses: [] },
+    { id: 'd6', metier: 'electricite', taille: 'moyen', titre: 'Remplacer le tableau électrique d’un T3', ville: 'Fontenay-sous-Bois', cp: '94120', lat: 48.85, lon: 2.48,
+      budget: '1 000 à 1 800 €', quand: 'Sous un mois', outilsClient: false, statut: 'ouverte', publiee: '2026-11-16', reponses: [] },
+    { id: 'd7', metier: 'bricolage', taille: 'petit', titre: 'Fixer une TV murale et 3 étagères', ville: 'Paris 20e', cp: '75020', lat: 48.86, lon: 2.40,
+      budget: 'Moins de 150 €', quand: 'Ce week-end', outilsClient: true, statut: 'ouverte', publiee: '2026-11-19', reponses: [] },
+    { id: 'd8', metier: 'reparation', taille: 'petit', titre: 'Perceuse Bosch qui ne démarre plus (étincelles)', ville: 'Bagnolet', cp: '93170', lat: 48.87, lon: 2.42,
+      budget: 'Moins de 150 €', quand: 'Cette semaine', outilsClient: true, statut: 'ouverte', publiee: '2026-11-18', reponses: [],
+      outil: 'Perceuse à percussion Bosch PSB 650', panne: 'Étincelles à l’arrière puis arrêt' },
+    { id: 'd9', metier: 'reparation', taille: 'petit', titre: 'Tondeuse thermique qui cale à chaud', ville: 'Champigny-sur-Marne', cp: '94500', lat: 48.82, lon: 2.51,
+      budget: '150 à 500 €', quand: 'Pas pressé', outilsClient: true, statut: 'ouverte', publiee: '2026-11-17', reponses: [],
+      outil: 'Tondeuse Honda HRG 466', panne: 'Démarre à froid, cale après 10 minutes' },
+  ];
+
+  PHOTOS.artisans = U('1621905251918-48416bd8575a', 1400);
+
+  const D = { PHOTOS, CATEGORIES, MEMBRES, ANNONCES, RESERVATIONS, ARTICLES, CREDITS, METIERS, ARTISANS, DEMANDES };
+  if (typeof module !== 'undefined' && module.exports) module.exports = D;
+  else racine.ZT_DONNEES = D;
+})(typeof window !== 'undefined' ? window : globalThis);
+
+</script>
+  <script>
+/* ZETOOLS · application de la maquette (routeur par #, vues, état local). */
+(function () {
+  'use strict';
+  const { PHOTOS, CATEGORIES, MEMBRES, ANNONCES, RESERVATIONS, ARTICLES, CREDITS } = window.ZT_DONNEES;
+  const Z = window.ZT;
+  const AUJOURDHUI = Z.versTexte(Z.versDate(new Date()));
+  const vue = document.getElementById('vue');
+
+  /* ---------- état persistant (navigateur seulement) ---------- */
+  const CLE = 'zetools-maquette-v1';
+  const ETAT_INITIAL = () => ({
+    reservations: [],
+    favoris: [],
+    annonces: [],
+    conversations: [
+      { id: 'c1', annonceId: 'a2', avec: 'm2', confirmee: false, messages: [
+        { de: 'moi', texte: 'Bonjour, le perforateur est-il disponible le week-end du 13 décembre ?' },
+        { de: 'eux', texte: 'Bonjour ! Oui, il est libre. Réservez directement sur la fiche, la caution est bloquée sur votre carte.' },
+      ] },
+      { id: 'c2', annonceId: 'a3', avec: 'm3', confirmee: false, messages: [
+        { de: 'eux', texte: 'Votre ponceuse m’intéresse pour l’échange contre ma visseuse à chocs. Elle a beaucoup servi ?' },
+      ] },
+    ],
+  });
+  function charger() {
+    try { const t = localStorage.getItem(CLE); if (t) return Object.assign(ETAT_INITIAL(), JSON.parse(t)); } catch (e) { /* stockage indisponible */ }
+    return ETAT_INITIAL();
+  }
+  let etat = charger();
+  function sauver() { try { localStorage.setItem(CLE, JSON.stringify(etat)); } catch (e) { /* ignoré */ } }
+
+  const toutesAnnonces = () => ANNONCES.concat(etat.annonces);
+  const toutesReservations = () => RESERVATIONS.concat(etat.reservations);
+  const annonce = (id) => toutesAnnonces().find((a) => a.id === id);
+  const membre = (id) => MEMBRES[id] || { id: 'moi', nom: 'Vous', ville: 'Paris', note: 5, avis: 0, verifie: true, pro: false, locations: 0 };
+
+  /* ---------- utilitaires ---------- */
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const catNom = (id) => (CATEGORIES.find((c) => c.id === id) || {}).nom || '';
+  const initiales = (nom) => nom.split(/\s+/).map((m) => m[0]).join('').slice(0, 2).toUpperCase();
+  function toast(texte) {
+    const t = document.createElement('div'); t.className = 'toast'; t.textContent = texte;
+    document.body.appendChild(t); setTimeout(() => t.remove(), 3800);
+  }
+  function badges(a) {
+    const b = [];
+    if (a.modes.includes('vente')) b.push(`<span class="badge badge-vente">Vente ${Z.euros(a.prixVente)}</span>`);
+    if (a.modes.includes('location')) b.push(`<span class="badge badge-location">Location ${Z.euros(a.prixJour)}/j</span>`);
+    if (a.modes.includes('echange')) b.push('<span class="badge badge-echange">Échange</span>');
+    return b.join('');
+  }
+  function prixPrincipal(a) {
+    if (a.modes.includes('location')) return `${Z.euros(a.prixJour)} <small>/ jour</small>`;
+    if (a.modes.includes('vente')) return Z.euros(a.prixVente);
+    return '<small>Troc · contre</small> ' + esc(a.echangeContre || 'à proposer');
+  }
+  function carte(a) {
+    const m = membre(a.membre); const fav = etat.favoris.includes(a.id);
+    return `<a class="carte" href="#/annonce/${a.id}">
+      <div class="visuel">${a.photo ? `<img loading="lazy" src="${a.photo}" alt="${esc(a.titre)}">` : ''}
+        <div class="badges">${badges(a)}</div>
+        <button class="coeur" data-fav="${a.id}" aria-label="Ajouter aux favoris">${fav ? '❤️' : '♡'}</button></div>
+      <div class="infos"><span class="badge badge-etat" style="align-self:start">${esc(a.etat)}</span>
+        <h3>${esc(a.titre)}</h3><div class="prix">${prixPrincipal(a)}</div>
+        <div class="meta"><span>📍 ${esc(a.ville)}</span><span>★ ${m.note.toFixed(1)} (${m.avis})</span></div></div></a>`;
+  }
+  document.addEventListener('click', (e) => {
+    const f = e.target.closest('[data-fav]');
+    if (!f) return;
+    e.preventDefault(); e.stopPropagation();
+    const id = f.dataset.fav;
+    etat.favoris = etat.favoris.includes(id) ? etat.favoris.filter((x) => x !== id) : etat.favoris.concat(id);
+    sauver(); f.textContent = etat.favoris.includes(id) ? '❤️' : '♡';
+    toast(etat.favoris.includes(id) ? 'Ajouté à vos favoris' : 'Retiré de vos favoris');
+  });
+
+  /* ---------- vues ---------- */
+  function vueAccueil() {
+    const une = toutesAnnonces().slice(0, 8);
+    return `
+    <section class="hero" style="background-image:url('${PHOTOS.hero}')">
+      <div class="conteneur">
+        <h1>Vos outils méritent <em>une seconde vie</em>. Les vôtres aussi.</h1>
+        <p class="sous">Achetez à prix réduit, louez à deux rues de chez vous ou troquez ce qui dort au garage. Paiement sécurisé, caution protégée, profils vérifiés.</p>
+        <div class="onglets-mode" id="onglets-hero">
+          <button data-mode="" class="actif">Tout</button><button data-mode="vente">Acheter</button><button data-mode="location">Louer</button><button data-mode="echange">Échanger</button>
+        </div>
+        <form class="moteur" id="moteur">
+          <input name="q" placeholder="Perforateur, tondeuse, Makita…" aria-label="Quel outil ?">
+          <select name="cat" aria-label="Catégorie"><option value="">Toutes catégories</option>${CATEGORIES.map((c) => `<option value="${c.id}">${c.nom}</option>`).join('')}</select>
+          <input name="lieu" placeholder="Ville ou code postal" aria-label="Localisation">
+          <button class="btn btn-cta" type="submit">Rechercher</button>
+        </form>
+        <div class="chiffres-hero"><div><b>×10</b>un outil prêté sert dix fois plus</div><div><b>-70 %</b>louer plutôt qu’acheter pour 2 jours</div><div><b>Île-de-France</b>zone pilote 2027</div></div>
+      </div>
+    </section>
+
+    <section class="bloc"><div class="conteneur">
+      <div class="titre-section"><div><div class="surtitre">Trois façons d’utiliser ZETOOLS</div><h2>Achetez, louez ou échangez</h2></div></div>
+      <div class="modes">
+        <div class="mode"><img src="${PHOTOS.vente}" alt="Perceuse-visseuse sur un établi"><div class="corps"><h3>Acheter / Vendre</h3><p>Équipez-vous à prix réduit avec du matériel contrôlé, ou rentabilisez les outils qui dorment dans votre cave. Paiement bloqué jusqu’à la remise.</p><a class="lien" href="#/annonces?mode=vente">Voir les outils à vendre →</a></div></div>
+        <div class="mode"><img src="${PHOTOS.location}" alt="Taille d’une haie avec des gants de travail"><div class="corps"><h3>Louer entre voisins</h3><p>Besoin d’un perforateur pour un week-end ? Louez-le à côté de chez vous, à la journée, avec caution et assurance casse en option.</p><a class="lien" href="#/annonces?mode=location">Louer près de chez moi →</a></div></div>
+        <div class="mode"><img src="${PHOTOS.echange}" alt="Brouette dans un jardin"><div class="corps"><h3>Échanger / Troquer</h3><p>Échangez un outil dont vous n’avez plus l’usage contre celui qu’il vous faut. Sans argent, avec la même protection.</p><a class="lien" href="#/annonces?mode=echange">Proposer un échange →</a></div></div>
+      </div>
+    </div></section>
+
+    <section class="bloc" style="padding-top:0"><div class="conteneur">
+      <div class="titre-section"><div><div class="surtitre">Catégories</div><h2>Trouvez le bon matériel</h2></div></div>
+      <div class="categories">${CATEGORIES.map((c) => `<a class="categorie" href="#/annonces?cat=${c.id}"><div class="ico">${c.icone}</div><span>${c.nom}</span></a>`).join('')}</div>
+    </div></section>
+
+    <section class="bloc" style="padding-top:0"><div class="conteneur">
+      <div class="titre-section"><div><div class="surtitre">À la une</div><h2>Annonces près de chez vous</h2><p>Sélection en Île-de-France, mise à jour en continu.</p></div><a class="btn btn-contour" href="#/annonces">Toutes les annonces</a></div>
+      <div class="grille">${une.map(carte).join('')}</div>
+    </div></section>
+
+    <section class="bloc" style="padding-top:0"><div class="conteneur">
+      <div class="titre-section"><div><div class="surtitre">Travaux et réparation</div><h2>Vous avez l’outil, il vous manque la main ?</h2><p>Des artisans géolocalisés près de chez vous, et des réparateurs pour les outils en panne.</p></div></div>
+      <div class="modes">
+        <div class="mode"><img src="${PHOTOS.artisans}" alt="Artisan au travail"><div class="corps"><h3>📍 Trouver un artisan</h3><p>Petits, moyens ou gros travaux : publiez votre demande gratuitement, les artisans abonnés de votre secteur vous répondent, classés par distance.</p><a class="lien" href="#/travaux">Voir les artisans autour de moi →</a></div></div>
+        <div class="mode"><img src="${PHOTOS.atelier}" alt="Établi d’atelier"><div class="corps"><h3>🪛 Outils à réparer</h3><p>Faites réparer un outil en panne près de chez vous, ou vendez-le pour pièces plutôt que de le jeter.</p><a class="lien" href="#/reparer">Donner une seconde vie →</a></div></div>
+        <div class="mode"><div class="corps"><h3>🧑‍🔧 Vous êtes artisan ?</h3><p><b>39 € par mois</b>, sans commission ni coût par contact : accédez à toutes les demandes de travaux de votre zone. 30 jours d’essai.</p><a class="btn btn-cta" href="#/espace-artisan">Ouvrir mon espace artisan</a></div></div>
+      </div>
+    </div></section>
+
+    ${blocReassurance()}
+
+    <section class="bloc"><div class="conteneur">
+      <div class="titre-section"><div><div class="surtitre">Comment ça marche</div><h2>Une location en quatre étapes</h2></div></div>
+      <div class="etapes">
+        <div class="etape"><h3>Je choisis mes dates</h3><p>Le calendrier de l’outil montre en direct les jours libres.</p></div>
+        <div class="etape"><h3>Je paie sur ZETOOLS</h3><p>Le loyer est bloqué, la caution n’est qu’une empreinte bancaire.</p></div>
+        <div class="etape"><h3>Je récupère l’outil</h3><p>Coordonnées dévoilées après paiement, photos d’état à la remise.</p></div>
+        <div class="etape"><h3>Je rends, on se note</h3><p>Le propriétaire est payé, la caution est libérée, chacun laisse un avis.</p></div>
+      </div>
+    </div></section>
+
+    <section class="bloc" style="padding-top:0"><div class="conteneur">
+      <div class="bandeau-pro"><div class="texte"><div class="surtitre" style="color:#cfe6d5">Professionnels</div><h2>Loueurs, artisans, jardiniers : rejoignez la phase pilote</h2><p>Publiez votre parc, gérez vos disponibilités et soyez trouvé par les particuliers de votre secteur. Commission dégressive, sans engagement.</p><a class="btn btn-cta" href="#/pros">Découvrir les offres pro</a></div>
+      <img src="${PHOTOS.atelier}" alt="Outils d’atelier anciens"></div>
+    </div></section>
+
+    <section class="bloc" style="padding-top:0"><div class="conteneur">
+      <div class="titre-section"><div><div class="surtitre">L’Atelier</div><h2>Le guide du bon bricoleur</h2></div><a class="btn btn-contour" href="#/atelier">Tous les articles</a></div>
+      ${grilleArticles()}
+    </div></section>`;
+  }
+
+  function blocReassurance() {
+    return `<section class="bloc reassurance"><div class="conteneur">
+      <div class="titre-section"><div><div class="surtitre">Confiance et sécurité</div><h2>Protégé du premier message au retour de l’outil</h2><p>Ces protections ne valent que pour les transactions réglées sur ZETOOLS.</p></div></div>
+      <div class="garanties">
+        <div class="garantie"><div class="ico">🔒</div><h3>Paiement sécurisé</h3><p>Fonds en séquestre chez un prestataire agréé, versés au vendeur après confirmation de la remise.</p></div>
+        <div class="garantie"><div class="ico">💳</div><h3>Caution protégée</h3><p>Simple empreinte bancaire pendant la location, libérée au retour de l’outil en bon état.</p></div>
+        <div class="garantie"><div class="ico">✅</div><h3>Profils vérifiés</h3><p>Identité, téléphone et, pour les pros, numéro SIRET contrôlés avant la première annonce payante.</p></div>
+        <div class="garantie"><div class="ico">⭐</div><h3>Avis communautaires</h3><p>Seuls les membres ayant réellement loué, acheté ou échangé peuvent laisser un avis.</p></div>
+        <div class="garantie"><div class="ico">🛡️</div><h3>Assurance casse</h3><p>Option casse et vol pendant la location, à partir de 3 € par réservation.</p></div>
+      </div></div></section>`;
+  }
+
+  function grilleArticles() {
+    return `<div class="articles">${ARTICLES.map((a) => `<article class="article"><img loading="lazy" src="${a.photo}" alt=""><div class="corps"><small class="surtitre">${a.duree} de lecture</small><h3>${esc(a.titre)}</h3><p>${esc(a.chapo)}</p></div></article>`).join('')}</div>`;
+  }
+
+  function vueAnnonces(params) {
+    const f = { mode: params.get('mode') || '', categorie: params.get('cat') || '', q: params.get('q') || '', lieu: params.get('lieu') || '' };
+    const res = Z.filtrer(toutesAnnonces(), f);
+    const titre = f.mode === 'vente' ? 'Outils à vendre' : f.mode === 'location' ? 'Outils à louer' : f.mode === 'echange' ? 'Outils à échanger' : 'Toutes les annonces';
+    return `<div class="page"><div class="conteneur">
+      <div class="fil"><a href="#/">Accueil</a> › ${titre}</div>
+      <div class="mise-en-page">
+        <form class="filtres" id="filtres">
+          <label>Recherche<input name="q" value="${esc(f.q)}" placeholder="Outil, marque…"></label>
+          <label>Transaction<select name="mode"><option value="">Toutes</option><option value="vente" ${f.mode === 'vente' ? 'selected' : ''}>Vente</option><option value="location" ${f.mode === 'location' ? 'selected' : ''}>Location</option><option value="echange" ${f.mode === 'echange' ? 'selected' : ''}>Échange</option></select></label>
+          <label>Catégorie<select name="cat"><option value="">Toutes</option>${CATEGORIES.map((c) => `<option value="${c.id}" ${f.categorie === c.id ? 'selected' : ''}>${c.nom}</option>`).join('')}</select></label>
+          <label>Ville ou code postal<input name="lieu" value="${esc(f.lieu)}" placeholder="94300"></label>
+          <button class="btn btn-cta" type="submit">Filtrer</button>
+          <a href="#/annonces" style="font-size:.9rem;text-align:center">Effacer les filtres</a>
+        </form>
+        <div>
+          <div class="titre-section"><div><h2>${titre}</h2><p>${res.length} annonce${res.length > 1 ? 's' : ''} en Île-de-France</p></div></div>
+          ${res.length ? `<div class="grille">${res.map(carte).join('')}</div>` : '<div class="vide">Aucun outil ne correspond. Élargissez la zone ou <a href="#/deposer">publiez une demande</a>.</div>'}
+        </div>
+      </div></div></div>`;
+  }
+
+  /* --- fiche outil : réservation, achat, échange --- */
+  let selection = { debut: null, fin: null, mois: null, onglet: null, assurance: true };
+  function vueFiche(id) {
+    const a = annonce(id);
+    if (!a) return '<div class="page"><div class="conteneur vide">Annonce introuvable. <a href="#/annonces">Retour aux annonces</a></div></div>';
+    const m = membre(a.membre);
+    if (selection.id !== id) selection = { id, debut: null, fin: null, mois: AUJOURDHUI.slice(0, 7), onglet: a.modes[0], assurance: true };
+    return `<div class="page"><div class="conteneur">
+      <div class="fil"><a href="#/">Accueil</a> › <a href="#/annonces?cat=${a.categorie}">${catNom(a.categorie)}</a> › ${esc(a.titre)}</div>
+      <div class="fiche">
+        <div>
+          <div class="photo-principale">${a.photo ? `<img src="${a.photo.replace('w=900', 'w=1400')}" alt="${esc(a.titre)}">` : ''}</div>
+          <div class="panneau" style="margin-top:16px">
+            <h2 style="margin-top:0">Description</h2><p>${esc(a.description)}</p>
+            <div class="ligne"><span>Marque</span><b>${esc(a.marque)}</b></div>
+            <div class="ligne"><span>État</span><b>${esc(a.etat)}</b></div>
+            <div class="ligne"><span>Catégorie</span><b>${catNom(a.categorie)}</b></div>
+            ${a.echangeContre ? `<div class="ligne"><span>Échange recherché</span><b>${esc(a.echangeContre)}</b></div>` : ''}
+            <div class="ligne"><span>Remise</span><b>📍 ${esc(a.ville)} (${esc(a.cp)}) · adresse exacte après paiement</b></div>
+          </div>
+        </div>
+        <div>
+          <div class="panneau">
+            <div class="badges" style="display:flex;gap:6px;flex-wrap:wrap">${badges(a)}<span class="badge badge-etat">${esc(a.etat)}</span></div>
+            <h1>${esc(a.titre)}</h1>
+            <div class="vendeur" style="margin-top:12px"><div class="avatar">${initiales(m.nom)}</div><div><b>${esc(m.nom)}</b>${m.pro ? ' <span class="badge badge-vente">PRO</span>' : ''}<br><span class="verifie">✔ Profil vérifié</span> · ★ ${m.note.toFixed(1)} (${m.avis} avis) · ${m.locations} transactions</div></div>
+            <div class="onglets" id="onglets-fiche">${a.modes.map((md) => `<button data-onglet="${md}" class="${selection.onglet === md ? 'actif' : ''}">${{ vente: 'Acheter', location: 'Louer', echange: 'Échanger' }[md]}</button>`).join('')}</div>
+            <div id="zone-transaction">${zoneTransaction(a)}</div>
+          </div>
+          <div class="panneau"><b>💬 Une question ?</b><p style="margin:6px 0 10px;color:var(--texte-doux)">Écrivez au propriétaire. Téléphone, e-mail et adresse sont masqués jusqu’à la transaction : c’est ce qui vous protège.</p><a class="btn btn-contour" href="#/messages?annonce=${a.id}">Contacter ${esc(m.nom)}</a></div>
+        </div>
+      </div></div></div>`;
+  }
+
+  function zoneTransaction(a) {
+    const o = selection.onglet;
+    if (o === 'vente') {
+      const d = Z.devisVente(a);
+      return `<div class="ligne"><span>Prix</span><b>${Z.euros(d.prix)}</b></div>
+        <div class="ligne discret"><span>Protection acheteur (séquestre)</span><span>incluse</span></div>
+        <div class="ligne total"><span>Vous payez</span><span>${Z.euros(d.prix)}</span></div>
+        <div class="alerte alerte-info">Le vendeur reçoit ${Z.euros(d.versementVendeur)} une fois la remise confirmée (commission ZETOOLS ${Z.euros(d.commission)}).</div>
+        <button class="btn btn-cta" style="width:100%" data-action="acheter">Acheter avec paiement sécurisé</button>`;
+    }
+    if (o === 'echange') {
+      return `<p>Le propriétaire cherche : <b>${esc(a.echangeContre || 'à discuter')}</b>.</p>
+        <label style="display:flex;flex-direction:column;gap:6px;font-weight:600">Votre proposition<textarea id="proposition" rows="3" style="border:1px solid var(--bord);border-radius:8px;padding:10px" placeholder="Ex. : ponceuse excentrique Makita, très bon état, avec 20 disques"></textarea></label>
+        <div class="ligne discret"><span>Frais de mise en relation, par partie</span><span>${Z.euros(Z.REGLES.fraisEchange)}</span></div>
+        <button class="btn btn-vert" style="width:100%;margin-top:10px" data-action="echanger">Proposer l’échange</button>`;
+    }
+    // location
+    let detail = '';
+    if (selection.debut && selection.fin) {
+      const v = Z.verifierDisponibilite(a, toutesReservations(), selection.debut, selection.fin, AUJOURDHUI);
+      if (!v.ok) detail = `<div class="alerte alerte-erreur">${esc(v.raison)}</div>`;
+      else {
+        const d = Z.devisLocation(a, selection.debut, selection.fin, { assurance: selection.assurance, locationsProprietaire: membre(a.membre).locations });
+        detail = `<div class="alerte alerte-ok">Du ${Z.formatDate(selection.debut)} au ${Z.formatDate(selection.fin)} · ${d.jours} jour${d.jours > 1 ? 's' : ''}</div>
+          <div class="ligne"><span>${Z.euros(a.prixJour)} × ${d.jours} j</span><span>${Z.euros(d.brut)}</span></div>
+          ${d.remise ? `<div class="ligne" style="color:var(--vert)"><span>Remise longue durée</span><span>− ${Z.euros(d.remise)}</span></div>` : ''}
+          <label class="ligne" style="cursor:pointer"><span><input type="checkbox" id="assurance" ${selection.assurance ? 'checked' : ''}> Assurance casse et vol</span><span>${Z.euros(d.assurance)}</span></label>
+          <div class="ligne"><span>Frais de service</span><span>${Z.euros(d.fraisService)}</span></div>
+          <div class="ligne total"><span>Total</span><span>${Z.euros(d.totalLocataire)}</span></div>
+          <div class="ligne discret"><span>Caution (empreinte, non débitée)</span><span>${Z.euros(d.caution)}</span></div>
+          <button class="btn btn-cta" style="width:100%;margin-top:10px" data-action="reserver">Réserver et payer ${Z.euros(d.totalLocataire)}</button>`;
+      }
+    } else {
+      detail = `<div class="alerte alerte-info">${selection.debut ? 'Choisissez maintenant le jour de retour.' : 'Choisissez le jour de retrait dans le calendrier.'}</div>`;
+    }
+    return `<div class="ligne"><span>Tarif</span><b>${Z.euros(a.prixJour)} / jour</b></div>
+      <div class="ligne discret"><span>-10 % dès 3 jours · -20 % dès 7 jours</span><span></span></div>
+      ${calendrier(a)}${detail}`;
+  }
+
+  function calendrier(a) {
+    const occ = Z.joursOccupes(a, toutesReservations());
+    const [an, mo] = selection.mois.split('-').map(Number);
+    const premier = new Date(Date.UTC(an, mo - 1, 1));
+    const nb = new Date(Date.UTC(an, mo, 0)).getUTCDate();
+    const decalage = (premier.getUTCDay() + 6) % 7;
+    const nomMois = premier.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+    let cases = ['L', 'M', 'M', 'J', 'V', 'S', 'D'].map((j) => `<span>${j}</span>`).join('');
+    for (let i = 0; i < decalage; i++) cases += '<span></span>';
+    for (let j = 1; j <= nb; j++) {
+      const t = `${an}-${String(mo).padStart(2, '0')}-${String(j).padStart(2, '0')}`;
+      let cls = '', dis = false;
+      if (t < AUJOURDHUI) { cls = 'passe'; dis = true; } else if (occ.has(t)) { cls = 'occupe'; dis = true; }
+      if (t === selection.debut || t === selection.fin) cls = 'choisi';
+      else if (selection.debut && selection.fin && t > selection.debut && t < selection.fin && !dis) cls = 'entre';
+      cases += `<button data-jour="${t}" class="${cls}" ${dis ? 'disabled' : ''}>${j}</button>`;
+    }
+    return `<div class="calendrier" style="margin:12px 0"><div class="tete"><button data-mois="-1" aria-label="Mois précédent">‹</button><span>${nomMois}</span><button data-mois="1" aria-label="Mois suivant">›</button></div>
+      <div class="jours">${cases}</div>
+      <div class="legende"><span><i style="background:var(--fond)"></i>Libre</span><span><i style="background:#f2d4cc"></i>Réservé</span><span><i style="background:var(--jaune)"></i>Votre sélection</span></div></div>`;
+  }
+
+  function brancherFiche(a) {
+    const zone = document.getElementById('zone-transaction');
+    const rafraichir = () => { zone.innerHTML = zoneTransaction(a); };
+    document.getElementById('onglets-fiche').addEventListener('click', (e) => {
+      const b = e.target.closest('[data-onglet]'); if (!b) return;
+      selection.onglet = b.dataset.onglet;
+      document.querySelectorAll('#onglets-fiche button').forEach((x) => x.classList.toggle('actif', x === b));
+      rafraichir();
+    });
+    zone.addEventListener('change', (e) => { if (e.target.id === 'assurance') { selection.assurance = e.target.checked; rafraichir(); } });
+    zone.addEventListener('click', (e) => {
+      const j = e.target.closest('[data-jour]');
+      if (j) {
+        const t = j.dataset.jour;
+        if (!selection.debut || selection.fin || t < selection.debut) { selection.debut = t; selection.fin = null; }
+        else selection.fin = t;
+        return rafraichir();
+      }
+      const mv = e.target.closest('[data-mois]');
+      if (mv) {
+        const [an, mo] = selection.mois.split('-').map(Number);
+        const d = new Date(Date.UTC(an, mo - 1 + Number(mv.dataset.mois), 1));
+        const nouveau = d.toISOString().slice(0, 7);
+        if (nouveau >= AUJOURDHUI.slice(0, 7)) selection.mois = nouveau;
+        return rafraichir();
+      }
+      const act = e.target.closest('[data-action]'); if (!act) return;
+      if (act.dataset.action === 'reserver') {
+        const v = Z.verifierDisponibilite(a, toutesReservations(), selection.debut, selection.fin, AUJOURDHUI);
+        if (!v.ok) return toast(v.raison);
+        const d = Z.devisLocation(a, selection.debut, selection.fin, { assurance: selection.assurance, locationsProprietaire: membre(a.membre).locations });
+        etat.reservations.push({ id: 'r' + Date.now(), outilId: a.id, debut: selection.debut, fin: selection.fin, statut: 'confirmée', locataire: 'Vous', total: d.totalLocataire, caution: d.caution });
+        deverrouillerConversation(a.id);
+        sauver();
+        toast(`Réservation confirmée (simulation) : ${Z.euros(d.totalLocataire)} payés, caution de ${Z.euros(d.caution)} bloquée.`);
+        selection.debut = selection.fin = null; aller('#/mon-espace');
+      } else if (act.dataset.action === 'acheter') {
+        deverrouillerConversation(a.id); sauver();
+        toast(`Paiement de ${Z.euros(a.prixVente)} placé en séquestre (simulation). Le vendeur est prévenu.`);
+        aller('#/messages?annonce=' + a.id);
+      } else if (act.dataset.action === 'echanger') {
+        const texte = (document.getElementById('proposition').value || '').trim();
+        if (!texte) return toast('Décrivez l’outil que vous proposez en échange.');
+        const c = conversationPour(a.id);
+        c.messages.push({ de: 'moi', texte: '🔁 Proposition d’échange : ' + Z.masquerCoordonnees(texte, c.confirmee).texte });
+        sauver(); toast('Proposition envoyée. Vous serez prévenu de la réponse.');
+        aller('#/messages?annonce=' + a.id);
+      }
+    });
+  }
+
+  function conversationPour(annonceId) {
+    let c = etat.conversations.find((x) => x.annonceId === annonceId);
+    if (!c) {
+      const a = annonce(annonceId);
+      c = { id: 'c' + Date.now(), annonceId, avec: a.membre, confirmee: false, messages: [] };
+      etat.conversations.unshift(c);
+    }
+    return c;
+  }
+  function deverrouillerConversation(annonceId) {
+    const c = conversationPour(annonceId);
+    c.confirmee = true;
+    c.messages.push({ de: 'systeme', texte: 'Transaction confirmée : les coordonnées de chacun sont désormais visibles. Remise prévue au 18 rue des Ateliers, 94300 Vincennes (adresse fictive).' });
+  }
+
+  /* --- messagerie avec masquage --- */
+  function vueMessages(params) {
+    const voulu = params.get('annonce');
+    if (voulu && annonce(voulu)) conversationPour(voulu);
+    const active = etat.conversations.find((c) => c.annonceId === voulu) || etat.conversations[0];
+    return `<div class="page"><div class="conteneur">
+      <div class="titre-section"><div><h2>Messagerie</h2><p>Les coordonnées (téléphone, e-mail, adresse, IBAN, liens) sont masquées automatiquement tant qu’aucune transaction n’est payée sur ZETOOLS.</p></div></div>
+      <div class="messagerie">
+        <div class="conversations">${etat.conversations.map((c) => { const a = annonce(c.annonceId); const m = membre(c.avec); return `<div class="conversation ${c === active ? 'actif' : ''}" data-conv="${c.annonceId}"><b>${esc(m.nom)}</b><small>${esc(a ? a.titre : '')}</small><small>${c.confirmee ? '🔓 coordonnées visibles' : '🔒 coordonnées masquées'}</small></div>`; }).join('')}</div>
+        <div class="fil-messages">
+          <div class="messages" id="messages">${active ? active.messages.map(rendreMessage).join('') : ''}</div>
+          <form class="saisie" id="saisie"><input id="texte-msg" autocomplete="off" placeholder="Écrivez votre message… (essayez d’y mettre un numéro de téléphone)"><button class="btn btn-cta">Envoyer</button></form>
+        </div>
+      </div></div></div>`;
+  }
+  function rendreMessage(m) {
+    if (m.de === 'systeme') return `<div class="alerte alerte-ok" style="align-self:center">${esc(m.texte)}</div>`;
+    const html = esc(m.texte).split(esc(Z.MASQUE)).join(`<span class="masque">${esc(Z.MASQUE)}</span>`);
+    return `<div class="msg ${m.de === 'moi' ? 'moi' : ''}">${html}</div>`;
+  }
+  function brancherMessages(params) {
+    const voulu = params.get('annonce');
+    const active = etat.conversations.find((c) => c.annonceId === voulu) || etat.conversations[0];
+    document.querySelectorAll('[data-conv]').forEach((el) => el.addEventListener('click', () => { aller('#/messages?annonce=' + el.dataset.conv); }));
+    const zone = document.getElementById('messages'); zone.scrollTop = zone.scrollHeight;
+    document.getElementById('saisie').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const champ = document.getElementById('texte-msg'); const brut = champ.value.trim();
+      if (!brut || !active) return;
+      const r = Z.masquerCoordonnees(brut, active.confirmee);
+      active.messages.push({ de: 'moi', texte: r.texte });
+      if (r.masque) active.messages.push({ de: 'systeme', texte: 'Pour votre sécurité, les coordonnées ont été masquées. Elles seront partagées automatiquement après le paiement sur ZETOOLS, qui seul vous assure caution, assurance et remboursement.' });
+      sauver(); champ.value = '';
+      zone.innerHTML = active.messages.map(rendreMessage).join(''); zone.scrollTop = zone.scrollHeight;
+    });
+  }
+
+  /* --- mon espace : réservations, calendrier de location, mes annonces --- */
+  function vueMonEspace() {
+    const mesRes = toutesReservations().filter((r) => r.locataire === 'Vous');
+    const mesAnn = etat.annonces;
+    return `<div class="page"><div class="conteneur">
+      <div class="titre-section"><div><h2>Mon espace</h2><p>Compte de démonstration · profil vérifié</p></div><a class="btn btn-cta" href="#/deposer">＋ Déposer une annonce</a></div>
+      <h3>Mon calendrier de location</h3>
+      ${mesRes.length ? `<table class="tableau"><thead><tr><th>Outil</th><th>Du</th><th>Au</th><th>Total payé</th><th>Caution bloquée</th><th>Statut</th></tr></thead><tbody>${mesRes.sort((x, y) => x.debut.localeCompare(y.debut)).map((r) => { const a = annonce(r.outilId); return `<tr><td><a href="#/annonce/${a.id}">${esc(a.titre)}</a></td><td>${Z.formatDate(r.debut)}</td><td>${Z.formatDate(r.fin)}</td><td>${r.total ? Z.euros(r.total) : '—'}</td><td>${Z.euros(r.caution ?? a.caution)}</td><td><span class="statut">${esc(r.statut)}</span></td></tr>`; }).join('')}</tbody></table>` : '<div class="vide">Aucune location pour l’instant.</div>'}
+      <h3 style="margin-top:32px">Mes demandes de travaux</h3>
+      ${blocMesDemandes()}
+      <h3 style="margin-top:32px">Mes annonces</h3>
+      ${mesAnn.length ? `<div class="grille">${mesAnn.map(carte).join('')}</div>` : '<div class="vide">Vous n’avez pas encore d’annonce. Un outil qui dort au garage ? <a href="#/deposer">Publiez-le en 2 minutes</a>.</div>'}
+      <h3 style="margin-top:32px">Mes favoris</h3>
+      ${etat.favoris.length ? `<div class="grille">${etat.favoris.map(annonce).filter(Boolean).map(carte).join('')}</div>` : '<div class="vide">Touchez ♡ sur une annonce pour la retrouver ici.</div>'}
+      <p style="margin-top:28px"><button class="btn btn-contour" id="reinitialiser">Réinitialiser la démonstration</button></p>
+    </div></div>`;
+  }
+
+  function vueDeposer(params) {
+    const enPanne = params && params.get('etat') === 'reparer';
+    return `<div class="page"><div class="conteneur" style="max-width:820px">
+      <div class="titre-section"><div><h2>Déposer une annonce</h2><p>Gratuit pour les particuliers. Votre annonce est visible immédiatement dans la maquette.</p></div></div>
+      <form class="panneau formulaire" id="form-depot">
+        <label class="large">Titre<input name="titre" required maxlength="80" placeholder="Ex. : Ponceuse excentrique 125 mm + 20 disques"></label>
+        <label>Marque<input name="marque" placeholder="Makita, Bosch…"></label>
+        <label>Catégorie<select name="categorie" required>${CATEGORIES.map((c) => `<option value="${c.id}">${c.nom}</option>`).join('')}</select></label>
+        <label>État<select name="etat"><option>Neuf</option><option ${enPanne ? '' : 'selected'}>Très bon état</option><option>Bon état</option><option ${enPanne ? 'selected' : ''}>À réparer</option></select></label>
+        <label class="large">Panne constatée (si à réparer)<input name="panne" placeholder="Ex. : batterie qui ne tient plus la charge"></label>
+        <label>Code postal<input name="cp" required pattern="\\d{5}" placeholder="94300"></label>
+        <div class="large"><b>Je propose</b><div class="cases" style="margin-top:6px"><label><input type="checkbox" name="modes" value="location" checked> la location</label><label><input type="checkbox" name="modes" value="vente"> la vente</label><label><input type="checkbox" name="modes" value="echange"> l’échange</label></div></div>
+        <label>Prix par jour (€)<input name="prixJour" type="number" min="1" step="0.5" placeholder="10"></label>
+        <label>Prix de vente (€)<input name="prixVente" type="number" min="1" step="1" placeholder="120"></label>
+        <label>Caution demandée (€)<input name="caution" type="number" min="0" step="10" placeholder="150"></label>
+        <label>Échange recherché<input name="echangeContre" placeholder="Ex. : scie sauteuse"></label>
+        <label class="large">Description<textarea name="description" rows="4" placeholder="Accessoires fournis, conseils d’usage… (vos coordonnées seront masquées)"></textarea></label>
+        <div class="large alerte alerte-info">Phase 1 : les photos se chargent depuis votre téléphone dans la version réelle. La maquette utilise une illustration par défaut.</div>
+        <div class="large"><button class="btn btn-cta">Publier l’annonce</button></div>
+      </form></div></div>`;
+  }
+  function brancherDeposer() {
+    document.getElementById('form-depot').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      const modes = fd.getAll('modes');
+      const nb = (k) => Number(fd.get(k)) || null;
+      if (!modes.length) return toast('Choisissez au moins : location, vente ou échange.');
+      if (modes.includes('location') && !nb('prixJour')) return toast('Indiquez un prix par jour pour la location.');
+      if (modes.includes('vente') && !nb('prixVente')) return toast('Indiquez un prix de vente.');
+      const cp = String(fd.get('cp'));
+      const a = {
+        id: 'u' + Date.now(), titre: String(fd.get('titre')), marque: String(fd.get('marque') || '—'), categorie: String(fd.get('categorie')),
+        etat: String(fd.get('etat')), modes, prixJour: nb('prixJour'), prixVente: nb('prixVente'), caution: nb('caution') || 0,
+        ville: cp.startsWith('75') ? 'Paris' : 'Île-de-France', cp, membre: 'moi', photo: PHOTOS.atelier,
+        description: Z.masquerCoordonnees(String(fd.get('description') || ''), false).texte,
+        echangeContre: String(fd.get('echangeContre') || ''), indispo: [],
+      };
+      etat.annonces.push(a); sauver();
+      toast('Annonce publiée.'); aller('#/annonce/' + a.id);
+    });
+  }
+
+  function vuePros() {
+    return `<div class="page"><div class="conteneur">
+      <div class="titre-section"><div><div class="surtitre">Offres</div><h2>Particuliers et professionnels</h2><p>Commission dégressive sur les locations : 15 %, puis 12 % dès 5 locations, puis 10 % dès 20.</p></div></div>
+      <div class="offres">
+        <div class="offre"><h3>Gratuit</h3><div class="tarif">0 €</div><ul><li>Annonces illimitées pour les particuliers</li><li>Paiement sécurisé et caution</li><li>Messagerie protégée</li></ul></div>
+        <div class="offre phare"><h3>Artisan abonné</h3><div class="tarif">39 € <small style="font-size:1rem">/ mois</small></div><ul><li>Toutes les demandes de travaux de votre zone : petits, moyens et gros</li><li>0 % de commission, 0 € par contact</li><li>Carte des chantiers autour de vous</li><li>390 € / an (2 mois offerts) · 30 jours d’essai</li></ul><a class="btn btn-cta" href="#/espace-artisan">Ouvrir mon espace artisan</a></div>
+        <div class="offre"><h3>Pro Solo</h3><div class="tarif">19 € <small style="font-size:1rem">/ mois</small></div><ul><li>Badge PRO et SIRET vérifié</li><li>Calendrier de disponibilités multi-outils</li><li>Mise en avant locale</li><li>Factures automatiques</li></ul><a class="btn btn-cta" href="#/messages">Rejoindre la phase pilote</a></div>
+        <div class="offre"><h3>Pro Business</h3><div class="tarif">dès 49 € <small style="font-size:1rem">/ mois</small></div><ul><li>Parc illimité, plusieurs comptes</li><li>Statistiques et export comptable</li><li>Interlocuteur dédié</li></ul></div>
+      </div>
+      ${blocReassurance().replace('class="bloc reassurance"', 'class="bloc reassurance" style="margin-top:40px;border-radius:16px"')}
+    </div></div>`;
+  }
+
+  function vueAtelier() {
+    return `<div class="page"><div class="conteneur"><div class="titre-section"><div><div class="surtitre">L’Atelier</div><h2>Le guide du bon bricoleur</h2><p>Conseils pratiques, choix du matériel, entretien.</p></div></div>${grilleArticles()}</div></div>`;
+  }
+
+  function vueAide() {
+    const q = [
+      ['Que se passe-t-il si l’outil est abîmé ?', 'Les photos d’état prises à la remise et au retour font foi. La caution couvre les petits dégâts ; l’assurance casse optionnelle prend le relais au-delà.'],
+      ['Pourquoi ne puis-je pas donner mon numéro ?', 'Tant que rien n’est payé sur ZETOOLS, nous ne pouvons ni garantir la caution ni vous rembourser. Les coordonnées s’affichent automatiquement après paiement.'],
+      ['Quand le propriétaire est-il payé ?', 'Le loyer est versé 24 h après le retour de l’outil, si aucun litige n’est ouvert. Pour une vente, après confirmation de la remise par l’acheteur.'],
+      ['Un échange est-il protégé ?', 'Oui : chacun règle des frais de mise en relation et une caution croisée peut être demandée pour les outils de valeur différente.'],
+      ['Faut-il être professionnel pour louer souvent ?', 'Au-delà d’un usage occasionnel, un numéro SIRET est demandé. Les revenus sont déclarés aux impôts conformément à la directive DAC7.'],
+    ];
+    return `<div class="page"><div class="conteneur" style="max-width:820px"><div class="titre-section"><div><h2>Questions fréquentes</h2></div></div>${q.map(([t, r]) => `<details class="panneau"><summary style="font-weight:700;cursor:pointer">${t}</summary><p>${r}</p></details>`).join('')}</div></div>`;
+  }
+
+  function vueLegal() {
+    return `<div class="page"><div class="conteneur" style="max-width:820px"><div class="panneau"><h2>Conditions générales et mentions légales</h2>
+      <p><b>À rédiger avec un avocat avant tout lancement.</b> Points à couvrir : statut d’intermédiaire de la plateforme, CGU et CGV distinctes particuliers/professionnels, prestataire de paiement agréé (aucun fonds ne transite par ZETOOLS), obligations DAC7, assurance, médiation de la consommation, RGPD.</p></div></div></div>`;
+  }
+
+  function vueCredits() {
+    return `<div class="page"><div class="conteneur" style="max-width:820px"><div class="panneau"><h2>Crédits photos</h2>
+      <p>Photographies issues d’<a href="https://unsplash.com/license" target="_blank" rel="noopener">Unsplash</a>, sous licence Unsplash : utilisation gratuite, y compris commerciale, sans attribution obligatoire. Nous créditons tout de même les auteurs.</p>
+      ${CREDITS.map(([sujet, auteur, id]) => `<div class="ligne"><span>${esc(sujet)}</span><span>${esc(auteur)} · <a href="https://images.unsplash.com/photo-${id}" target="_blank" rel="noopener">source</a></span></div>`).join('')}
+    </div></div></div>`;
+  }
+
+  /* =====================================================================
+     ARTISANS : géolocalisation, demandes de travaux, espace abonné
+     ===================================================================== */
+  const { METIERS, ARTISANS, DEMANDES } = window.ZT_DONNEES;
+  const AB = Z.REGLES.abonnementArtisan;
+  const metierNom = (id) => (METIERS.find((m) => m.id === id) || {}).nom || id;
+  const metierIco = (id) => (METIERS.find((m) => m.id === id) || {}).icone || '🛠️';
+  const tailleNom = (t) => Z.REGLES.tailles[t] || t;
+  etat.demandes = etat.demandes || [];
+  etat.reponses = etat.reponses || {};
+  etat.abonnements = etat.abonnements || {};
+  etat.artisanDemo = etat.artisanDemo || 'p2';
+  let posClient = null; // { lat, lon, libelle, source } — gardée en mémoire seulement
+
+  const toutesDemandes = () => DEMANDES.concat(etat.demandes).map((d) => Object.assign({}, d, {
+    reponses: (d.reponses || []).concat(etat.reponses[d.id] || []),
+    statut: etat.statuts && etat.statuts[d.id] ? etat.statuts[d.id] : d.statut,
+  }));
+  const artisan = (id) => {
+    const a = ARTISANS.find((x) => x.id === id);
+    return a && etat.abonnements[id] ? Object.assign({}, a, { abonnement: etat.abonnements[id] }) : a;
+  };
+  const tousArtisans = () => ARTISANS.map((a) => artisan(a.id));
+  const artisansAbonnes = () => tousArtisans().filter((a) => Z.abonnementActif(a, AUJOURDHUI));
+
+  function plusJours(t, n) { return Z.versTexte(new Date(Z.versDate(t).getTime() + n * 86400000)); }
+
+  /* --- carte : Leaflet + OpenStreetMap si disponible, sinon radar dessiné --- */
+  function dessinerCarte(id, centre, points, rayonKm) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (window.L) {
+      try {
+        const carte = window.L.map(el, { scrollWheelZoom: false }).setView([centre.lat, centre.lon], 12);
+        window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '© OpenStreetMap' }).addTo(carte);
+        const zone = window.L.circle([centre.lat, centre.lon], { radius: rayonKm * 1000, color: '#2b5f3a', weight: 1, fillOpacity: 0.06 }).addTo(carte);
+        window.L.circleMarker([centre.lat, centre.lon], { radius: 9, color: '#23272b', fillColor: '#23272b', fillOpacity: 1 }).addTo(carte).bindTooltip(centre.libelle || 'Vous');
+        points.forEach((p) => window.L.circleMarker([p.lat, p.lon], { radius: 8, color: '#23272b', weight: 2, fillColor: p.couleur || '#f5b700', fillOpacity: 1 })
+          .addTo(carte).bindPopup(`<b>${esc(p.titre)}</b><br>${esc(p.detail || '')}`));
+        carte.fitBounds(zone.getBounds(), { padding: [10, 10] });
+        return;
+      } catch (e) { /* repli sur le radar */ }
+    }
+    // radar : positions relatives, sans dépendance externe
+    const R = 140, k = R / rayonKm, kmLon = 111.32 * Math.cos((centre.lat * Math.PI) / 180);
+    const pts = points.map((p) => {
+      const x = (p.lon - centre.lon) * kmLon * k, y = -(p.lat - centre.lat) * 110.57 * k;
+      return `<circle cx="${(R + x).toFixed(1)}" cy="${(R + y).toFixed(1)}" r="7" fill="${p.couleur || '#f5b700'}" stroke="#23272b" stroke-width="2"><title>${esc(p.titre)}</title></circle>`;
+    }).join('');
+    el.innerHTML = `<svg viewBox="0 0 ${2 * R} ${2 * R}" style="width:100%;height:100%;background:#eef1ee">
+      ${[1, 0.66, 0.33].map((f) => `<circle cx="${R}" cy="${R}" r="${R * f}" fill="none" stroke="#2b5f3a" stroke-opacity=".35" stroke-dasharray="4 4"/>`).join('')}
+      <text x="${R + 4}" y="14" font-size="10" fill="#2b5f3a">${rayonKm} km</text>
+      <circle cx="${R}" cy="${R}" r="8" fill="#23272b"/>${pts}</svg>`;
+  }
+
+  function carteArtisan(x, avecBouton) {
+    const a = x.artisan;
+    return `<div class="artisan-carte">
+      <div class="vendeur"><div class="avatar">${initiales(a.nom)}</div><div style="flex:1"><b>${esc(a.nom)}</b> <span class="badge badge-echange">Abonné vérifié</span><br>
+        <span class="verifie">${a.siret ? '✔ SIRET' : ''}${a.decennale ? ' · ✔ Décennale' : ''}</span> · ★ ${a.note.toFixed(1)} (${a.avis})</div>
+        <div class="distance">📍 ${Z.formatDistance(x.km)}</div></div>
+      <p style="margin:8px 0;color:var(--texte-doux);font-size:.92rem">${esc(a.presentation)}</p>
+      <div class="puces">${a.metiers.map((m) => `<span class="puce">${metierIco(m)} ${esc(metierNom(m))}</span>`).join('')}</div>
+      <div class="ligne discret"><span>Dès ${Z.euros(a.tarifHoraire)} / h · intervient ${esc(a.delai)}</span><span>${a.outils ? 'Vient avec ses outils' : 'Outils à fournir ou à louer'}</span></div>
+      ${avecBouton ? `<button class="btn btn-cta" data-devis="${a.id}" style="width:100%;margin-top:6px">Demander un devis gratuit</button>` : ''}
+    </div>`;
+  }
+
+  /* --- page client : trouver un artisan près de chez moi --- */
+  let filtreTravaux = { rayon: 10, metier: '', vise: '' };
+  function vueTravaux() {
+    const res = posClient ? Z.artisansProches(posClient, artisansAbonnes(), { rayonKm: filtreTravaux.rayon, metier: filtreTravaux.metier }) : [];
+    return `<section class="hero hero-court" style="background-image:url('${PHOTOS.artisans}')"><div class="conteneur">
+        <div class="surtitre" style="color:var(--jaune)">Petits, moyens et gros travaux</div>
+        <h1>Un artisan vérifié <em>près de chez vous</em>, avec ses outils.</h1>
+        <p class="sous">Décrivez vos travaux : les artisans abonnés de votre secteur reçoivent votre demande et vous envoient leur devis. Gratuit et sans engagement pour vous.</p>
+      </div></section>
+      <div class="page"><div class="conteneur">
+      <div class="panneau" style="margin-bottom:20px">
+        <div class="localisation">
+          <button class="btn btn-sombre" id="geoloc">📍 Me localiser</button>
+          <span style="color:var(--texte-doux)">ou</span>
+          <form id="form-cp" style="display:flex;gap:8px"><input id="cp-client" inputmode="numeric" maxlength="5" placeholder="Code postal" style="width:130px;border:1px solid var(--bord);border-radius:8px;padding:10px"><button class="btn btn-contour">Valider</button></form>
+          <label>Rayon <select id="rayon">${[5, 10, 20, 40].map((r) => `<option value="${r}" ${filtreTravaux.rayon === r ? 'selected' : ''}>${r} km</option>`).join('')}</select></label>
+          <label>Métier <select id="metier-filtre"><option value="">Tous</option>${METIERS.map((m) => `<option value="${m.id}" ${filtreTravaux.metier === m.id ? 'selected' : ''}>${m.nom}</option>`).join('')}</select></label>
+        </div>
+        <div id="etat-geo" class="alerte ${posClient ? 'alerte-ok' : 'alerte-info'}">${posClient
+          ? `Position : ${esc(posClient.libelle)} (${posClient.source}). Les artisans ne voient qu’une zone d’environ 1 km, jamais votre adresse avant que vous acceptiez un devis.`
+          : 'Autorisez la localisation ou saisissez votre code postal pour voir les artisans qui interviennent chez vous.'}</div>
+      </div>
+      ${posClient ? `<div class="travaux-grille">
+        <div><div id="carte-client" class="carte-geo"></div><p class="legende"><span><i style="background:var(--anthracite)"></i>Vous</span><span><i style="background:var(--jaune)"></i>Artisans abonnés</span></p></div>
+        <div><div class="titre-section" style="margin-bottom:10px"><div><h2 style="font-size:1.3rem">${res.length} artisan${res.length > 1 ? 's' : ''} dans un rayon de ${filtreTravaux.rayon} km</h2><p>Classés du plus proche au plus loin. Seuls les artisans dont la zone d’intervention couvre votre adresse apparaissent.</p></div></div>
+          <div class="liste-artisans">${res.map((x) => carteArtisan(x, true)).join('') || '<div class="vide">Aucun artisan abonné ne couvre encore votre secteur pour ce métier. Publiez votre demande : elle sera visible dès qu’un artisan s’inscrit dans votre zone.</div>'}</div></div>
+      </div>` : ''}
+      <div class="panneau" id="bloc-demande" style="margin-top:24px">
+        <h2 style="margin-top:0">Décrire mes travaux</h2>
+        <form class="formulaire" id="form-demande">
+          <label>Métier<select name="metier" required>${METIERS.map((m) => `<option value="${m.id}" ${(filtreTravaux.metier || '') === m.id ? 'selected' : ''}>${m.icone} ${m.nom}</option>`).join('')}</select></label>
+          <label>Ampleur<select name="taille"><option value="petit">Petits travaux (quelques heures)</option><option value="moyen">Travaux moyens (quelques jours)</option><option value="gros">Gros travaux (chantier)</option></select></label>
+          <label class="large">Titre<input name="titre" required maxlength="90" placeholder="Ex. : Poser 3 étagères et fixer une TV murale"></label>
+          <label class="large">Détails<textarea name="details" rows="3" placeholder="Surface, matériaux, accès… (vos coordonnées seront masquées)"></textarea></label>
+          <label>Budget indicatif<select name="budget"><option>Moins de 150 €</option><option>150 à 500 €</option><option>500 à 1 500 €</option><option>1 500 à 5 000 €</option><option>Plus de 5 000 €</option><option>Je ne sais pas</option></select></label>
+          <label>Quand ?<select name="quand"><option>Urgent</option><option>Cette semaine</option><option>Ce mois-ci</option><option>Dans les 3 mois</option><option>Pas pressé</option></select></label>
+          <label class="large">Les outils<select name="outils"><option value="artisan">L’artisan vient avec ses outils</option><option value="client">J’ai les outils nécessaires</option><option value="location">Je loue les outils sur ZETOOLS</option></select></label>
+          <label>Code postal du chantier<input name="cp" required inputmode="numeric" pattern="\\d{5}" value="${esc(posClient && posClient.cp ? posClient.cp : '')}" placeholder="94300"></label>
+          <input type="hidden" name="vise" value="${esc(filtreTravaux.vise)}">
+          <div class="large">${filtreTravaux.vise ? `<div class="alerte alerte-info">Demande adressée en priorité à <b>${esc(artisan(filtreTravaux.vise).nom)}</b>, et visible par les autres artisans abonnés du secteur.</div>` : ''}<button class="btn btn-cta">Publier ma demande · gratuit</button></div>
+        </form>
+      </div></div></div>`;
+  }
+
+  function brancherTravaux() {
+    const rafraichir = () => { vue.innerHTML = vueTravaux(); brancherTravaux(); };
+    const placer = (p) => { posClient = p; rafraichir(); };
+    document.getElementById('geoloc').addEventListener('click', () => {
+      const etatGeo = document.getElementById('etat-geo');
+      if (!navigator.geolocation) { etatGeo.textContent = 'Localisation indisponible sur cet appareil : saisissez votre code postal.'; return; }
+      etatGeo.textContent = 'Recherche de votre position…';
+      navigator.geolocation.getCurrentPosition((g) => {
+        const p = { lat: g.coords.latitude, lon: g.coords.longitude };
+        const horsZone = Z.distanceKm(p, { lat: 48.8566, lon: 2.3522 }) > 80;
+        if (horsZone) { etatGeo.className = 'alerte alerte-erreur'; etatGeo.textContent = 'Vous êtes hors de la zone pilote (Île-de-France). Saisissez le code postal du chantier.'; return; }
+        placer(Object.assign(Z.positionApprochee(p), { libelle: 'votre position', source: 'GPS, arrondie à 1 km' }));
+      }, () => { etatGeo.className = 'alerte alerte-erreur'; etatGeo.textContent = 'Localisation refusée ou impossible : saisissez votre code postal.'; },
+      { enableHighAccuracy: false, timeout: 8000, maximumAge: 600000 });
+    });
+    document.getElementById('form-cp').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const cp = document.getElementById('cp-client').value.trim();
+      const p = Z.positionCodePostal(cp);
+      if (!p) return toast('Code postal hors de la zone pilote Île-de-France.');
+      placer({ lat: p.lat, lon: p.lon, libelle: `${p.libelle} (${cp})`, source: `code postal, précision ${p.precision}`, cp });
+    });
+    document.getElementById('rayon').addEventListener('change', (e) => { filtreTravaux.rayon = Number(e.target.value); rafraichir(); });
+    document.getElementById('metier-filtre').addEventListener('change', (e) => { filtreTravaux.metier = e.target.value; rafraichir(); });
+    vue.addEventListener('click', function choisir(e) {
+      const b = e.target.closest('[data-devis]'); if (!b) return;
+      vue.removeEventListener('click', choisir);
+      filtreTravaux.vise = b.dataset.devis;
+      const a = artisan(b.dataset.devis);
+      if (!filtreTravaux.metier) filtreTravaux.metier = a.metiers[0];
+      rafraichir(); document.getElementById('bloc-demande').scrollIntoView({ behavior: 'smooth' });
+    });
+    if (posClient) {
+      const res = Z.artisansProches(posClient, artisansAbonnes(), { rayonKm: filtreTravaux.rayon, metier: filtreTravaux.metier });
+      dessinerCarte('carte-client', posClient, res.map((x) => ({ lat: x.artisan.lat, lon: x.artisan.lon, titre: x.artisan.nom, detail: `${Z.formatDistance(x.km)} · ${x.artisan.metiers.map(metierNom).join(', ')}` })), filtreTravaux.rayon);
+    }
+    document.getElementById('form-demande').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      const cp = String(fd.get('cp')).trim();
+      const p = Z.positionCodePostal(cp);
+      if (!p) return toast('Code postal hors de la zone pilote Île-de-France.');
+      const pos = posClient && posClient.cp !== cp && posClient.source.startsWith('GPS') ? Z.positionApprochee(posClient) : Z.positionApprochee(p);
+      const d = {
+        id: 'd' + Date.now(), metier: String(fd.get('metier')), taille: String(fd.get('taille')),
+        titre: String(fd.get('titre')), details: Z.masquerCoordonnees(String(fd.get('details') || ''), false).texte,
+        ville: p.libelle, cp, lat: pos.lat, lon: pos.lon, budget: String(fd.get('budget')), quand: String(fd.get('quand')),
+        outilsClient: fd.get('outils') !== 'artisan', outils: String(fd.get('outils')), statut: 'ouverte', publiee: AUJOURDHUI,
+        vise: String(fd.get('vise') || ''), mienne: true, reponses: [],
+      };
+      const destinataires = artisansAbonnes().filter((a) => Z.peutRepondre(a, d, AUJOURDHUI).ok);
+      etat.demandes.push(d);
+      // simulation : l'artisan le plus proche répond aussitôt
+      const premier = destinataires.map((a) => ({ a, km: Z.distanceKm(a, d) })).sort((x, y) => x.km - y.km)[0];
+      if (premier) {
+        etat.reponses[d.id] = [{ artisanId: premier.a.id, prix: d.taille === 'gros' ? 'Visite technique gratuite avant chiffrage' : `Environ ${Z.euros(premier.a.tarifHoraire * (d.taille === 'moyen' ? 16 : 3))}`,
+          dispo: premier.a.delai, message: 'Bonjour, je suis disponible et je viens avec mon matériel. Je peux passer voir le chantier si besoin.', date: AUJOURDHUI, simulee: true }];
+      }
+      filtreTravaux.vise = ''; sauver();
+      toast(`Demande publiée : ${destinataires.length} artisan${destinataires.length > 1 ? 's' : ''} abonné${destinataires.length > 1 ? 's' : ''} de votre secteur la reçoi${destinataires.length > 1 ? 'vent' : 't'}.`);
+      aller('#/mon-espace');
+    });
+  }
+
+  /* --- suivi des demandes du client (dans Mon espace) --- */
+  function blocMesDemandes() {
+    const miennes = toutesDemandes().filter((d) => d.mienne);
+    if (!miennes.length) return '<div class="vide">Aucune demande en cours. <a href="#/travaux">Trouver un artisan près de chez moi</a>.</div>';
+    return miennes.map((d) => `<div class="panneau">
+      <div class="titre-section" style="margin-bottom:6px"><div><b>${metierIco(d.metier)} ${esc(d.titre)}</b><p>${esc(tailleNom(d.taille))} · ${esc(d.ville)} · ${esc(d.budget)} · ${esc(d.quand)}</p></div><span class="statut">${esc(d.statut)}</span></div>
+      ${d.reponses.length ? d.reponses.map((r, i) => { const a = artisan(r.artisanId); return `<div class="reponse">
+        <div><b>${esc(a.nom)}</b> · ★ ${a.note.toFixed(1)} · ${esc(r.prix)} · ${esc(r.dispo)}${r.simulee ? ' <small>(réponse simulée)</small>' : ''}<br><span style="color:var(--texte-doux)">${esc(r.message)}</span>
+        ${d.statut === 'attribuée' && d.retenu === r.artisanId ? `<div class="alerte alerte-ok">Devis accepté. Coordonnées échangées : ${esc(a.nom)}, tél. 01 23 45 67 89 (fictif). L’artisan reçoit votre adresse exacte.</div>` : ''}</div>
+        ${d.statut === 'ouverte' ? `<button class="btn btn-vert" data-accepter="${esc(d.id)}" data-artisan="${esc(a.id)}">Accepter</button>` : ''}</div>`; }).join('')
+      : '<p style="color:var(--texte-doux)">En attente des réponses des artisans du secteur.</p>'}
+    </div>`).join('');
+  }
+  document.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-accepter]'); if (!b) return;
+    etat.statuts = etat.statuts || {};
+    etat.statuts[b.dataset.accepter] = 'attribuée';
+    const d = etat.demandes.find((x) => x.id === b.dataset.accepter);
+    if (d) d.retenu = b.dataset.artisan;
+    sauver(); toast('Devis accepté : vos coordonnées sont transmises à l’artisan.'); router();
+  });
+
+  /* --- espace artisan abonné --- */
+  function vueEspaceArtisan() {
+    const a = artisan(etat.artisanDemo);
+    const actif = Z.abonnementActif(a, AUJOURDHUI);
+    const liste = Z.demandesPourArtisan(a, toutesDemandes());
+    const ab = a.abonnement;
+    return `<div class="page"><div class="conteneur">
+      <div class="titre-section"><div><div class="surtitre">Espace artisan</div><h2>${esc(a.nom)}</h2><p>${esc(a.ville)} · zone d’intervention ${a.rayonKm} km · ${a.metiers.map(metierNom).join(', ')}</p></div>
+        <label style="font-weight:600">Démonstration, se connecter en tant que : <select id="choix-artisan">${ARTISANS.map((x) => `<option value="${x.id}" ${x.id === a.id ? 'selected' : ''}>${esc(x.nom)}</option>`).join('')}</select></label></div>
+      <div class="abonnement ${actif ? 'actif' : ''}">
+        ${actif ? `<div><b>✔ Abonnement ${ab.formule === 'annuel' ? 'annuel' : 'mensuel'} actif</b> jusqu’au ${Z.formatDate(ab.finPeriode)}${ab.essai ? ' (période d’essai)' : ''}.<br>Accès illimité à toutes les demandes de votre zone : 0 % de commission, 0 € par contact.</div>
+          <div class="chiffre"><b>${liste.length}</b>demande${liste.length > 1 ? 's' : ''} ouverte${liste.length > 1 ? 's' : ''} dans votre zone</div>`
+        : `<div><b>${liste.length} client${liste.length > 1 ? 's' : ''} cherche${liste.length > 1 ? 'nt' : ''} un artisan dans votre zone en ce moment.</b><br>Abonnez-vous pour voir le détail et leur répondre : ${Z.euros(AB.mensuel)} par mois, sans engagement, ou ${Z.euros(AB.annuel)} par an (2 mois offerts). ${AB.essaiJours} jours d’essai.</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-cta" data-abonner="mensuel">${Z.euros(AB.mensuel)} / mois</button><button class="btn btn-sombre" data-abonner="annuel">${Z.euros(AB.annuel)} / an</button></div>`}
+      </div>
+      <div class="travaux-grille" style="margin-top:20px">
+        <div><div id="carte-artisan" class="carte-geo"></div><p class="legende"><span><i style="background:var(--anthracite)"></i>Votre atelier</span><span><i style="background:var(--jaune)"></i>Petits</span><span><i style="background:var(--orange)"></i>Moyens</span><span><i style="background:var(--vert)"></i>Gros travaux</span></p></div>
+        <div class="liste-artisans ${actif ? '' : 'floute'}">${liste.map((x) => carteDemande(x, a, actif)).join('') || '<div class="vide">Aucune demande ouverte dans votre zone pour vos métiers.</div>'}</div>
+      </div></div></div>`;
+  }
+  const couleurTaille = (t) => ({ petit: '#f5b700', moyen: '#e8590c', gros: '#2b5f3a' }[t]);
+  function carteDemande(x, a, actif) {
+    const d = x.demande;
+    const peut = Z.peutRepondre(a, d, AUJOURDHUI);
+    const dejaRepondu = d.reponses.some((r) => r.artisanId === a.id);
+    return `<div class="artisan-carte">
+      <div class="vendeur"><div class="avatar" style="background:${couleurTaille(d.taille)};color:#fff">${metierIco(d.metier)}</div><div style="flex:1"><b>${actif ? esc(d.titre) : esc(metierNom(d.metier)) + ' · détail réservé aux abonnés'}</b><br>
+        <span style="color:var(--texte-doux);font-size:.9rem">${esc(tailleNom(d.taille))} · ${esc(d.ville)} · publiée le ${Z.formatDate(d.publiee)}</span></div><div class="distance">📍 ${Z.formatDistance(x.km)}</div></div>
+      ${actif ? `<div class="ligne discret"><span>Budget : ${esc(d.budget)} · ${esc(d.quand)}</span><span>${d.outilsClient ? 'Le client a les outils' : 'Venir avec ses outils'}</span></div>
+        <div class="ligne discret"><span>${d.reponses.length} réponse${d.reponses.length > 1 ? 's' : ''} d’artisans</span><span>Adresse exacte après acceptation</span></div>
+        ${dejaRepondu ? '<div class="alerte alerte-ok">Votre devis est envoyé. Vous serez prévenu si le client l’accepte.</div>'
+          : peut.ok ? `<form class="form-reponse" data-demande="${esc(d.id)}">
+            <input name="prix" required placeholder="Prix estimé (ex. 350 € TTC)"><input name="dispo" required placeholder="Disponibilité (ex. mardi 9 h)">
+            <input name="message" class="large" placeholder="Message au client (coordonnées masquées)"><button class="btn btn-cta large">Envoyer mon devis</button></form>`
+          : `<div class="alerte alerte-erreur">${esc(peut.raison)}</div>`}` : ''}
+    </div>`;
+  }
+  function brancherEspaceArtisan() {
+    const a = artisan(etat.artisanDemo);
+    document.getElementById('choix-artisan').addEventListener('change', (e) => { etat.artisanDemo = e.target.value; sauver(); router(); });
+    document.querySelectorAll('[data-abonner]').forEach((b) => b.addEventListener('click', () => {
+      const formule = b.dataset.abonner;
+      etat.abonnements[a.id] = { formule, finPeriode: plusJours(AUJOURDHUI, AB.essaiJours), essai: true };
+      sauver(); toast(`Abonnement ${formule} activé (simulation) : ${AB.essaiJours} jours d’essai, puis ${formule === 'annuel' ? Z.euros(AB.annuel) + ' / an' : Z.euros(AB.mensuel) + ' / mois'}.`); router();
+    }));
+    document.querySelectorAll('.form-reponse').forEach((f) => f.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const fd = new FormData(f);
+      const d = toutesDemandes().find((x) => x.id === f.dataset.demande);
+      const v = Z.peutRepondre(artisan(etat.artisanDemo), d, AUJOURDHUI);
+      if (!v.ok) return toast(v.raison);
+      const propre = (k) => Z.masquerCoordonnees(String(fd.get(k) || ''), false).texte;
+      (etat.reponses[d.id] = etat.reponses[d.id] || []).push({ artisanId: a.id, prix: propre('prix'), dispo: propre('dispo'), message: propre('message') || 'Bonjour, je suis disponible pour ces travaux.', date: AUJOURDHUI });
+      sauver(); toast('Devis envoyé au client.'); router();
+    }));
+    const liste = Z.demandesPourArtisan(a, toutesDemandes());
+    dessinerCarte('carte-artisan', { lat: a.lat, lon: a.lon, libelle: a.nom }, liste.map((x) => ({ lat: x.demande.lat, lon: x.demande.lon, couleur: couleurTaille(x.demande.taille),
+      titre: Z.abonnementActif(a, AUJOURDHUI) ? x.demande.titre : metierNom(x.demande.metier), detail: `${tailleNom(x.demande.taille)} · ${Z.formatDistance(x.km)}` })), a.rayonKm);
+  }
+
+  /* --- espace « Outils à réparer » --- */
+  function vueReparer() {
+    const aReparer = toutesAnnonces().filter((a) => a.etat === 'À réparer');
+    const reparateurs = artisansAbonnes().filter((a) => a.metiers.includes('reparation'));
+    return `<section class="hero hero-court" style="background-image:url('${PHOTOS.atelier}')"><div class="conteneur">
+        <div class="surtitre" style="color:var(--jaune)">Outils à réparer</div>
+        <h1>Un outil en panne n’est pas <em>un déchet</em>.</h1>
+        <p class="sous">Faites-le réparer par un réparateur près de chez vous, vendez-le pour pièces, ou offrez-lui une seconde vie entre les mains d’un bricoleur.</p>
+      </div></section>
+      <div class="page"><div class="conteneur">
+      <div class="modes">
+        <div class="mode"><div class="corps"><h3>🪛 Faire réparer mon outil</h3><p>Décrivez la panne : les réparateurs abonnés de votre secteur vous envoient un diagnostic et un devis. Gratuit pour vous.</p><a class="btn btn-cta" href="#/travaux?metier=reparation">Trouver un réparateur</a></div></div>
+        <div class="mode"><div class="corps"><h3>🔁 Vendre ou troquer pour pièces</h3><p>Moteur grillé, batterie morte, manche cassé ? Publiez-le « À réparer » : pièces et carcasses intéressent les bricoleurs.</p><a class="btn btn-sombre" href="#/deposer?etat=reparer">Déposer un outil en panne</a></div></div>
+        <div class="mode"><div class="corps"><h3>🧰 Acheter à petit prix</h3><p>Des outils à remettre en état pour quelques euros. La panne est décrite par le vendeur avant l’achat.</p><a class="btn btn-contour" href="#outils-a-reparer">Voir les outils à réparer</a></div></div>
+      </div>
+      <div class="titre-section" style="margin-top:40px"><div><div class="surtitre">Réparateurs abonnés</div><h2>${reparateurs.length} ateliers de réparation en Île-de-France</h2><p>Électroportatif, motoculture, affûtage. Indiquez votre code postal sur la page suivante pour les voir classés par distance.</p></div></div>
+      <div class="liste-artisans deux-colonnes">${reparateurs.map((a) => carteArtisan({ artisan: a, km: Z.distanceKm({ lat: 48.8566, lon: 2.3522 }, a) }, false).replace('📍', '📍 de Paris centre :')).join('')}</div>
+      <div class="titre-section" style="margin-top:40px" id="outils-a-reparer"><div><div class="surtitre">À remettre en état</div><h2>Outils à réparer</h2></div></div>
+      <div class="grille">${aReparer.map(carte).join('') || '<div class="vide">Aucun outil à réparer pour le moment.</div>'}</div>
+      <div class="panneau" style="margin-top:32px"><h3 style="margin-top:0">Bon à savoir avant de jeter</h3>
+        <ul style="color:var(--texte-doux);margin:0;padding-left:18px">
+          <li>Les pannes les plus courantes (charbons, interrupteur, cordon, batterie) se réparent souvent pour moins de la moitié du prix du neuf.</li>
+          <li>L’outillage électroportatif et les tondeuses ouvrent droit au <b>bonus réparation</b> (20 € déduits de la facture pour l’électroportatif) chez un réparateur labellisé QualiRépar.</li>
+          <li>Un outil réparé garde l’historique de ses interventions sur ZETOOLS : un argument à la revente.</li>
+        </ul></div>
+    </div></div>`;
+  }
+
+  /* ---------- routeur ---------- */
+  function router() {
+    const [chemin, qs] = (location.hash.slice(1) || '/').split('?');
+    const params = new URLSearchParams(qs || '');
+    const seg = chemin.split('/').filter(Boolean);
+    let html, apres = null;
+    switch (seg[0]) {
+      case undefined: html = vueAccueil(); apres = brancherAccueil; break;
+      case 'annonces': html = vueAnnonces(params); apres = brancherFiltres; break;
+      case 'annonce': html = vueFiche(seg[1]); apres = () => { const a = annonce(seg[1]); if (a) brancherFiche(a); }; break;
+      case 'messages': html = vueMessages(params); apres = () => brancherMessages(params); break;
+      case 'mon-espace': html = vueMonEspace(); apres = brancherEspace; break;
+      case 'favoris': html = vueMonEspace(); apres = () => { brancherEspace(); const h = [...document.querySelectorAll('h3')].find((x) => x.textContent === 'Mes favoris'); if (h) h.scrollIntoView(); }; break;
+      case 'deposer': html = vueDeposer(params); apres = brancherDeposer; break;
+      case 'pros': html = vuePros(); break;
+      case 'travaux': if (params.get('metier') !== null) { filtreTravaux.metier = params.get('metier'); filtreTravaux.vise = ''; } html = vueTravaux(); apres = brancherTravaux; break;
+      case 'espace-artisan': html = vueEspaceArtisan(); apres = brancherEspaceArtisan; break;
+      case 'reparer': html = vueReparer(); break;
+      case 'securite': html = blocReassurance(); break;
+      case 'atelier': html = vueAtelier(); break;
+      case 'aide': html = vueAide(); break;
+      case 'legal': html = vueLegal(); break;
+      case 'credits': html = vueCredits(); break;
+      default: html = '<div class="page"><div class="conteneur vide">Page introuvable. <a href="#/">Retour à l’accueil</a></div></div>';
+    }
+    vue.innerHTML = html;
+    if (apres) apres();
+    document.getElementById('bulle-msg').textContent = etat.conversations.length;
+    if (!seg[0] || seg[0] !== 'favoris') window.scrollTo(0, 0);
+  }
+  function versAnnonces(obj) {
+    const p = new URLSearchParams(); Object.entries(obj).forEach(([k, v]) => { if (v) p.set(k, v); });
+    aller('#/annonces' + (p.toString() ? '?' + p : ''));
+  }
+  function brancherAccueil() {
+    let mode = '';
+    document.getElementById('onglets-hero').addEventListener('click', (e) => {
+      const b = e.target.closest('[data-mode]'); if (!b) return;
+      mode = b.dataset.mode; document.querySelectorAll('#onglets-hero button').forEach((x) => x.classList.toggle('actif', x === b));
+    });
+    document.getElementById('moteur').addEventListener('submit', (e) => {
+      e.preventDefault(); const fd = new FormData(e.target);
+      versAnnonces({ mode, q: fd.get('q'), cat: fd.get('cat'), lieu: fd.get('lieu') });
+    });
+  }
+  function brancherFiltres() {
+    document.getElementById('filtres').addEventListener('submit', (e) => {
+      e.preventDefault(); const fd = new FormData(e.target);
+      versAnnonces({ mode: fd.get('mode'), q: fd.get('q'), cat: fd.get('cat'), lieu: fd.get('lieu') });
+    });
+  }
+  function brancherEspace() {
+    const b = document.getElementById('reinitialiser');
+    if (b) b.addEventListener('click', () => { etat = ETAT_INITIAL(); sauver(); toast('Démonstration réinitialisée.'); router(); });
+  }
+  document.getElementById('recherche-entete').addEventListener('submit', (e) => {
+    e.preventDefault(); const v = document.getElementById('q-entete').value.trim();
+    if (/^\d{2,5}$/.test(v)) versAnnonces({ lieu: v }); else versAnnonces({ q: v });
+  });
+  // navigation interne robuste (certains aperçus ignorent les changements de #)
+  function aller(h) {
+    location.hash = h;
+    if (location.hash !== h) { try { history.pushState(null, '', h); } catch (e) { /* ignoré */ } router(); }
+  }
+  window.ZT_ALLER = aller;
+  document.addEventListener('click', (e) => {
+    const lien = e.target.closest('a[href^="#/"]');
+    if (!lien || e.defaultPrevented || e.metaKey || e.ctrlKey) return;
+    e.preventDefault(); aller(lien.getAttribute('href'));
+  });
+  window.addEventListener('hashchange', router);
+  window.addEventListener('popstate', router);
+  router();
+})();
+
+</script>
+</body>
+</html>
