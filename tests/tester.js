@@ -254,6 +254,70 @@ test('le prix négocié s’applique à l’annonce tant que l’accord est vala
 });
 test('les offres de démonstration sont cohérentes', () => { for (const o of D.OFFRES_DEMO) assert.ok(o.montant < o.prixAffiche && o.montant >= o.prixAffiche * Z.REGLES.offres.plancher, o.id); });
 
+console.log('Services');
+const SV = D.SERVICES[0];
+test('les services de la maquette sont valides et leurs prestataires existent', () => { for (const x of D.SERVICES) { assert.ok(Z.verifierService(x).ok, x.id); assert.ok(D.MEMBRES[x.membre], x.id); assert.ok(D.METIERS.some((m) => m.id === x.metier), x.id); } });
+test('métier réglementé : SIRET exigé', () => {
+  const x = Object.assign({}, SV, { metier: 'electricite', siret: false });
+  assert.match(Z.verifierService(x).erreurs[0], /professionnels qualifiés/); assert.ok(Z.verifierService(Object.assign({}, x, { siret: true })).ok);
+  assert.strictEqual(Z.estReglemente('bricolage'), false); assert.strictEqual(Z.estReglemente('plomberie'), true);
+});
+test('service refusé : sans titre, sans tarif, unité ou code postal invalides', () => {
+  assert.strictEqual(Z.verifierService(Object.assign({}, SV, { titre: 'ab' })).ok, false); assert.strictEqual(Z.verifierService(Object.assign({}, SV, { tarif: 0 })).ok, false);
+  assert.strictEqual(Z.verifierService(Object.assign({}, SV, { unite: 'jour' })).ok, false); assert.strictEqual(Z.verifierService(Object.assign({}, SV, { cp: '9310' })).ok, false);
+});
+test('devis à l’heure : frais client 8 %, commission 12 %', () => {
+  const d = Z.devisService(SV, 3);
+  assert.deepStrictEqual([d.heures, d.base, d.fraisService, d.total, d.commission, d.versementPrestataire], [3, 66, 5.28, 71.28, 7.92, 58.08]);
+});
+test('devis : durée minimum du prestataire et 8 h au plus', () => {
+  const x = Object.assign({}, SV, { dureeMin: 2 });
+  assert.strictEqual(Z.devisService(x, 1).heures, 2); assert.strictEqual(Z.devisService(x, 20).heures, 8); assert.strictEqual(Z.devisService(x).heures, 2);
+});
+test('devis au forfait : prix fixe quelle que soit la durée demandée', () => { const f = D.SERVICES.find((x) => x.unite === 'forfait'); const d = Z.devisService(f, 5); assert.strictEqual(d.base, f.tarif); assert.strictEqual(d.heures, f.dureeForfait); assert.strictEqual(d.forfait, true); });
+test('artisan abonné : aucune commission', () => { const d = Z.devisService(SV, 2, { abonne: true }); assert.strictEqual(d.commission, 0); assert.strictEqual(d.versementPrestataire, 44); });
+test('recherche de services par métier, mot et lieu', () => {
+  assert.ok(Z.filtrerServices(D.SERVICES, { metier: 'jardin' }).every((x) => x.metier === 'jardin')); assert.strictEqual(Z.filtrerServices(D.SERVICES, { q: 'meubles' })[0].id, 's1');
+  assert.strictEqual(Z.filtrerServices(D.SERVICES, { lieu: '94' }).length, D.SERVICES.filter((x) => x.cp.startsWith('94')).length); assert.strictEqual(Z.filtrerServices(D.SERVICES, { q: 'zzz' }).length, 0);
+});
+test('offre de prix sur un service, puis tarif négocié appliqué au devis', () => {
+  assert.ok(Z.verifierOffre(SV, 'service', 18).ok); assert.match(Z.verifierOffre(SV, 'service', 10).raison, /trop basse/); assert.strictEqual(Z.verifierOffre(SV, 'vente', 18).ok, false);
+  const acc = Z.repondreOffre(Z.creerOffre(SV, 'service', 18, M), 'accepter', M).offre;
+  const n = Z.appliquerOffres(SV, [acc], M); assert.strictEqual(n.tarif, 18); assert.strictEqual(n.tarifAffiche, 22); assert.strictEqual(Z.devisService(n, 2).base, 36); assert.strictEqual(SV.tarif, 22);
+});
+test('une prestation réservée est un rendez-vous de type « service »', () => {
+  const r = { id: 'rs', type: 'service', objet: SV.titre, creneaux: ['2026-11-21T10:00'], dureeHeures: 2 };
+  assert.ok(Z.verifierProposition(r, M).ok); assert.strictEqual(Z.confirmerRdv(r, '2026-11-21T10:00').rdv.statut, 'confirmé'); assert.match(Z.versIcs(Object.assign({}, r, { creneau: '2026-11-21T10:00' })), /Prestation de service/);
+});
+
+console.log('Fiches techniques et PDF');
+const PDF = require('../pdf.js');
+test('six fiches complètes : outils, étapes, sécurité', () => {
+  assert.strictEqual(D.FICHES.length, 6);
+  for (const f of D.FICHES) { assert.ok(f.titre && f.resume && f.niveau && f.duree && f.budget, f.id); assert.ok(f.outils.length >= 3, f.id); assert.ok(f.etapes.length >= 6, f.id); assert.ok(f.securite.length >= 3, f.id); }
+});
+test('chaque fiche produit un PDF valide : en-tête, fin, table des objets exacte', () => {
+  for (const f of D.FICHES) {
+    const pdf = PDF.fichePdf(f);
+    assert.ok(pdf.startsWith('%PDF-1.4\n') && pdf.endsWith('%%EOF\n'), f.id);
+    assert.ok(/^[\x00-\x7f]*$/.test(pdf), f.id + ' : le fichier doit rester en ASCII');
+    const debut = Number(pdf.match(/startxref\n(\d+)\n%%EOF/)[1]); assert.strictEqual(pdf.slice(debut, debut + 4), 'xref', f.id);
+    const lignes = pdf.slice(debut).split('\n'); const nb = Number(lignes[1].split(' ')[1]);
+    for (let n = 1; n < nb; n++) { const pos = Number(lignes[2 + n].slice(0, 10)); assert.ok(pdf.slice(pos).startsWith(`${n} 0 obj\n`), `${f.id} objet ${n}`); }
+    const pages = (pdf.match(/\/Type \/Page /g) || []).length; assert.ok(pages >= 1 && pages <= 3, f.id); assert.ok(pdf.includes(`/Count ${pages} `), f.id);
+    for (const m of pdf.matchAll(/<< \/Length (\d+) >>\nstream\n([\s\S]*?)\nendstream/g)) assert.strictEqual(m[2].length, Number(m[1]), f.id + ' longueur de flux');
+  }
+});
+test('accents, apostrophes, euro et « œ » encodés en WinAnsi', () => {
+  const pdf = PDF.fichePdf(Object.assign({}, D.FICHES[0], { titre: 'Étagère d’œuvre à 5 € (test)' }));
+  assert.ok(pdf.includes('(\\311tag\\350re d\\222\\234uvre \\340 5 \\200 \\(test\\))'));
+});
+test('le texte long est coupé dans la largeur de la page', () => {
+  const l = PDF.couper(D.FICHES[0].etapes.join(' '), 10.5, false, 495); assert.ok(l.length > 5); for (const x of l) assert.ok(PDF.largeur(x, 10.5, false) <= 495);
+});
+test('nom de fichier sans accent ni espace', () => assert.strictEqual(PDF.nomFichier({ titre: 'Fixer une étagère murale solide et de niveau' }), 'zetools-fiche-fixer-une-etagere-murale-solide-et-de-niveau.pdf'));
+test('octets : même longueur que le fichier', () => { const pdf = PDF.fichePdf(D.FICHES[5]); assert.strictEqual(PDF.octets(pdf).length, pdf.length); });
+
 console.log('Textes juridiques');
 const JUR = require('../juridique.js');
 test('les six documents existent et sont complets', () => {
