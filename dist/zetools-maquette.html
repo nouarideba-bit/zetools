@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>ZETOOLS · Achetez, louez, échangez vos outils entre voisins</title>
   <meta name="description" content="La plateforme communautaire et sécurisée pour donner une seconde vie aux outils : achat, location et troc entre particuliers et professionnels en Île-de-France.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpolygon points='50,6 88.1,28 88.1,72 50,94 11.9,72 11.9,28' fill='%23f5b700' stroke='%23f5b700' stroke-width='8' stroke-linejoin='round'/%3E%3Cpolygon points='28,26 72,26 72,37 45,63 72,63 72,74 28,74 28,63 55,37 28,37' fill='%2323272b'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
@@ -402,13 +403,25 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
 .entete .btn-cta { white-space: nowrap; }
 @media (max-width: 1400px) { .entete .btn-deposer-texte { display: none; } }
 
+/* ---------- logo : l'écrou ZE ---------- */
+.logo-zt { width: 34px; height: 34px; flex-shrink: 0; display: block; }
+
+/* ---------- fiches : étapes illustrées ---------- */
+.etapes-picto { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+.etapes-picto li { display: flex; gap: 14px; align-items: flex-start; }
+.etapes-picto li b { color: var(--vert); }
+.case-picto { flex-shrink: 0; width: 46px; height: 46px; border-radius: 10px; background: #fff3cf; color: var(--anthracite); display: grid; place-items: center; }
+.marque-fiche { display: flex; align-items: center; gap: 8px; font-size: .85rem; color: var(--texte-doux); margin-bottom: 14px; }
+.marque-fiche .marque-ze { color: var(--jaune-fonce); }
+.marque-fiche b { color: var(--anthracite); letter-spacing: .5px; }
+
 </style>
 </head>
 <body>
   <div class="maquette">Maquette phase 1 · paiements et comptes simulés · données fictives</div>
   <header class="entete">
     <div class="conteneur">
-      <a class="logo" href="#/"><span class="pastille">⚒</span><span><span class="marque-ze">ZE</span>TOOLS</span></a>
+      <a class="logo" href="#/"><svg class="logo-zt" viewBox="0 0 100 100" aria-hidden="true"><polygon points="50,6 88.1,28 88.1,72 50,94 11.9,72 11.9,28" fill="#f5b700" stroke="#f5b700" stroke-width="8" stroke-linejoin="round"/><polygon points="28,26 72,26 72,37 45,63 72,63 72,74 28,74 28,63 55,37 28,37" fill="#23272b"/></svg><span><span class="marque-ze">ZE</span>TOOLS</span></a>
       <form class="recherche-entete" id="recherche-entete" role="search">
         <input id="q-entete" type="search" placeholder="Outil, marque ou code postal…" aria-label="Rechercher">
         <button type="submit">Chercher</button>
@@ -434,7 +447,7 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
     <div class="conteneur">
       <div class="colonnes">
         <div>
-          <a class="logo" href="#/" style="color:#fff"><span class="pastille">⚒</span><span><span class="marque-ze">ZE</span>TOOLS</span></a>
+          <a class="logo" href="#/" style="color:#fff"><svg class="logo-zt" viewBox="0 0 100 100" aria-hidden="true"><polygon points="50,6 88.1,28 88.1,72 50,94 11.9,72 11.9,28" fill="#f5b700" stroke="#f5b700" stroke-width="8" stroke-linejoin="round"/><polygon points="28,26 72,26 72,37 45,63 72,63 72,74 28,74 28,63 55,37 28,37" fill="#23272b"/></svg><span><span class="marque-ze">ZE</span>TOOLS</span></a>
           <p>Le bon outil, au bon moment, à deux rues de chez vous. Moins d’achats inutiles, plus d’outils qui servent.</p>
           <div class="reseaux"><a href="#/" title="Instagram">IG</a><a href="#/" title="Facebook">f</a><a href="#/" title="YouTube">▶</a><a href="#/" title="LinkedIn">in</a></div>
         </div>
@@ -489,7 +502,10 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
     offres: { plancher: 0.5, validiteHeures: 48, maxParAnnonce: 3, seuilAcceptationDemo: 0.8 },
     typesRdv: { travaux: 'Travaux', echange: 'Échange de matériel', reparation: 'Réparation', remise: 'Remise d’un outil', service: 'Prestation de service' },
     // Services proposés par les membres (particuliers et professionnels), réservés à l'heure ou au forfait
-    service: { fraisClient: 0.08, commission: 0.12, heuresMax: 8, metiersReglementes: ['plomberie', 'electricite', 'maconnerie'] },
+    service: { fraisClient: 0.08, commission: 0.12, heuresMax: 8, metiersReglementes: ['plomberie', 'electricite', 'maconnerie'],
+      // assurances optionnelles, jamais cochées d'avance (art. L.121-17 C. conso) :
+      assuranceClientTaux: 0.06, assuranceClientMin: 2,   // « Je prends l'assurance » : dommages chez le client pendant la prestation
+      assurancePrestataireTaux: 0.04 },                   // responsabilité civile du prestataire particulier, déduite de son versement
   };
 
   const arrondi = (x) => Math.round(x * 100) / 100;
@@ -852,7 +868,20 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
     const base = arrondi(forfait ? s.tarif : s.tarif * h);
     const fraisService = arrondi(base * S.fraisClient);
     const commission = opts.abonne ? 0 : arrondi(base * S.commission);
-    return { heures: h, forfait, base, fraisService, total: arrondi(base + fraisService), commission, versementPrestataire: arrondi(base - commission) };
+    const assurance = opts.assurance ? arrondi(Math.max(S.assuranceClientMin, base * S.assuranceClientTaux)) : 0;
+    const cotisationPrestataire = s.assurePlateforme ? arrondi(base * S.assurancePrestataireTaux) : 0;
+    return { heures: h, forfait, base, fraisService, assurance, total: arrondi(base + fraisService + assurance), commission, cotisationPrestataire,
+      versementPrestataire: arrondi(base - commission - cotisationPrestataire), couverture: couvertureService(s, opts.assurance) };
+  }
+  /** Qui assure la prestation ? Sert à informer clairement le client avant qu'il paie. */
+  function couvertureService(s, assuranceClient) {
+    const sources = [];
+    if (s.siret) sources.push('responsabilité civile professionnelle du prestataire');
+    if (s.assurePlateforme) sources.push('assurance responsabilité civile ZETools du prestataire');
+    if (assuranceClient) sources.push('votre assurance dommages ZETools');
+    return { assure: sources.length > 0, sources,
+      message: sources.length ? 'Prestation couverte par : ' + sources.join(' ; ') + '.'
+        : 'Prestation non assurée : ce prestataire est un particulier sans assurance professionnelle. Un dommage éventuel serait à régler directement avec lui.' };
   }
   function filtrerServices(services, f = {}) {
     const q = (f.q || '').trim().toLowerCase(); const lieu = (f.lieu || '').trim().toLowerCase();
@@ -924,7 +953,7 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
     positionCodePostal, distanceKm, positionApprochee, formatDistance, artisansProches, demandesPourArtisan, abonnementActif, coutAbonnement, peutRepondre,
     plafondPrix, verifierPrix, remiseSurNeuf,
     stockLot, verifierLot, devisLot, retirerDuStock,
-    estReglemente, verifierService, devisService, filtrerServices,
+    estReglemente, verifierService, devisService, couvertureService, filtrerServices,
     verifierOffre, creerOffre, offreExpiree, repondreOffre, reponseVendeurDemo, appliquerOffres,
     creneauxJour, avancer, verifierProposition, confirmerRdv, annulationGratuite, versIcs,
   };
@@ -1192,7 +1221,7 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
 
   // Services proposés par des membres : particuliers (coups de main occasionnels) et professionnels (SIRET)
   const SERVICES = [
-    { id: 's1', modes: ['service'], titre: 'Montage de meubles en kit et pose d’étagères', metier: 'bricolage', membre: 'm1', siret: false,
+    { id: 's1', modes: ['service'], titre: 'Montage de meubles en kit et pose d’étagères', metier: 'bricolage', membre: 'm1', siret: false, assurePlateforme: true,
       tarif: 22, unite: 'heure', dureeMin: 1, ville: 'Montreuil', cp: '93100', rayonKm: 8, outils: true, photo: U('1623161551706-318825cd18ef'),
       description: 'Armoires, lits, bureaux, dressings : je monte vos meubles en kit et je fixe étagères et meubles hauts. Je viens avec ma visseuse, mon niveau et mes chevilles.',
       inclus: ['Déplacement dans un rayon de 8 km', 'Outillage et petite quincaillerie', 'Nettoyage en fin de montage'] },
@@ -1216,42 +1245,42 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
 
   // Fiches techniques téléchargeables en PDF (contenu rédigé pour ZETools, indicatif)
   const FICHES = [
-    { id: 'f1', icone: '🪑', titre: 'Monter un meuble en kit sans se tromper', theme: 'Montage', niveau: 'Débutant', duree: '1 à 2 h', budget: '0 € hors meuble',
+    { id: 'f1', pictos: ['espace', 'inventaire', 'trier', 'goutte', 'assembler', 'mesurer', 'redresser', 'fixer'], icone: '🪑', titre: 'Monter un meuble en kit sans se tromper', theme: 'Montage', niveau: 'Débutant', duree: '1 à 2 h', budget: '0 € hors meuble',
       resume: 'La méthode pour monter une armoire, une commode ou un bureau en kit d’équerre, sans abîmer les panneaux et sans vis en trop à la fin.',
       outils: [{ nom: 'Visseuse sans fil à couple réglable, embouts cruciformes et six pans', q: 'visseuse' }, { nom: 'Maillet en caoutchouc', q: 'maillet' }, { nom: 'Mètre ruban et niveau à bulle', q: 'niveau' }, { nom: 'Petites coupelles pour trier la visserie', q: '' }],
       materiaux: ['Colle à bois vinylique (facultatif, pour les tourillons)', 'Carton d’emballage pour protéger le sol', 'Vis et chevilles adaptées à votre mur pour la fixation anti-basculement'],
       etapes: ['Dégagez une surface plus grande que le meuble couché et protégez le sol avec le carton d’emballage.', 'Faites l’inventaire des panneaux et de la quincaillerie avec la notice. S’il manque une pièce, ne commencez pas.', 'Triez la visserie par type dans des coupelles et repérez chaque panneau par sa lettre ou son numéro.', 'Posez d’abord tourillons et excentriques sur les panneaux. Une goutte de colle dans les trous de tourillons rigidifie le meuble, mais empêche tout démontage.', 'Assemblez la caisse à plat : côtés, dessus, dessous. Serrez les excentriques d’un quart de tour, sans forcer.', 'Contrôlez l’équerrage : les deux diagonales de la caisse doivent être égales. Fixez ensuite le fond, qui bloque l’équerrage.', 'Redressez le meuble à deux. Posez tablettes, portes et tiroirs, puis réglez les charnières avec leurs vis de réglage.', 'Fixez le meuble au mur avec le dispositif anti-basculement fourni.'],
       securite: ['Réglez la visseuse sur un couple faible : l’aggloméré éclate si l’on serre trop fort.', 'Manipulez les grands panneaux à deux.', 'Un meuble haut non fixé au mur peut basculer : la fixation murale est indispensable, surtout avec des enfants.'],
       astuce: 'Gardez la notice et la clé fournie dans une pochette collée au dos du meuble : elles serviront au prochain déménagement.' },
-    { id: 'f2', icone: '📏', titre: 'Fixer une étagère murale solide et de niveau', theme: 'Fixation', niveau: 'Débutant', duree: '45 min', budget: '10 à 30 €',
+    { id: 'f2', pictos: ['mur', 'electricite', 'niveau', 'percer', 'nettoyer', 'visser', 'verifier'], icone: '📏', titre: 'Fixer une étagère murale solide et de niveau', theme: 'Fixation', niveau: 'Débutant', duree: '45 min', budget: '10 à 30 €',
       resume: 'Choisir la bonne cheville selon le mur, percer proprement et obtenir une étagère parfaitement horizontale.',
       outils: [{ nom: 'Perceuse à percussion ou perforateur', q: 'perforateur' }, { nom: 'Forets adaptés au mur (béton, brique, bois ou métal pour le placo)', q: 'forets' }, { nom: 'Détecteur de câbles et de métaux', q: 'détecteur' }, { nom: 'Niveau à bulle, mètre, crayon', q: 'niveau' }, { nom: 'Visseuse et aspirateur', q: 'visseuse' }],
       materiaux: ['Étagère avec ses équerres ou ses supports invisibles', 'Chevilles adaptées : métalliques à expansion pour la plaque de plâtre, longues ou chimiques pour la brique creuse, nylon pour le béton et la brique pleine', 'Vis du diamètre indiqué sur la boîte de chevilles'],
       etapes: ['Identifiez le mur : il sonne creux (plaque de plâtre, brique creuse) ou plein (béton, brique pleine). La couleur de la poussière au perçage confirme : blanche pour le plâtre, rouge pour la brique, grise pour le béton.', 'Passez le détecteur. Ne percez jamais à l’aplomb ni à l’horizontale d’une prise ou d’un interrupteur.', 'Tracez un trait horizontal au niveau à bulle et marquez les points de perçage à travers les supports.', 'Percez au diamètre de la cheville, un centimètre plus profond que sa longueur. Sans percussion dans la plaque de plâtre, la brique creuse et le carrelage.', 'Aspirez la poussière et enfoncez les chevilles à fleur du mur.', 'Vissez les supports sans les bloquer, contrôlez le niveau, puis serrez.', 'Posez la tablette, fixez-la aux supports et chargez-la progressivement.'],
       securite: ['Portez des lunettes de protection.', 'Près d’un circuit électrique, coupez le courant au tableau avant de percer.', 'Respectez la charge maximale indiquée sur la boîte de chevilles : elle dépend du mur.'],
       astuce: 'Collez une enveloppe pliée sous le point de perçage avec du ruban adhésif : elle recueille la poussière.' },
-    { id: 'f3', icone: '🪚', titre: 'Fabriquer une étagère en bois sur mesure', theme: 'Fabrication', niveau: 'Intermédiaire', duree: 'Une demi-journée, plus le séchage', budget: '40 à 90 €',
+    { id: 'f3', pictos: ['plan', 'tracer', 'scier', 'poncer', 'percer', 'assembler', 'visser', 'peindre', 'fixer'], icone: '🪚', titre: 'Fabriquer une étagère en bois sur mesure', theme: 'Fabrication', niveau: 'Intermédiaire', duree: 'Une demi-journée, plus le séchage', budget: '40 à 90 €',
       resume: 'Une bibliothèque simple en planches massives, aux dimensions exactes de votre niche ou de votre mur.',
       outils: [{ nom: 'Scie circulaire avec guide, ou scie sauteuse', q: 'scie' }, { nom: 'Ponceuse excentrique', q: 'ponceuse' }, { nom: 'Perceuse-visseuse, foret de 3 mm et fraise à chanfreiner', q: 'perceuse' }, { nom: 'Serre-joints, équerre de menuisier, mètre', q: 'serre-joints' }],
       materiaux: ['Planches de pin ou de chêne, 18 à 22 mm d’épaisseur', 'Vis à bois 4 × 40 mm, colle à bois', 'Abrasifs grains 80, 120, 180 et 240', 'Huile ou vernis de finition', 'Fond en contreplaqué de 5 mm ou traverse arrière'],
       etapes: ['Dessinez un plan coté. Pour une planche de 18 mm chargée de livres, limitez la portée à 80 cm environ entre deux montants.', 'Tracez les coupes à l’équerre et numérotez les pièces.', 'Sciez avec la belle face vers le bas : la lame fait des éclats sur le dessus.', 'Poncez au grain 80, puis 120, puis 180, et cassez légèrement les arêtes.', 'Pré-percez à 3 mm et fraisez l’entrée des trous : le bois ne fend pas et les têtes de vis s’effacent.', 'Assemblez montants et tablettes à la colle et aux vis, sous serre-joints. Contrôlez l’équerrage par les diagonales.', 'Posez le fond ou une traverse arrière : c’est ce qui empêche le meuble de se déformer en parallélogramme.', 'Dépoussiérez, puis appliquez deux couches de finition en égrenant au grain 240 entre les deux.', 'Fixez l’étagère au mur.'],
       securite: ['Lunettes, protections auditives et masque anti-poussière pendant le sciage et le ponçage.', 'Bloquez toujours la pièce avec des serre-joints : ne la tenez jamais à la main près de la lame.', 'Débranchez l’outil ou retirez la batterie avant de changer une lame.'],
       astuce: 'Faites débiter les planches à la bonne longueur en magasin : il ne vous restera que les coupes de finition.' },
-    { id: 'f4', icone: '🧱', titre: 'Percer un mur : le bon foret, la bonne cheville', theme: 'Perçage', niveau: 'Débutant', duree: '20 min', budget: '5 à 15 €',
+    { id: 'f4', pictos: ['mur', 'electricite', 'percer', 'attention', 'percer', 'attendre', 'nettoyer'], icone: '🧱', titre: 'Percer un mur : le bon foret, la bonne cheville', theme: 'Perçage', niveau: 'Débutant', duree: '20 min', budget: '5 à 15 €',
       resume: 'Plaque de plâtre, brique, béton, carrelage : à chaque support sa méthode pour un trou net et une fixation qui tient.',
       outils: [{ nom: 'Perceuse à percussion (brique pleine, parpaing) ou perforateur SDS (béton)', q: 'perforateur' }, { nom: 'Jeu de forets : béton, bois, métal, carrelage', q: 'forets' }, { nom: 'Détecteur de câbles et de métaux', q: 'détecteur' }, { nom: 'Aspirateur et ruban adhésif de masquage', q: 'aspirateur' }],
       materiaux: ['Chevilles adaptées au support et à la charge', 'Vis correspondantes'],
       etapes: ['Reconnaissez le support : plaque de plâtre (sonne creux, poussière blanche), brique (poussière rouge), béton (poussière grise, très dur).', 'Repérez câbles et tuyaux au détecteur. Les gaines électriques courent à la verticale et à l’horizontale des prises et interrupteurs.', 'Plaque de plâtre : foret à métaux, sans percussion, cheville métallique à expansion.', 'Brique creuse : sans percussion pour ne pas casser les alvéoles, cheville longue ou scellement chimique.', 'Béton et brique pleine : percussion ou perforateur, foret béton, cheville nylon.', 'Carrelage : collez un ruban de masquage, percez sans percussion avec un foret spécial, à vitesse lente, puis changez de foret pour le mur.', 'Percez bien perpendiculairement, un centimètre plus profond que la cheville, et aspirez le trou avant de la poser.'],
       securite: ['Lunettes de protection ; masque si vous percez beaucoup.', 'Coupez le courant au tableau en cas de doute sur le passage d’un câble.', 'Tenez la machine à deux mains et utilisez la poignée latérale d’un perforateur.'],
       astuce: 'Un morceau de ruban adhésif enroulé sur le foret sert de butée de profondeur.' },
-    { id: 'f5', icone: '🖌️', titre: 'Poncer et repeindre un meuble en bois', theme: 'Rénovation', niveau: 'Intermédiaire', duree: 'Un week-end avec les séchages', budget: '30 à 60 €',
+    { id: 'f5', pictos: ['demonter', 'nettoyer', 'poncer', 'nettoyer', 'goutte', 'peindre', 'poncer', 'peindre', 'attendre'], icone: '🖌️', titre: 'Poncer et repeindre un meuble en bois', theme: 'Rénovation', niveau: 'Intermédiaire', duree: 'Un week-end avec les séchages', budget: '30 à 60 €',
       resume: 'Redonner une seconde vie à une commode ou à une table : préparation du support, sous-couche et deux couches bien tendues.',
       outils: [{ nom: 'Ponceuse excentrique et cale à poncer', q: 'ponceuse' }, { nom: 'Pinceau à rechampir et petit rouleau laqueur', q: '' }, { nom: 'Tournevis, bâche de protection', q: '' }],
       materiaux: ['Abrasifs grains 120, 180 et 240', 'Dégraissant ou lessive, chiffons', 'Pâte à bois', 'Sous-couche adaptée (primaire d’accrochage pour un meuble mélaminé ou verni)', 'Peinture pour boiseries'],
       etapes: ['Démontez poignées, portes et tiroirs. Protégez le sol.', 'Lessivez, rincez et laissez sécher complètement.', 'Poncez au grain 120. Sur un vernis sain, il suffit de dépolir pour donner de l’accroche : inutile de mettre le bois à nu.', 'Dépoussiérez à l’aspirateur, puis au chiffon légèrement humide.', 'Rebouchez trous et éclats à la pâte à bois, laissez sécher, poncez au grain 180.', 'Appliquez la sous-couche et laissez sécher le temps indiqué.', 'Égrenez au grain 240 et dépoussiérez.', 'Passez deux couches fines de peinture dans le sens du fil du bois, en respectant le temps de séchage entre les couches.', 'Remontez la quincaillerie. Attendez plusieurs jours avant un usage intensif : la peinture durcit lentement.'],
       securite: ['Masque anti-poussière FFP2 et lunettes pendant le ponçage.', 'Les peintures des meubles anciens peuvent contenir du plomb : ne les poncez pas à sec, faites-les tester ou utilisez un décapant adapté.', 'Aérez la pièce pendant l’application et le séchage.'],
       astuce: 'Deux couches fines valent mieux qu’une couche épaisse : moins de coulures, un film plus dur.' },
-    { id: 'f6', icone: '🔋', titre: 'Entretenir sa perceuse-visseuse et ses batteries', theme: 'Entretien', niveau: 'Débutant', duree: '15 min', budget: '0 €',
+    { id: 'f6', pictos: ['batterie', 'nettoyer', 'goutte', 'trier', 'batterie', 'electricite', 'nettoyer', 'inventaire'], icone: '🔋', titre: 'Entretenir sa perceuse-visseuse et ses batteries', theme: 'Entretien', niveau: 'Débutant', duree: '15 min', budget: '0 €',
       resume: 'Les gestes simples qui doublent la durée de vie d’un outil sans fil, et qui lui gardent sa valeur à la revente ou à la location.',
       outils: [{ nom: 'Pinceau sec ou soufflette', q: '' }, { nom: 'Chiffon propre', q: '' }, { nom: 'Huile fine', q: '' }],
       materiaux: [],
@@ -1334,6 +1363,7 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
         ['Article 10. Échange', `<p>L’échange est un contrat par lequel les membres se donnent un outil pour un autre (articles 1702 et suivants du Code civil). Si les valeurs diffèrent, les membres peuvent convenir d’une soulte, payée par l’intermédiaire de la plateforme. Chaque partie règle des frais de mise en relation de ${eur(R.fraisEchange)}.</p>`],
         ['Article 11. Artisans, travaux et réparations', `<p>Le client publie gratuitement une demande de travaux ou de réparation. Les artisans abonnés y répondent par un devis. Le contrat de travaux ou de réparation est conclu directement entre le client et l’artisan, qui en est seul responsable : conformité, délais, garanties légales, assurance de responsabilité civile et, pour les ouvrages qui en relèvent, assurance décennale (article 1792 du Code civil).</p>
           <p><b>Services proposés par les membres.</b> Un membre peut publier une offre de service, à l’heure ou au forfait. Le client réserve un jour et une heure et paie en ligne ; le prix est conservé par le prestataire de paiement et versé au prestataire une fois le service rendu. Le contrat de prestation de services est conclu directement entre le client et le prestataire.</p>
+          <p><b>Assurance des services.</b> Un prestataire particulier n’a pas d’assurance de responsabilité civile professionnelle. Avant tout paiement, la plateforme indique au client si la prestation est assurée, et par qui. Le prestataire peut souscrire l’assurance de responsabilité civile proposée par ZETools, pour ${pc(R.service.assurancePrestataireTaux)} du prix de chaque prestation. Le client peut souscrire, par une case qu’il coche lui-même, l’assurance dommages proposée par ZETools, pour ${pc(R.service.assuranceClientTaux)} du prix avec un minimum de ${eur(R.service.assuranceClientMin)}. À défaut d’assurance, les dommages se règlent directement entre le client et le prestataire. Garanties, plafonds et exclusions : ${AC('assureur et notice d’information de l’assurance des services')}.</p>
           <p>Un particulier ne peut proposer que de petits services occasionnels : petit bricolage, montage, jardinage courant, cours. Les activités soumises à qualification professionnelle, notamment l’électricité, la plomberie, le gaz et la maçonnerie, sont réservées aux professionnels qualifiés et immatriculés (article L. 121-1 du Code de l’artisanat). Le prestataire particulier déclare ses revenus ; une activité habituelle impose un statut professionnel.</p>
           <p>ZETools vérifie à l’inscription le numéro SIRET et, pour les gros travaux, l’attestation d’assurance décennale, sur la base des documents fournis. Cette vérification ne vaut pas garantie de la qualité des travaux.</p>`],
         ['Article 12. Déstockage des enseignes', `<p>Les produits proposés en déstockage sont vendus par des professionnels identifiés sur chaque offre. Le prix barré est le prix le plus bas pratiqué par l’enseigne au cours des trente jours précédant la réduction (article L. 112-1-1 du Code de la consommation). L’achat est limité à ${R.maxParClient} unités par client et par lot. Le retrait a lieu en magasin, sur présentation du code de retrait, dans un délai de 7 jours.</p>`],
@@ -1349,8 +1379,11 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
           <tr><td>Échange</td><td>${eur(R.fraisEchange)} par partie</td></tr>
           <tr><td>Service réservé en ligne, côté client</td><td>Frais de service de ${pc(R.service.fraisClient)} du prix</td></tr>
           <tr><td>Service réservé en ligne, côté prestataire</td><td>Commission de ${pc(R.service.commission)} du prix ; aucune commission pour les artisans abonnés</td></tr>
+          <tr><td>Assurance dommages d’un service, optionnelle, côté client</td><td>${pc(R.service.assuranceClientTaux)} du prix, avec un minimum de ${eur(R.service.assuranceClientMin)}</td></tr>
+          <tr><td>Assurance responsabilité civile du prestataire, optionnelle</td><td>${pc(R.service.assurancePrestataireTaux)} du prix de chaque prestation, déduits du versement</td></tr>
           <tr><td>Fiches techniques en PDF</td><td>Gratuit</td></tr>
           <tr><td>Garantie casse et vol, optionnelle</td><td>${pc(R.assuranceTaux)} du loyer, avec un minimum de ${eur(R.assuranceMin)}</td></tr></table>
+          <p>Aucune option payante n’est cochée d’avance : toute assurance résulte d’un choix exprès du membre (article L. 121-17 du Code de la consommation).</p>
           <p>Le prix total, frais compris, est affiché avant tout paiement. Les tarifs des professionnels figurent dans les conditions particulières.</p>`],
         ['Article 15. Paiement', `<p>Les paiements sont encaissés par le prestataire de paiement, sur un compte de cantonnement. <b>ZETools ne détient à aucun moment les fonds des membres.</b> Le membre accepte les conditions du prestataire de paiement lors de l’ouverture de son compte de paiement.</p>
           <p>Tout paiement hors plateforme prive le membre du séquestre, de la caution, de la garantie optionnelle et du traitement des litiges.</p>`],
@@ -1497,6 +1530,11 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
           <li><b>Recours</b> : chaque partie conserve le droit de saisir le médiateur ou le tribunal.</li></ol>
           <p>L’usure normale n’est jamais retenue. Un retard est facturé au tarif journalier, par jour commencé.</p>`],
         ['5. La garantie casse et vol, en option', `<p>Pour ${pc(R.assuranceTaux)} du loyer (minimum ${eur(R.assuranceMin)}), le locataire peut souscrire une garantie qui prend en charge la casse accidentelle et le vol au-delà d’une franchise. Assureur, plafonds et exclusions : ${AC('assureur, notice d’information, franchise')}.</p>`],
+        ['5 bis. L’assurance des services', `<ul>
+          <li>Un professionnel est couvert par sa propre responsabilité civile professionnelle.</li>
+          <li>Un particulier n’en a pas. Il peut prendre l’assurance responsabilité civile ZETools : son annonce porte alors le badge « Assuré ».</li>
+          <li>À la réservation, vous pouvez cocher « Je prends l’assurance » : pour ${pc(R.service.assuranceClientTaux)} du prix (minimum ${eur(R.service.assuranceClientMin)}), les dégâts causés chez vous pendant la prestation sont couverts.</li>
+          <li>Avant de payer, un encadré vous dit toujours si la prestation est assurée, et par qui. Rien n’est coché à votre place.</li></ul>`],
         ['6. Des membres vérifiés', `<ul>
           <li>Téléphone vérifié pour tous ; identité vérifiée par le prestataire de paiement avant tout versement.</li>
           <li>Professionnels : SIRET vérifié ; artisans : assurance décennale vérifiée pour les gros travaux.</li>
@@ -1572,17 +1610,79 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
     return lignes;
   }
 
+  /* ---------- logo ZETools (l'écrou ZE), dessiné en formes simples dans un carré de 100 ---------- */
+  const LOGO = { hexagone: [[50, 6], [88.1, 28], [88.1, 72], [50, 94], [11.9, 72], [11.9, 28]],
+    z: [[28, 26], [72, 26], [72, 37], [45, 63], [72, 63], [72, 74], [28, 74], [28, 63], [55, 37], [28, 37]] };
+  const pts = (l) => l.map((p) => p.join(',')).join(' ');
+  function logoSvg(taille) {
+    return `<svg width="${taille || 34}" height="${taille || 34}" viewBox="0 0 100 100" aria-hidden="true"><polygon points="${pts(LOGO.hexagone)}" fill="#f5b700" stroke="#f5b700" stroke-width="8" stroke-linejoin="round"/><polygon points="${pts(LOGO.z)}" fill="#23272b"/></svg>`;
+  }
+
+  /* ---------- pictogrammes des étapes : traits simples sur une grille de 24, rendus en SVG et en PDF ----------
+     l = ligne [x1, y1, x2, y2] ; r = rectangle [x, y, largeur, hauteur] ; c = cercle [cx, cy, rayon, plein ?] ; p = polygone fermé [[x, y], …] */
+  const PICTOS = {
+    espace: [['l', 3, 8, 3, 4], ['l', 3, 4, 7, 4], ['l', 17, 4, 21, 4], ['l', 21, 4, 21, 8], ['l', 21, 16, 21, 20], ['l', 21, 20, 17, 20], ['l', 7, 20, 3, 20], ['l', 3, 20, 3, 16], ['r', 8, 9, 8, 6]],
+    inventaire: [['r', 5, 4, 14, 17], ['r', 9, 2, 6, 4], ['l', 8, 11, 16, 11], ['l', 8, 14, 16, 14], ['l', 8, 17, 13, 17]],
+    trier: [['r', 2, 13, 5.5, 6], ['r', 9.25, 13, 5.5, 6], ['r', 16.5, 13, 5.5, 6], ['c', 4.75, 7, 1.3, 1], ['c', 12, 7, 1.3, 1], ['c', 19.25, 7, 1.3, 1]],
+    goutte: [['p', [[12, 3], [17.5, 12.5], [17.5, 16], [15, 19.5], [12, 20.5], [9, 19.5], [6.5, 16], [6.5, 12.5]]]],
+    assembler: [['r', 3, 3, 11, 11], ['r', 10, 10, 11, 11]],
+    mesurer: [['r', 2, 8, 20, 8], ['l', 6, 8, 6, 12], ['l', 10, 8, 10, 11], ['l', 14, 8, 14, 12], ['l', 18, 8, 18, 11]],
+    redresser: [['l', 12, 19, 12, 4], ['l', 12, 4, 7, 9], ['l', 12, 4, 17, 9], ['l', 5, 21, 19, 21]],
+    fixer: [['l', 4, 3, 4, 21], ['r', 4, 10, 8, 4], ['l', 12, 12, 20, 12], ['l', 20, 9, 20, 15]],
+    mur: [['r', 3, 5, 18, 14], ['l', 3, 9.7, 21, 9.7], ['l', 3, 14.3, 21, 14.3], ['l', 12, 5, 12, 9.7], ['l', 8, 9.7, 8, 14.3], ['l', 16, 9.7, 16, 14.3], ['l', 12, 14.3, 12, 19]],
+    electricite: [['p', [[13, 2], [6, 13], [11, 13], [10, 22], [18, 10], [13, 10]]]],
+    niveau: [['r', 2, 8, 20, 8], ['c', 12, 12, 2.2], ['l', 8.5, 9.5, 8.5, 14.5], ['l', 15.5, 9.5, 15.5, 14.5]],
+    percer: [['r', 3, 7, 11, 6], ['p', [[6, 13], [10, 13], [9, 20], [5, 20]]], ['l', 14, 8, 14, 12], ['l', 14, 10, 21, 10]],
+    nettoyer: [['l', 12, 3, 12, 9], ['l', 9, 6, 15, 6], ['l', 6, 13, 6, 19], ['l', 3, 16, 9, 16], ['l', 17, 12, 17, 20], ['l', 13, 16, 21, 16]],
+    visser: [['r', 3, 9, 8, 6], ['l', 11, 12, 19, 12], ['p', [[19, 10.2], [22, 12], [19, 13.8]]]],
+    verifier: [['c', 12, 12, 9], ['l', 7.5, 12.5, 10.5, 15.5], ['l', 10.5, 15.5, 16.5, 8.5]],
+    plan: [['r', 4, 3, 16, 18], ['l', 4, 9, 20, 9], ['l', 10, 9, 10, 21]],
+    tracer: [['p', [[4, 20], [6, 14], [16, 4], [20, 8], [10, 18]]], ['l', 6, 14, 10, 18], ['l', 14, 6, 18, 10]],
+    scier: [['p', [[3, 9], [15, 7], [15, 15], [3, 12]]], ['r', 15, 6, 6, 10], ['l', 5, 12.5, 6, 15], ['l', 8, 13.2, 9, 15.7], ['l', 11, 14, 12, 16.5]],
+    poncer: [['r', 4, 9, 16, 6], ['l', 8, 9, 8, 6], ['l', 8, 6, 16, 6], ['l', 16, 6, 16, 9], ['l', 3, 18, 21, 18], ['l', 2, 21, 6, 21], ['l', 18, 21, 22, 21]],
+    peindre: [['r', 10, 2, 4, 9], ['r', 8, 11, 8, 3], ['p', [[8, 14], [16, 14], [15, 21], [9, 21]]]],
+    attention: [['p', [[12, 3], [22, 20], [2, 20]]], ['l', 12, 9, 12, 14], ['c', 12, 17, 0.7, 1]],
+    attendre: [['c', 12, 12, 9], ['l', 12, 7, 12, 12], ['l', 12, 12, 15.5, 14]],
+    demonter: [['l', 7, 17, 15, 9], ['c', 17, 7, 3.2], ['c', 6, 18, 1.8]],
+    batterie: [['r', 3, 8, 16, 9], ['r', 19, 10.5, 2, 4], ['l', 6.5, 10.5, 6.5, 14.5], ['l', 9.5, 10.5, 9.5, 14.5], ['l', 12.5, 10.5, 12.5, 14.5]],
+  };
+  function pictoSvg(cle, taille) {
+    const formes = (PICTOS[cle] || PICTOS.verifier).map((f) => {
+      if (f[0] === 'l') return `<line x1="${f[1]}" y1="${f[2]}" x2="${f[3]}" y2="${f[4]}"/>`;
+      if (f[0] === 'r') return `<rect x="${f[1]}" y="${f[2]}" width="${f[3]}" height="${f[4]}"/>`;
+      if (f[0] === 'c') return `<circle cx="${f[1]}" cy="${f[2]}" r="${f[3]}"${f[4] ? ' fill="currentColor"' : ''}/>`;
+      return `<polygon points="${pts(f[1])}"/>`;
+    }).join('');
+    return `<svg class="picto" width="${taille || 28}" height="${taille || 28}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${formes}</svg>`;
+  }
+
   /** Construit le PDF d'une fiche technique. Retourne le fichier sous forme de chaîne ASCII. */
   function fichePdf(f, societe) {
     const soc = societe || { nom: 'ZETools', siege: '58 rue de Ponthieu, 75008 Paris' };
     const pages = []; let ops = []; let y = 0;
     const texte = (t, x, yy, taille, gras, rgb) => ops.push(`BT /${gras ? 'F2' : 'F1'} ${taille} Tf ${rgb || '0.11 0.13 0.15'} rg ${x.toFixed(1)} ${yy.toFixed(1)} Td ${chaine(t)} Tj ET`);
     const rect = (x, yy, w, h, rgb) => ops.push(`${rgb} rg ${x} ${yy.toFixed(1)} ${w} ${h} re f`);
+    const n = (v) => Number(v.toFixed(2));
+    // dessin vectoriel : repère d'origine (x0, haut), y vers le bas, échelle e
+    const chemin = (liste, x0, haut, e) => liste.map((p, i) => `${n(x0 + p[0] * e)} ${n(haut - p[1] * e)} ${i ? 'l' : 'm'}`).join(' ') + ' h';
+    const logo = (x0, haut, taille) => { const e = taille / 100;
+      ops.push(`q 0.96 0.72 0 rg 0.96 0.72 0 RG ${n(8 * e)} w 1 j ${chemin(LOGO.hexagone, x0, haut, e)} B 0.137 0.153 0.169 rg ${chemin(LOGO.z, x0, haut, e)} f Q`); };
+    const picto = (cle, x0, haut, taille) => { const e = taille / 24; const K = 0.5523;
+      const formes = (PICTOS[cle] || PICTOS.verifier).map((f) => {
+        if (f[0] === 'l') return `${n(x0 + f[1] * e)} ${n(haut - f[2] * e)} m ${n(x0 + f[3] * e)} ${n(haut - f[4] * e)} l S`;
+        if (f[0] === 'r') return `${n(x0 + f[1] * e)} ${n(haut - (f[2] + f[4]) * e)} ${n(f[3] * e)} ${n(f[4] * e)} re S`;
+        if (f[0] === 'c') { const cx = x0 + f[1] * e, cy = haut - f[2] * e, r = f[3] * e, k = r * K;
+          return `${n(cx + r)} ${n(cy)} m ${n(cx + r)} ${n(cy + k)} ${n(cx + k)} ${n(cy + r)} ${n(cx)} ${n(cy + r)} c ${n(cx - k)} ${n(cy + r)} ${n(cx - r)} ${n(cy + k)} ${n(cx - r)} ${n(cy)} c ${n(cx - r)} ${n(cy - k)} ${n(cx - k)} ${n(cy - r)} ${n(cx)} ${n(cy - r)} c ${n(cx + k)} ${n(cy - r)} ${n(cx + r)} ${n(cy - k)} ${n(cx + r)} ${n(cy)} c ${f[4] ? 'B' : 'S'}`; }
+        return chemin(f[1], x0, haut, e) + ' S';
+      });
+      ops.push(`q 0.137 0.153 0.169 RG 0.137 0.153 0.169 rg ${n(1.7 * e)} w 1 J 1 j ${formes.join(' ')} Q`); };
     const nouvellePage = () => {
       if (ops.length) pages.push(ops);
       ops = [];
       rect(0, H - 56, L, 56, '0.137 0.153 0.169');
-      texte('ZE', MARGE, H - 36, 18, true, '0.96 0.72 0'); texte('TOOLS', MARGE + largeur('ZE', 18, true) + 1, H - 36, 18, true, '1 1 1');
+      logo(MARGE, H - 13, 30);
+      const xm = MARGE + 38;
+      texte('ZE', xm, H - 36, 18, true, '0.96 0.72 0'); texte('TOOLS', xm + largeur('ZE', 18, true) + 1, H - 36, 18, true, '1 1 1');
       const d = 'Fiche technique'; texte(d, L - MARGE - largeur(d, 11, false), H - 34, 11, false, '1 1 1');
       y = H - 56 - 34;
     };
@@ -1596,6 +1696,18 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
       });
     };
     const titreSection = (t) => { place(46); y -= 10; rect(MARGE, y - 5, 28, 3, '0.96 0.72 0'); y -= 0; texte(t, MARGE, y + 4, 13, true); y -= 24; };
+    // étapes illustrées : pictogramme dans un carré jaune pâle, numéro, texte
+    const etapes = (items, pictos) => items.forEach((it, i) => {
+      const lignes = couper(it, 10.5, false, LARGEUR - 62); const pas = 10.5 * 1.45;
+      const h = Math.max(30, lignes.length * pas + 4);
+      place(h + 6);
+      const haut = y + 11;
+      rect(MARGE, haut - 28, 28, 28, '1 0.96 0.84');
+      picto((pictos || [])[i], MARGE + 3, haut - 3, 22);
+      texte(`${i + 1}.`, MARGE + 36, y, 10.5, true, '0.17 0.37 0.23');
+      lignes.forEach((l, k) => texte(l, MARGE + 54, y - k * pas, 10.5, false));
+      y -= h + 6;
+    });
     const liste = (items, numerote) => items.forEach((it, i) => { paragraphe(it, 10.5, false, numerote ? 24 : 14, null, numerote ? `${i + 1}.` : '-'); y -= 3; });
 
     nouvellePage();
@@ -1604,7 +1716,7 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
     paragraphe(f.resume, 11, false); 
     titreSection('Outils nécessaires'); liste(f.outils.map((o) => o.nom));
     if ((f.materiaux || []).length) { titreSection('Matériaux et fournitures'); liste(f.materiaux); }
-    titreSection('Étapes'); liste(f.etapes, true);
+    titreSection('Étapes'); etapes(f.etapes, f.pictos);
     titreSection('Sécurité'); liste(f.securite);
     if (f.astuce) { titreSection('L’astuce du bricoleur'); paragraphe(f.astuce, 10.5, false); }
     y -= 10; paragraphe('Tous ces outils se louent ou s’achètent d’occasion sur ZETools, près de chez vous. Pas envie de le faire vous-même ? Réservez un prestataire dans la rubrique Services.', 10, true, 0, '0.17 0.37 0.23');
@@ -1612,6 +1724,7 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
 
     // pieds de page, une fois le nombre de pages connu
     pages.forEach((p, i) => {
+      ops = p; logo(L - MARGE - 16, 40, 16);   // la marque sur chaque page, en tête et en pied
       p.push(`0.87 0.88 0.9 rg ${MARGE} 46 ${LARGEUR} 0.7 re f`);
       const pied = (t, yy) => p.push(`BT /F1 7.5 Tf 0.35 0.38 0.42 rg ${MARGE} ${yy} Td ${chaine(t)} Tj ET`);
       pied(`${soc.nom} SAS · ${soc.siege} · Fiche indicative : suivez toujours la notice du fabricant de vos outils et de vos fournitures.`, 34);
@@ -1642,7 +1755,7 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
   function octets(pdf) { const o = new Uint8Array(pdf.length); for (let i = 0; i < pdf.length; i++) o[i] = pdf.charCodeAt(i) & 0xFF; return o; }
   const nomFichier = (f) => 'zetools-fiche-' + String(f.titre).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60) + '.pdf';
 
-  const ZT_PDF = { fichePdf, octets, nomFichier, largeur, couper };
+  const ZT_PDF = { fichePdf, octets, nomFichier, largeur, couper, PICTOS, pictoSvg, logoSvg };
   if (typeof module !== 'undefined' && module.exports) module.exports = ZT_PDF;
   else racine.ZT_PDF = ZT_PDF;
 })(typeof window !== 'undefined' ? window : globalThis);
@@ -1888,12 +2001,13 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
   }
 
   /* --- fiche outil : réservation, achat, échange --- */
-  let selection = { debut: null, fin: null, mois: null, onglet: null, assurance: true };
+  // l'assurance n'est jamais cochée d'avance : une option payante exige un choix exprès du client
+  let selection = { debut: null, fin: null, mois: null, onglet: null, assurance: false };
   function vueFiche(id) {
     const a = Z.appliquerOffres(annonce(id), etat.offres, maintenant());
     if (!a) return '<div class="page"><div class="conteneur vide">Annonce introuvable. <a href="#/annonces">Retour aux annonces</a></div></div>';
     const m = membre(a.membre);
-    if (selection.id !== id) selection = { id, debut: null, fin: null, mois: AUJOURDHUI.slice(0, 7), onglet: a.modes[0], assurance: true };
+    if (selection.id !== id) selection = { id, debut: null, fin: null, mois: AUJOURDHUI.slice(0, 7), onglet: a.modes[0], assurance: false };
     return `<div class="page"><div class="conteneur">
       <div class="fil"><a href="#/">Accueil</a> › <a href="#/annonces?cat=${a.categorie}">${catNom(a.categorie)}</a> › ${esc(a.titre)}</div>
       <div class="fiche">
@@ -1966,8 +2080,9 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
         detail = `<div class="alerte alerte-ok">Du ${Z.formatDate(selection.debut)} au ${Z.formatDate(selection.fin)} · ${d.jours} jour${d.jours > 1 ? 's' : ''}</div>
           <div class="ligne"><span>${Z.euros(a.prixJour)} × ${d.jours} j</span><span>${Z.euros(d.brut)}</span></div>
           ${d.remise ? `<div class="ligne" style="color:var(--vert)"><span>Remise longue durée</span><span>− ${Z.euros(d.remise)}</span></div>` : ''}
-          <label class="ligne" style="cursor:pointer"><span><input type="checkbox" id="assurance" ${selection.assurance ? 'checked' : ''}> Assurance casse et vol</span><span>${Z.euros(d.assurance)}</span></label>
+          <label class="ligne" style="cursor:pointer"><span><input type="checkbox" id="assurance" ${selection.assurance ? 'checked' : ''}> <b>Je prends l’assurance</b> casse et vol</span><span>${Z.euros(d.assurance)}</span></label>
           <div class="ligne"><span>Frais de service</span><span>${Z.euros(d.fraisService)}</span></div>
+          ${selection.assurance ? '' : '<div class="ligne discret"><span>Sans assurance, la casse et le vol sont couverts par votre seule caution.</span><span></span></div>'}
           <div class="ligne total"><span>Total</span><span>${Z.euros(d.totalLocataire)}</span></div>
           <div class="ligne discret"><span>Caution (empreinte, non débitée)</span><span>${Z.euros(d.caution)}</span></div>
           <button class="btn btn-cta" style="width:100%;margin-top:10px" data-action="reserver">Réserver et payer ${Z.euros(d.totalLocataire)}</button>`;
@@ -2222,6 +2337,7 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
       ['Quand le propriétaire est-il payé ?', 'Le loyer est versé 24 h après le retour de l’outil, si aucun litige n’est ouvert. Pour une vente, après confirmation de la remise par l’acheteur.'],
       ['Un échange est-il protégé ?', 'Oui : chacun règle des frais de mise en relation et une caution croisée peut être demandée pour les outils de valeur différente.'],
       ['Puis-je négocier le prix ?', 'Oui. Sur chaque annonce de vente ou de location, « Proposer mon prix » envoie votre offre au propriétaire. Il a 48 h pour accepter, refuser ou vous faire une contre-proposition. Rien n’est débité avant l’accord, et le paiement reste sécurisé.'],
+      ['La prestation d’un particulier est-elle assurée ?', 'Un particulier n’a pas d’assurance professionnelle. Deux protections existent : le prestataire peut prendre l’assurance responsabilité civile ZETools (badge « Assuré »), et vous pouvez cocher « Je prends l’assurance » à la réservation pour couvrir les dégâts causés chez vous. Sans l’une ni l’autre, la fiche l’indique clairement avant le paiement.'],
       ['Pourquoi les prix sont-ils plafonnés ?', 'ZETools est une place de marché d’outils à petit prix. Un outil d’occasion se vend au plus à 50 % du neuf en très bon état, 40 % en bon état, 30 % en état correct. Même un outil neuf, jamais servi, reste sous le prix du magasin (70 % au plus). Le prix neuf de référence et la remise sont affichés sur chaque annonce.'],
       ['Comment fixer un rendez-vous pour des travaux ou un échange ?', 'Depuis la fiche d’un artisan ou d’une annonce, cliquez sur « Proposer un rendez-vous » : choisissez jusqu’à 3 créneaux dans le calendrier. L’autre partie en accepte un, et le rendez-vous s’inscrit dans votre agenda. Annulation gratuite jusqu’à 24 h avant.'],
       ['Qu’est-ce que le déstockage des enseignes ?', 'Des professionnels (grandes surfaces de bricolage, négoces, fabricants, loueurs) y écoulent leurs fins de série et surstocks : des produits neufs, à prix cassés, payés en ligne et retirés en magasin, avec les garanties légales du vendeur.'],
@@ -2778,7 +2894,7 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
       cases += `<button type="button" disabled class="${t < AUJOURDHUI ? 'passe' : ''} ${conf ? 'rdv-ok' : prop ? 'rdv-attente' : ''}">${j}</button>`;
     }
     const groupe = (titre, liste, rendu) => `<div class="panneau"><h3 style="margin-top:0">${titre} <span class="discret">(${liste.length})</span></h3>${liste.map(rendu).join('') || '<p class="discret">Rien pour le moment.</p>'}</div>`;
-    const entete = (r) => `<div><span class="badge badge-echange">${esc(Z.REGLES.typesRdv[r.type])}</span> <b>${esc(r.objet)}</b><br><span class="discret">avec ${esc(nomContact(r.avec))} · ${r.dureeHeures >= 8 ? 'journée' : r.dureeHeures + ' h'} · ${esc(r.lieu)}</span>${r.message ? `<p class="citation">« ${esc(r.message)} »</p>` : ''}</div>`;
+    const entete = (r) => `<div><span class="badge badge-echange">${esc(Z.REGLES.typesRdv[r.type])}</span> <b>${esc(r.objet)}</b><br><span class="discret">avec ${esc(nomContact(r.avec))} · ${r.dureeHeures >= 8 ? 'journée' : r.dureeHeures + ' h'} · ${esc(r.lieu)}${r.type === 'service' ? (r.assure ? ' · 🛡️ assurée' : ' · ⚠️ non assurée') : ''}</span>${r.message ? `<p class="citation">« ${esc(r.message)} »</p>` : ''}</div>`;
     const recus = etat.rdv.filter((r) => r.sens === 'recu' && r.statut === 'proposé');
     const envoyes = etat.rdv.filter((r) => r.sens === 'envoye' && r.statut === 'proposé');
     const confirmes = rdvConfirmes().slice().sort((a, b) => a.creneau.localeCompare(b.creneau));
@@ -2830,7 +2946,7 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
     const m = membre(s.membre);
     return `<a class="carte" href="#/service/${s.id}">
       <div class="visuel">${s.photo ? `<img loading="lazy" src="${s.photo}" alt="${esc(s.titre)}">` : ''}
-        <div class="badges"><span class="badge badge-service">Service</span>${s.siret ? '<span class="badge badge-vente">PRO</span>' : ''}</div></div>
+        <div class="badges"><span class="badge badge-service">Service</span>${s.siret ? '<span class="badge badge-vente">PRO</span>' : ''}${s.siret || s.assurePlateforme ? '<span class="badge badge-echange">🛡️ Assuré</span>' : ''}</div></div>
       <div class="infos"><span class="badge badge-etat" style="align-self:start">${metierIco(s.metier)} ${esc(metierNom(s.metier))}</span>
         <h3>${esc(s.titre)}</h3><div class="prix">${Z.euros(s.tarif)} <small>${uniteService(s)}</small></div>
         <div class="meta"><span>📍 ${esc(s.ville)} · ${s.rayonKm} km</span><span>★ ${m.note.toFixed(1)} (${m.avis})</span></div></div></a>`;
@@ -2867,7 +2983,8 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
     }
     const pris = rdvConfirmes().map((r) => r.creneau);
     const slots = selService.jour ? Z.creneauxJour(selService.jour, { maintenant: maintenant(), pris }) : [];
-    const d = Z.devisService(s, selService.heures);
+    const d = Z.devisService(s, selService.heures, { assurance: selService.assurance });
+    const prixAssurance = Z.devisService(s, selService.heures, { assurance: true }).assurance;
     const heures = s.unite === 'forfait' ? '' : `<label class="ligne">Durée <select id="heures-svc">${Array.from({ length: Z.REGLES.service.heuresMax - (s.dureeMin || 1) + 1 }, (_, i) => i + (s.dureeMin || 1)).map((h) => `<option value="${h}" ${h === d.heures ? 'selected' : ''}>${h} h</option>`).join('')}</select></label>`;
     return `<div class="ligne"><span>Tarif</span><b>${Z.euros(s.tarif)}${uniteService(s)}</b></div>
       <div class="ligne discret"><span>${s.unite === 'forfait' ? `Forfait d’environ ${s.dureeForfait || 1} h` : `${s.dureeMin || 1} h minimum`} · se déplace à ${s.rayonKm} km</span><span></span></div>
@@ -2877,6 +2994,8 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
       ${selService.creneau ? `<div class="alerte alerte-ok" style="text-transform:none">${quand(selService.creneau)} · ${d.heures} h</div>
         <div class="ligne"><span>${d.forfait ? 'Forfait' : `${Z.euros(s.tarif)} × ${d.heures} h`}</span><span>${Z.euros(d.base)}</span></div>
         <div class="ligne"><span>Frais de service</span><span>${Z.euros(d.fraisService)}</span></div>
+        <label class="ligne" style="cursor:pointer"><span><input type="checkbox" id="assurance-svc" ${selService.assurance ? 'checked' : ''}> <b>Je prends l’assurance</b> dommages</span><span>${Z.euros(prixAssurance)}</span></label>
+        <div class="alerte ${d.couverture.assure ? 'alerte-ok' : 'alerte-erreur'}" style="text-transform:none">${d.couverture.assure ? '🛡️' : '⚠️'} ${esc(d.couverture.message)}${selService.assurance ? '' : ' L’assurance dommages ZETools couvre les dégâts causés chez vous pendant la prestation.'}</div>
         <div class="ligne total"><span>Total</span><span>${Z.euros(d.total)}</span></div>
         <div class="ligne discret"><span>Payé au prestataire une fois le service rendu</span><span>${Z.euros(d.versementPrestataire)}</span></div>
         <button class="btn btn-cta" style="width:100%;margin-top:10px" data-action="reserver-service">Réserver et payer ${Z.euros(d.total)}</button>` : ''}
@@ -2887,7 +3006,7 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
     const s = Z.appliquerOffres(service(id), etat.offres, maintenant());
     if (!s) return '<div class="page"><div class="conteneur vide">Service introuvable. <a href="#/services">Retour aux services</a></div></div>';
     const m = membre(s.membre);
-    if (selService.id !== id) selService = { id, mois: AUJOURDHUI.slice(0, 7), jour: '', creneau: '', heures: s.dureeMin || 1 };
+    if (selService.id !== id) selService = { id, mois: AUJOURDHUI.slice(0, 7), jour: '', creneau: '', heures: s.dureeMin || 1, assurance: false };
     return `<div class="page"><div class="conteneur">
       <div class="fil"><a href="#/">Accueil</a> › <a href="#/services">Services</a> › ${esc(s.titre)}</div>
       <div class="fiche">
@@ -2897,6 +3016,7 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
             <h2 style="margin-top:0">Le service</h2><p>${esc(s.description)}</p>
             <div class="ligne"><span>Métier</span><b>${metierIco(s.metier)} ${esc(metierNom(s.metier))}</b></div>
             <div class="ligne"><span>Prestataire</span><b>${statutPrestataire(s)}${s.decennale ? ' · assurance décennale' : ''}</b></div>
+            <div class="ligne"><span>Assurance</span><b>${s.siret ? '🛡️ Responsabilité civile professionnelle' : s.assurePlateforme ? '🛡️ Assuré par ZETools à chaque prestation' : '⚠️ Non assuré : prenez l’assurance à la réservation'}</b></div>
             <div class="ligne"><span>Outils</span><b>${s.outils ? 'Vient avec ses outils' : 'Sur vos outils (ou loués sur ZETools)'}</b></div>
             <div class="ligne"><span>Zone d’intervention</span><b>📍 ${esc(s.ville)} (${esc(s.cp)}) · ${s.rayonKm} km autour</b></div>
             ${(s.inclus || []).length ? `<h3>Compris dans le prix</h3><ul class="liste-avantages">${s.inclus.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}
@@ -2918,7 +3038,10 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
     const zone = document.getElementById('zone-service'); if (!zone) return;
     const courant = () => Z.appliquerOffres(service(id), etat.offres, maintenant());
     const rafraichir = () => { zone.innerHTML = zoneService(courant()); };
-    zone.addEventListener('change', (e) => { if (e.target.id === 'heures-svc') { selService.heures = Number(e.target.value); rafraichir(); } });
+    zone.addEventListener('change', (e) => {
+      if (e.target.id === 'heures-svc') { selService.heures = Number(e.target.value); rafraichir(); }
+      if (e.target.id === 'assurance-svc') { selService.assurance = e.target.checked; rafraichir(); }
+    });
     zone.addEventListener('click', (e) => {
       const b = e.target.closest('button'); if (!b) return;
       const s = courant();
@@ -2933,13 +3056,13 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
         toast(`Offre de ${Z.euros(montant)} envoyée. Réponse sous 48 h.`); return aller('#/offres');
       }
       if (b.dataset.action === 'reserver-service') {
-        const d = Z.devisService(s, selService.heures);
-        const rdv = { id: 'r' + Date.now(), sens: 'envoye', type: 'service', avec: s.membre, serviceId: s.id, objet: s.titre, creneaux: [selService.creneau], dureeHeures: d.heures,
+        const d = Z.devisService(s, selService.heures, { assurance: selService.assurance });
+        const rdv = { id: 'r' + Date.now(), sens: 'envoye', type: 'service', assure: d.couverture.assure, assuranceClient: !!selService.assurance, avec: s.membre, serviceId: s.id, objet: s.titre, creneaux: [selService.creneau], dureeHeures: d.heures,
           lieu: 'À mon domicile (adresse transmise après réservation)', statut: 'proposé', montant: d.total, message: '' };
         const v = Z.verifierProposition(rdv, maintenant()); if (!v.ok) return toast(v.erreurs[0]);
         const c = Z.confirmerRdv(rdv, selService.creneau, etat.rdv); if (!c.ok) return toast(c.raison);
         etat.rdv.push(c.rdv); deverrouillerConversation(s.id); sauver();
-        toast(`Prestation réservée (simulation) : ${Z.euros(d.total)} payés et conservés jusqu’à la fin du service.`);
+        toast(`Prestation réservée (simulation) : ${Z.euros(d.total)} payés et conservés jusqu’à la fin du service${selService.assurance ? ', assurance dommages incluse' : ''}.`);
         selService = { id: null }; aller('#/agenda');
       }
     });
@@ -2957,6 +3080,7 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
         <label>Code postal<input name="cp" required pattern="\\d{5}" placeholder="94300"></label>
         <label>Rayon de déplacement (km)<input name="rayon" type="number" min="1" max="50" value="10"></label>
         <label class="case"><input type="checkbox" name="outils" checked> Je viens avec mes outils</label>
+        <label class="large case"><input type="checkbox" name="assurePlateforme"> <span><b>Je prends l’assurance</b> responsabilité civile ZETools : ${Math.round(Z.REGLES.service.assurancePrestataireTaux * 100)} % déduits de chaque prestation, et le badge « Assuré » sur mon annonce. Conseillé si vous êtes un particulier, sans assurance professionnelle.</span></label>
         <label class="large">Description<textarea name="description" rows="4" placeholder="Votre expérience, ce qui est compris, ce qui ne l’est pas… (vos coordonnées seront masquées)"></textarea></label>
         <div class="large alerte alerte-info" id="aide-service">Particulier : seuls les petits services occasionnels sont ouverts (petit bricolage, montage, jardinage, cours). L’électricité, la plomberie et la maçonnerie sont réservées aux professionnels qualifiés, avec SIRET. Vos revenus sont à déclarer ; une activité régulière suppose un statut professionnel (micro-entreprise).</div>
         <div class="large"><button class="btn btn-cta">Publier mon service</button></div>
@@ -2969,7 +3093,7 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
       const pos = Z.positionCodePostal(cp);
       const s = { id: 'us' + Date.now(), modes: ['service'], titre: String(fd.get('titre')), metier: String(fd.get('metier')), membre: 'moi', siret: fd.get('statut') === 'pro',
         tarif: Number(fd.get('tarif')), unite: String(fd.get('unite')), dureeMin: forfait ? 1 : Number(fd.get('duree')) || 1, dureeForfait: forfait ? Number(fd.get('duree')) || 1 : undefined,
-        ville: pos ? pos.libelle : 'Île-de-France', cp, rayonKm: Number(fd.get('rayon')) || 10, outils: fd.get('outils') === 'on', photo: PHOTOS.artisans,
+        ville: pos ? pos.libelle : 'Île-de-France', cp, rayonKm: Number(fd.get('rayon')) || 10, outils: fd.get('outils') === 'on', assurePlateforme: fd.get('assurePlateforme') === 'on', photo: PHOTOS.artisans,
         description: Z.masquerCoordonnees(String(fd.get('description') || ''), false).texte, inclus: [] };
       const v = Z.verifierService(s);
       if (!v.ok) return toast(v.erreurs[0]);
@@ -3009,6 +3133,7 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
     return `<div class="page"><div class="conteneur" style="max-width:900px">
       <div class="fil"><a href="#/">Accueil</a> › <a href="#/fiches">Fiches techniques</a> › ${esc(f.titre)}</div>
       <article class="panneau fiche-technique">
+        <div class="marque-fiche">${window.ZT_PDF.logoSvg(26)}<span><b class="marque-ze">ZE</b><b>TOOLS</b> · fiche technique</span></div>
         <div class="entete-fiche"><span class="icone-fiche">${f.icone}</span><div><div class="surtitre">Fiche technique · ${esc(f.theme)}</div><h1>${esc(f.titre)}</h1>
           <div class="puces"><span class="puce">Niveau : ${esc(f.niveau)}</span><span class="puce">⏱ ${esc(f.duree)}</span><span class="puce">Budget : ${esc(f.budget)}</span></div></div></div>
         <p class="resume-fiche">${esc(f.resume)}</p>
@@ -3016,7 +3141,7 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
         <h3>Outils nécessaires</h3>
         <ul class="liste-fiche">${f.outils.map((o) => `<li>${esc(o.nom)}${o.q ? ` · <a href="#/annonces?q=${encodeURIComponent(o.q)}">louer ou acheter d’occasion</a>` : ''}</li>`).join('')}</ul>
         ${f.materiaux.length ? `<h3>Matériaux et fournitures</h3>${liste(f.materiaux.map(esc))}` : ''}
-        <h3>Étapes</h3>${liste(f.etapes.map(esc), true)}
+        <h3>Étapes</h3><ol class="etapes-picto">${f.etapes.map((e, i) => `<li><span class="case-picto">${window.ZT_PDF.pictoSvg((f.pictos || [])[i])}</span><span><b>${i + 1}.</b> ${esc(e)}</span></li>`).join('')}</ol>
         <h3>Sécurité</h3>${liste(f.securite.map(esc))}
         ${f.astuce ? `<div class="alerte alerte-info"><b>L’astuce du bricoleur.</b> ${esc(f.astuce)}</div>` : ''}
         <p class="note-legale">Fiche indicative rédigée par ZETools. Suivez toujours la notice du fabricant de vos outils et de vos fournitures. En cas de doute, faites appel à un professionnel.</p>
