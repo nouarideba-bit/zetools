@@ -582,5 +582,14 @@ test('charte : aucun émoji dans l’en-tête et le pied de page, filtre actif s
   assert.ok(app.includes('vue.innerHTML = sansPictos(html)')); assert.ok(app.includes("t.textContent = sansPictos(texte)"));
 });
 
+test('vidéos : lecture dans le site, même en fichier local (relais hébergé)', () => {
+  const fs = require('fs'); const path = require('path');
+  const app = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8');
+  const relais = fs.readFileSync(path.join(__dirname, '..', 'lecteur.html'), 'utf8');
+  assert.strictEqual((app.match(/youtube-nocookie\.com\/embed/g) || []).length, 1);   // une seule fabrique d'iframe
+  assert.ok(app.includes("RELAIS_VIDEO = 'https://nouarideba-bit.github.io/zetools/lecteur.html'"));
+  assert.ok(relais.includes('/^[A-Za-z0-9_-]{11}$/') && relais.includes('youtube-nocookie.com/embed/'));
+});
+
 console.log(`\n${ok} réussis, ${ko} échoués`);
 process.exit(ko ? 1 : 0);
