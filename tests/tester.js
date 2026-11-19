@@ -384,5 +384,83 @@ test('PDF : encart vidéo avec QR code quand l’adresse est fournie', () => {
   assert.ok(avec.length > sans.length + 2000);
 });
 
+// ---------- urgence travaux ----------
+test('jours fériés 2026 : Pâques, Ascension, Pentecôte', () => { const j = Z.joursFeries(2026); ['2026-04-06', '2026-05-14', '2026-05-25', '2026-07-14', '2026-12-25'].forEach((d) => assert.ok(j.includes(d), d)); });
+test('majoration : jour 0 %, nuit 50 %, dimanche 50 %, non cumulées', () => {
+  assert.strictEqual(Z.majorationUrgence('2026-11-19T14:00').taux, 0);
+  assert.strictEqual(Z.majorationUrgence('2026-11-19T22:10').taux, 0.5);
+  assert.strictEqual(Z.majorationUrgence('2026-11-19T07:59').taux, 0.5);
+  assert.strictEqual(Z.majorationUrgence('2026-11-22T14:00').taux, 0.5);
+  assert.strictEqual(Z.majorationUrgence('2026-11-22T23:00').taux, 0.5);
+  assert.strictEqual(Z.majorationUrgence('2026-12-25T10:00').taux, 0.5);
+});
+test('devis urgence de nuit : 152,28 € et devis écrit obligatoire', () => {
+  const a = D.ARTISANS.find((x) => x.id === 'p3'); const d = Z.devisUrgence(a, '2026-11-19T22:10', 1);
+  assert.strictEqual(d.total, 152.28); assert.ok(d.devisEcritObligatoire);
+  assert.strictEqual(+(d.deplacement + d.mainOeuvre + d.majoration + d.fraisService).toFixed(2), d.total);
+});
+test('devis urgence de jour sous 150 € : pas de devis écrit obligatoire', () => {
+  const a = D.ARTISANS.find((x) => x.id === 'p3'); const d = Z.devisUrgence(a, '2026-11-19T14:00', 1);
+  assert.strictEqual(d.majoration, 0); assert.ok(d.total < 150); assert.ok(!d.devisEcritObligatoire);
+});
+test('professionnels d’urgence : SIRET, bon métier, classés par délai, 15 km au plus', () => {
+  const r = Z.artisansUrgence({ lat: 48.8475, lon: 2.4393 }, D.ARTISANS, 'plomberie');
+  assert.ok(r.length >= 1); r.forEach((x) => { assert.ok(x.artisan.siret && x.artisan.urgence && x.artisan.metiers.includes('plomberie')); assert.ok(x.km <= 15); });
+  for (let i = 1; i < r.length; i++) assert.ok(r[i - 1].minutes <= r[i].minutes);
+  assert.strictEqual(Z.artisansUrgence({ lat: 48.8475, lon: 2.4393 }, D.ARTISANS, 'jardinage').length, 0);
+});
+test('le gaz n’envoie aucun artisan', () => { const g = D.TYPES_URGENCE.find((t) => t.id === 'gaz'); assert.ok(g.danger); assert.ok(!g.metier); });
+
+// ---------- bons cadeaux ----------
+const aleaFixe = (() => { let i = 0; return () => ((i++ * 7919) % 31) / 31; });
+test('code de bon cadeau : format, clé de contrôle, faute de frappe détectée', () => {
+  for (let k = 0; k < 50; k++) { const c = Z.genererCodeCoupon(); assert.ok(/^ZT-[2-9A-HJ-NP-Z]{4}-[2-9A-HJ-NP-Z]{4}$/.test(c), c); assert.ok(Z.verifierCodeCoupon(c)); assert.ok(Z.verifierCodeCoupon(c.toLowerCase().replace(/-/g, ' '))); }
+  const c = Z.genererCodeCoupon(aleaFixe()); const n = c.split(''); n[4] = n[4] === '2' ? '3' : '2';
+  assert.ok(!Z.verifierCodeCoupon(n.join(''))); assert.ok(!Z.verifierCodeCoupon('ZT-AAAA')); assert.strictEqual(Z.formaterCode('zt jz4c bfsk'), 'ZT-JZ4C-BFSK');
+});
+test('bon cadeau : contrôles du montant, du prénom, de l’e-mail et du message', () => {
+  const ok = { montant: 50, destinataire: { prenom: 'Léa' } };
+  assert.ok(Z.verifierCoupon(ok, '2026-11-19').ok);
+  assert.ok(!Z.verifierCoupon({ montant: 10, destinataire: { prenom: 'Léa' } }, '2026-11-19').ok);
+  assert.ok(!Z.verifierCoupon({ montant: 501, destinataire: { prenom: 'Léa' } }, '2026-11-19').ok);
+  assert.ok(!Z.verifierCoupon({ montant: 50.5, destinataire: { prenom: 'Léa' } }, '2026-11-19').ok);
+  assert.ok(!Z.verifierCoupon({ montant: 50, destinataire: { prenom: ' ' } }, '2026-11-19').ok);
+  assert.ok(!Z.verifierCoupon({ montant: 50, destinataire: { prenom: 'Léa' }, envoi: { mode: 'email', email: 'lea@' } }, '2026-11-19').ok);
+  assert.ok(!Z.verifierCoupon({ montant: 50, destinataire: { prenom: 'Léa' }, envoi: { mode: 'email', email: 'lea@exemple.fr', date: '2026-11-18' } }, '2026-11-19').ok);
+  assert.ok(!Z.verifierCoupon({ montant: 50, destinataire: { prenom: 'Léa' }, message: 'x'.repeat(301) }, '2026-11-19').ok);
+});
+test('bon cadeau : validité 12 mois à partir de l’envoi', () => {
+  const c = Z.creerCoupon({ montant: 100, destinataire: { prenom: 'Léa' }, envoi: { mode: 'email', email: 'lea@exemple.fr', date: '2026-12-24' } }, '2026-11-19');
+  assert.strictEqual(c.expire, '2027-12-24'); assert.strictEqual(c.solde, 100); assert.strictEqual(c.achete, '2026-11-19');
+  assert.strictEqual(Z.ajouterMois('2027-01-31', 1), '2027-02-28');
+});
+test('bon cadeau : utilisation partielle, puis solde épuisé, puis expiration', () => {
+  let c = Z.creerCoupon({ montant: 100, destinataire: { prenom: 'Léa' } }, '2026-11-19');
+  let u = Z.utiliserCoupon(c, 60.5, '2026-12-01', 'Montage');
+  assert.ok(u.ok); assert.strictEqual(u.debit, 60.5); assert.strictEqual(u.resteAPayer, 0); assert.strictEqual(u.coupon.solde, 39.5);
+  u = Z.utiliserCoupon(u.coupon, 104.76, '2026-12-02'); assert.strictEqual(u.debit, 39.5); assert.strictEqual(u.resteAPayer, 65.26); assert.strictEqual(u.coupon.solde, 0); assert.strictEqual(u.coupon.utilisations.length, 2);
+  assert.ok(!Z.utiliserCoupon(u.coupon, 10, '2026-12-03').ok);
+  assert.ok(!Z.utiliserCoupon(c, 10, '2027-11-20').ok); assert.ok(Z.utiliserCoupon(c, 10, '2027-11-19').ok);
+  assert.strictEqual(c.solde, 100);
+});
+test('bon cadeau en PDF : page unique, code, montant et QR code', () => {
+  const P = require('../pdf.js'); const c = Object.assign(Z.creerCoupon({ montant: 150, theme: 'jardin', de: 'Adam', destinataire: { prenom: 'Papa' }, message: 'Bonne fête !' }, '2026-11-19'), { themeNom: 'Jardin' });
+  const url = D.SITE_PUBLIC + '#/offrir?code=' + c.code;
+  const pdf = P.bonCadeauPdf(c, null, { url });
+  assert.ok(pdf.startsWith('%PDF-1.4')); assert.ok(pdf.trim().endsWith('%%EOF')); assert.ok(pdf.includes('/Count 1'));
+  assert.ok(pdf.includes(c.code)); assert.ok(pdf.includes('Pour Papa')); assert.ok(pdf.includes('150 \\200'));
+  assert.ok(url.length <= 106); assert.ok(pdf.length > P.bonCadeauPdf(c, null, {}).length + 2000);
+  assert.strictEqual(P.nomFichierCoupon(c), `ZETools-bon-cadeau-${c.code}.pdf`);
+});
+
+// ---------- vidéothèque ----------
+test('vidéothèque : identifiants YouTube valides, sans doublon, thèmes connus', () => {
+  const ids = D.VIDEOS_TUTOS.map((v) => v.yt).concat(...D.FICHES.map((f) => (f.videos || []).map((v) => v.yt)));
+  ids.forEach((id) => assert.ok(/^[\w-]{11}$/.test(id), id)); assert.strictEqual(new Set(ids).size, ids.length);
+  const th = D.THEMES_VIDEO.map((t) => t.id); D.VIDEOS_TUTOS.forEach((v) => assert.ok(th.includes(v.theme)));
+  Object.values(D.THEME_FICHE).forEach((t) => assert.ok(th.includes(t)));
+  D.VIDEOS_TUTOS.filter((v) => v.urgence).forEach((v) => assert.ok(D.TYPES_URGENCE.some((t) => t.id === v.urgence)));
+});
+
 console.log(`\n${ok} réussis, ${ko} échoués`);
 process.exit(ko ? 1 : 0);
