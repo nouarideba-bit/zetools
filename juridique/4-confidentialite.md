@@ -27,6 +27,8 @@ ZETools traite vos données dans le respect du règlement (UE) 2016/679 (RGPD) e
 
 | Vérification des professionnels | SIRET, attestations d’assurance, identité du représentant | Obligation légale ; intérêt légitime |
 
+| Passeport outil, test acoustique | Historique de l’outil, vidéos de contrôle de l’outil, résultat de l’analyse du son du moteur. Le son est analysé sur le téléphone et n’est pas conservé **[À COMPLÉTER : à confirmer selon la solution technique retenue]**. | Exécution du contrat ; intérêt légitime (confiance entre membres) |
+
 | Avis et réputation | Notes, avis, taux de réponse, annulations | Intérêt légitime |
 
 | Déclarations fiscales | Identité, numéro fiscal, montants perçus, nombre de transactions | Obligation légale (Code général des impôts) |

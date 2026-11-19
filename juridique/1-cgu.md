@@ -206,6 +206,26 @@ Le bon n’est ni remboursable ni échangeable contre des espèces, sauf disposi
 
 Lorsque le bon est envoyé par ZETools à l’adresse électronique indiquée par l’acheteur, celui-ci déclare avoir l’accord du bénéficiaire pour la transmission de cette adresse.
 
+## Article 22-3. Passeport outil et garantie ZETools
+
+Le passeport outil réunit les informations connues sur un outil : date de mise en service, durée d’usage, contrôles (vidéo au retour de location, test acoustique, passage en atelier), réparations et, pour les outils sans fil, une estimation de l’état de la batterie. Les informations déclarées par le propriétaire restent sous sa responsabilité ; il s’engage à les donner sincères et à jour.
+
+Le score de santé sur 100 est calculé selon une méthode publiée sur la page du passeport : chaque point retiré y est expliqué. Le test acoustique et l’estimation de la batterie sont des aides à la décision : ils ne remplacent ni une expertise ni la description de l’annonce. **[À COMPLÉTER : incidence éventuelle du score sur le classement des annonces, à décrire au titre de l’article L. 111-7 du Code de la consommation]**.
+
+Lorsque l’outil vendu affiche un score d’au moins 80 sur 100 et un contrôle réussi de moins de 90 jours, ZETools accorde à l’acheteur une garantie commerciale « ça marche ou remboursé » de 30 jours à compter de la remise : si l’outil ne fonctionne pas conformément à son passeport, ZETools rembourse le prix contre retour de l’outil **[À COMPLÉTER : modalités : preuve du dysfonctionnement, frais de retour, exclusions (casse, mauvaise utilisation, consommables), recours contre le vendeur]**. Cette garantie est gratuite. Elle s’ajoute, sans les remplacer, à la garantie légale de conformité due par un vendeur professionnel (articles L. 217-3 et suivants du Code de la consommation) et à la garantie des vices cachés (articles 1641 et suivants du Code civil).
+
+## Article 22-4. Location-achat « Je le garde »
+
+Lorsqu’un outil loué est aussi proposé à la vente, le locataire peut l’acheter jusqu’au lendemain de la date de fin de location en choisissant « Je le garde ». Le loyer payé, hors frais de service et assurance, est déduit du prix de vente affiché au jour de la réservation. La vente est conclue au paiement du solde ; la caution est alors libérée et le propriétaire reçoit le prix de vente, diminué de la commission de vente.
+
+**[À COMPLÉTER : droit de rétractation lorsque le vendeur est un professionnel : point de départ et effet de la période de location déjà écoulée]**
+
+## Article 22-5. Mode Projet
+
+Le Mode Projet propose un ensemble d’outils, de consommables et, au choix, une prestation, pour un chantier décrit par le membre. Chaque élément forme un contrat distinct avec le membre ou le partenaire qui le fournit, aux conditions de son annonce ; ZETools agit en intermédiaire et encaisse un paiement unique pour leur compte. Les quantités de consommables sont calculées à titre indicatif ; le membre reste juge de ses besoins.
+
+Les consommables sont vendus par **[À COMPLÉTER : identité du partenaire vendeur et conditions de vente, de retrait et de retour]**. L’annulation d’un élément n’entraîne pas l’annulation des autres, sauf **[À COMPLÉTER : règle d’indivisibilité éventuelle à arrêter]**.
+
 ## Article 23. Durée, résiliation, modification
 
 Le contrat est conclu pour une durée indéterminée. Le membre peut clôturer son compte à tout moment, depuis son espace, sans frais ; les transactions en cours vont à leur terme.
