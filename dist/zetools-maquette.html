@@ -551,6 +551,14 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
 .hero.hero-cadeau p.sous { color: var(--anthracite); }
 .hero.hero-urgence p.sous { color: #ffe3de; }
 
+/* ---------- en-tête : la recherche garde toujours sa place ---------- */
+.entete .recherche-entete { flex: 1 1 320px; min-width: 300px; }
+.entete .actions-entete { flex: 0 1 auto; min-width: 0; }
+@media (max-width: 1800px) { .entete .lien-secondaire { display: none; } }
+@media (max-width: 1560px) { .entete .lien-niveau2 { display: none; } }
+@media (max-width: 1320px) { .entete .lien-niveau3 { display: none; } }
+@media (max-width: 760px) { .entete .recherche-entete { min-width: 0; } }
+
 </style>
 </head>
 <body>
@@ -564,10 +572,10 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
       </form>
       <nav class="actions-entete" aria-label="Mon compte">
         <a class="lien-entete lien-urgence" href="#/urgence" title="Urgence travaux : un professionnel vérifié, vite">🚨 Urgence</a>
-        <a class="lien-entete" href="#/travaux" title="Trouver un artisan près de chez moi">📍 Artisans</a>
-        <a class="lien-entete" href="#/services" title="Services : réserver un voisin ou un professionnel">🙋 Services</a>
-        <a class="lien-entete" href="#/videos" title="Vidéothèque : des tutoriels à regarder sur ZETools">🎬 Vidéos</a>
-        <a class="lien-entete" href="#/offrir" title="Offrir des travaux : un bon cadeau">🎁 Offrir</a>
+        <a class="lien-entete lien-niveau3" href="#/travaux" title="Trouver un artisan près de chez moi">📍 Artisans</a>
+        <a class="lien-entete lien-niveau2" href="#/services" title="Services : réserver un voisin ou un professionnel">🙋 Services</a>
+        <a class="lien-entete lien-niveau2" href="#/videos" title="Vidéothèque : des tutoriels à regarder sur ZETools">🎬 Vidéos</a>
+        <a class="lien-entete lien-niveau2" href="#/offrir" title="Offrir des travaux : un bon cadeau">🎁 Offrir</a>
         <a class="lien-entete lien-secondaire" href="#/reparer" title="Outils à réparer">🪛 Réparer</a>
         <a class="lien-entete lien-secondaire" href="#/destockage" title="Déstockage des enseignes : du neuf à prix cassés">🏷️ Déstockage</a>
         <a class="icone-btn" href="#/offres" title="Offres de prix : proposer et négocier">🤝</a>
