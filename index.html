@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ZETOOLS · Achetez, louez, échangez vos outils entre voisins</title>
+  <meta name="description" content="La plateforme communautaire et sécurisée pour donner une seconde vie aux outils : achat, location et troc entre particuliers et professionnels en Île-de-France.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="maquette">Maquette phase 1 · paiements et comptes simulés · données fictives</div>
+  <header class="entete">
+    <div class="conteneur">
+      <a class="logo" href="#/"><span class="pastille">⚒</span><span><span class="marque-ze">ZE</span>TOOLS</span></a>
+      <form class="recherche-entete" id="recherche-entete" role="search">
+        <input id="q-entete" type="search" placeholder="Outil, marque ou code postal…" aria-label="Rechercher">
+        <button type="submit">Chercher</button>
+      </form>
+      <nav class="actions-entete" aria-label="Mon compte">
+        <a class="lien-entete" href="#/travaux" title="Trouver un artisan près de chez moi">📍 Artisans</a>
+        <a class="lien-entete" href="#/reparer" title="Outils à réparer">🪛 Réparer</a>
+        <a class="icone-btn" href="#/messages" title="Messagerie">💬<span class="bulle" id="bulle-msg">2</span></a>
+        <a class="icone-btn" href="#/favoris" title="Favoris">♡</a>
+        <a class="icone-btn" href="#/mon-espace" title="Mon espace">👤</a>
+        <a class="btn btn-cta" href="#/deposer">＋ <span class="btn-deposer-texte">Déposer une annonce</span></a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="vue"></main>
+
+  <footer class="pied">
+    <div class="conteneur">
+      <div class="colonnes">
+        <div>
+          <a class="logo" href="#/" style="color:#fff"><span class="pastille">⚒</span><span><span class="marque-ze">ZE</span>TOOLS</span></a>
+          <p>Le bon outil, au bon moment, à deux rues de chez vous. Moins d’achats inutiles, plus d’outils qui servent.</p>
+          <div class="reseaux"><a href="#/" title="Instagram">IG</a><a href="#/" title="Facebook">f</a><a href="#/" title="YouTube">▶</a><a href="#/" title="LinkedIn">in</a></div>
+        </div>
+        <div><h4>Plateforme</h4><a href="#/annonces?mode=vente">Acheter</a><a href="#/annonces?mode=location">Louer</a><a href="#/annonces?mode=echange">Échanger</a><a href="#/deposer">Déposer une annonce</a><a href="#/travaux">Trouver un artisan</a><a href="#/reparer">Outils à réparer</a><a href="#/espace-artisan">Espace artisan abonné</a></div>
+        <div><h4>Ressources</h4><a href="#/atelier">L’Atelier · guide du bon bricoleur</a><a href="#/aide">FAQ</a><a href="#/securite">Sécurité et caution</a><a href="#/pros">Offres professionnelles</a></div>
+        <div><h4>Légal</h4><a href="#/legal">Conditions générales</a><a href="#/legal">Mentions légales</a><a href="#/legal">Confidentialité</a><a href="#/credits">Crédits photos</a></div>
+        <div><h4>Zone pilote</h4><p style="font-size:.92rem;margin:0">Île-de-France · lancement 2027.<br>Électroportatif et jardinage d’abord.</p></div>
+      </div>
+      <div class="bas"><span>© 2026 ZETOOLS · maquette non contractuelle</span><span>Paiements opérés à terme par un prestataire agréé (Stripe Connect ou Mangopay)</span></div>
+    </div>
+  </footer>
+
+  <script src="logique.js"></script>
+  <script src="donnees.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
