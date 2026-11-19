@@ -85,6 +85,8 @@ Le client publie gratuitement une demande de travaux ou de réparation. Les arti
 
 **Services proposés par les membres.** Un membre peut publier une offre de service, à l’heure ou au forfait. Le client réserve un jour et une heure et paie en ligne ; le prix est conservé par le prestataire de paiement et versé au prestataire une fois le service rendu. Le contrat de prestation de services est conclu directement entre le client et le prestataire.
 
+**Assurance des services.** Un prestataire particulier n’a pas d’assurance de responsabilité civile professionnelle. Avant tout paiement, la plateforme indique au client si la prestation est assurée, et par qui. Le prestataire peut souscrire l’assurance de responsabilité civile proposée par ZETools, pour 4 % du prix de chaque prestation. Le client peut souscrire, par une case qu’il coche lui-même, l’assurance dommages proposée par ZETools, pour 6 % du prix avec un minimum de 2 €. À défaut d’assurance, les dommages se règlent directement entre le client et le prestataire. Garanties, plafonds et exclusions : **[À COMPLÉTER : assureur et notice d’information de l’assurance des services]**.
+
 Un particulier ne peut proposer que de petits services occasionnels : petit bricolage, montage, jardinage courant, cours. Les activités soumises à qualification professionnelle, notamment l’électricité, la plomberie, le gaz et la maçonnerie, sont réservées aux professionnels qualifiés et immatriculés (article L. 121-1 du Code de l’artisanat). Le prestataire particulier déclare ses revenus ; une activité habituelle impose un statut professionnel.
 
 ZETools vérifie à l’inscription le numéro SIRET et, pour les gros travaux, l’attestation d’assurance décennale, sur la base des documents fournis. Cette vérification ne vaut pas garantie de la qualité des travaux.
@@ -118,9 +120,15 @@ Les produits proposés en déstockage sont vendus par des professionnels identif
 
 | Service réservé en ligne, côté prestataire | Commission de 12 % du prix ; aucune commission pour les artisans abonnés |
 
+| Assurance dommages d’un service, optionnelle, côté client | 6 % du prix, avec un minimum de 2 € |
+
+| Assurance responsabilité civile du prestataire, optionnelle | 4 % du prix de chaque prestation, déduits du versement |
+
 | Fiches techniques en PDF | Gratuit |
 
 | Garantie casse et vol, optionnelle | 7 % du loyer, avec un minimum de 3 € |
+
+Aucune option payante n’est cochée d’avance : toute assurance résulte d’un choix exprès du membre (article L. 121-17 du Code de la consommation).
 
 Le prix total, frais compris, est affiché avant tout paiement. Les tarifs des professionnels figurent dans les conditions particulières.
 

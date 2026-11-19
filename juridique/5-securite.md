@@ -38,6 +38,13 @@ L’usure normale n’est jamais retenue. Un retard est facturé au tarif journa
 
 Pour 7 % du loyer (minimum 3 €), le locataire peut souscrire une garantie qui prend en charge la casse accidentelle et le vol au-delà d’une franchise. Assureur, plafonds et exclusions : **[À COMPLÉTER : assureur, notice d’information, franchise]**.
 
+## 5 bis. L’assurance des services
+
+- Un professionnel est couvert par sa propre responsabilité civile professionnelle.
+- Un particulier n’en a pas. Il peut prendre l’assurance responsabilité civile ZETools : son annonce porte alors le badge « Assuré ».
+- À la réservation, vous pouvez cocher « Je prends l’assurance » : pour 6 % du prix (minimum 2 €), les dégâts causés chez vous pendant la prestation sont couverts.
+- Avant de payer, un encadré vous dit toujours si la prestation est assurée, et par qui. Rien n’est coché à votre place.
+
 ## 6. Des membres vérifiés
 
 - Téléphone vérifié pour tous ; identité vérifiée par le prestataire de paiement avant tout versement.
