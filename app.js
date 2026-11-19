@@ -116,7 +116,7 @@
     <section class="hero hero-video" style="background-image:url('${PHOTOS.hero}')">
       ${videoFond(VIDEOS.accueil)}
       <div class="conteneur">
-        <h1>Vos outils méritent <em>une seconde vie</em>. Les vôtres aussi.</h1>
+        <h1>Le bon outil, <em>près de chez vous</em>.</h1>
         <p class="sous">Achetez à prix réduit, louez à deux rues de chez vous ou troquez ce qui dort au garage. Paiement sécurisé, caution protégée, profils vérifiés.</p>
         <div class="onglets-mode" id="onglets-hero">
           <button data-mode="" class="actif">Tout</button><button data-mode="vente">Acheter</button><button data-mode="location">Louer</button><button data-mode="echange">Échanger</button>
@@ -1845,6 +1845,40 @@
     });
   }
 
+
+  /* ---------- Notre offre : tout ce que propose ZETools, et ce que cela coûte ---------- */
+  function vueOffre() {
+    const R = Z.REGLES, pc = (x) => `${Math.round(x * 1000) / 10} %`.replace('.', ','), AB = R.abonnementArtisan;
+    const pal = R.paliersCommission.map((p) => pc(p.taux)).join(', puis ');
+    const lignes = [
+      ['🛒', 'Acheter un outil', 'Prix plafonnés : jamais plus de 70 % du neuf', 'Aucun frais : vous payez le prix affiché', `Vendeur : ${pc(R.commissionVente)} sur la vente`, '#/annonces?mode=vente'],
+      ['📅', 'Louer un outil', 'À la journée, remise dès 3 et 7 jours', `Frais de service ${pc(R.fraisServiceLocataire)} · assurance casse optionnelle ${pc(R.assuranceTaux)} (${R.assuranceMin} € min.)`, `Propriétaire : ${pal} selon le nombre de locations`, '#/annonces?mode=location'],
+      ['🔁', 'Échanger', 'Troc d’outil contre outil, caution croisée possible', `${Z.euros(R.fraisEchange)} de mise en relation`, `${Z.euros(R.fraisEchange)} de mise en relation`, '#/annonces?mode=echange'],
+      ['🙋', 'Réserver un service', 'Un voisin ou un pro, à l’heure ou au forfait', `Frais de service ${pc(R.service.fraisClient)} · assurance optionnelle ${pc(R.service.assuranceClientTaux)}`, `Prestataire : ${pc(R.service.commission)} sur la prestation`, '#/services'],
+      ['🚨', 'Urgence travaux', 'Un professionnel vérifié, au plus vite', `Déplacement ${Z.euros(R.urgence.forfaitDeplacement)} · +${pc(R.urgence.majorationNuit)} la nuit, le dimanche et les jours fériés`, `Devis écrit au-delà de ${Z.euros(R.urgence.seuilDevisEcrit)}`, '#/urgence'],
+      ['🎁', 'Offrir des travaux', `Bon cadeau de ${R.coupon.min} à ${R.coupon.max} €, valable ${R.coupon.validiteMois} mois`, 'Aucun frais : le bon vaut ce que vous payez', 'Utilisable en plusieurs fois', '#/offrir'],
+      ['🏷️', 'Déstockage des enseignes', 'Du neuf en fin de série, retrait en magasin', 'Aucun frais pour l’acheteur', `Enseigne : ${pc(R.commissionDestockage)} par vente`, '#/destockage'],
+      ['🎬', 'Vidéos et fiches techniques', 'Tutoriels et pas-à-pas en PDF', 'Gratuit', 'Gratuit', '#/videos'],
+    ];
+    return `<div class="page"><div class="conteneur">
+      <div class="titre-section"><div><div class="surtitre">Notre offre</div><h2>Tout ce que fait ZETools, et ce que cela coûte</h2><p>L’inscription est gratuite. Vous ne payez que lorsqu’une transaction aboutit, et chaque frais est affiché avant le paiement.</p></div></div>
+
+      <div class="offres">
+        <div class="offre phare"><h3>Particuliers</h3><div class="tarif">0 € <small style="font-size:1rem">pour s’inscrire</small></div><ul><li>Annonces illimitées : vente, location, échange</li><li>Services entre voisins, urgence travaux, bons cadeaux</li><li>Paiement sécurisé, caution protégée, messagerie protégée</li><li>Prix plafonnés sous le prix du magasin</li></ul><a class="btn btn-cta" href="#/deposer">Déposer une annonce</a></div>
+        <div class="offre"><h3>Artisans</h3><div class="tarif">${AB.mensuel} € <small style="font-size:1rem">/ mois HT</small></div><ul><li>Toutes les demandes de travaux de votre zone</li><li>0 % de commission, 0 € par contact</li><li>Interventions d’urgence pour les pros assurés</li><li>${AB.annuel} € / an · ${AB.essaiJours} jours d’essai</li></ul><a class="btn btn-cta" href="#/espace-artisan">Ouvrir mon espace artisan</a></div>
+        <div class="offre"><h3>Enseignes</h3><div class="tarif">${pc(R.commissionDestockage)} <small style="font-size:1rem">par vente</small></div><ul><li>Grandes surfaces, négoces, fabricants, loueurs</li><li>Fins de série et surstocks, stock par magasin</li><li>0 € d’abonnement pendant le pilote</li></ul><a class="btn btn-cta" href="#/espace-enseigne">Espace enseigne</a></div>
+      </div>
+
+      <div class="titre-section" style="margin-top:44px"><div><div class="surtitre">Service par service</div><h2>Qui paie quoi</h2></div></div>
+      <div class="tableau-offre" role="table" aria-label="Tarifs par service">
+        <div class="to-ligne to-tete" role="row"><span role="columnheader">Service</span><span role="columnheader">Vous payez</span><span role="columnheader">L’autre partie</span></div>
+        ${lignes.map(([ic, t, d, client, autre, lien]) => `<a class="to-ligne" role="row" href="${lien}"><span role="cell"><b>${ic} ${t}</b><small>${d}</small></span><span role="cell" data-t="Vous payez">${client}</span><span role="cell" data-t="L’autre partie">${autre}</span></a>`).join('')}
+      </div>
+      <p class="note-legale">Prix TTC pour les particuliers, HT pour les professionnels. Les assurances restent facultatives et ne sont jamais cochées d’avance. Détail : <a href="#/legal/cgu">conditions générales</a> · <a href="#/legal/pros">conditions professionnels et enseignes</a> · <a href="#/legal/prix">règles de prix</a> · <a href="#/pros">offres professionnelles</a>.</p>
+      ${blocReassurance().replace('class="bloc reassurance"', 'class="bloc reassurance" style="margin-top:40px;border-radius:16px"')}
+    </div></div>`;
+  }
+
   /* ---------- routeur ---------- */
   function router() {
     const [chemin, qs] = (location.hash.slice(1) || '/').split('?');
@@ -1860,6 +1894,7 @@
       case 'favoris': html = vueMonEspace(); apres = () => { brancherEspace(); const h = [...document.querySelectorAll('h3')].find((x) => x.textContent === 'Mes favoris'); if (h) h.scrollIntoView(); }; break;
       case 'deposer': html = vueDeposer(params); apres = brancherDeposer; break;
       case 'pros': html = vuePros(); break;
+      case 'offre': html = vueOffre(); break;
       case 'travaux': if (params.get('metier') !== null) { filtreTravaux.metier = params.get('metier'); filtreTravaux.vise = ''; } html = vueTravaux(); apres = brancherTravaux; break;
       case 'espace-artisan': html = vueEspaceArtisan(); apres = brancherEspaceArtisan; break;
       case 'reparer': html = vueReparer(); break;
