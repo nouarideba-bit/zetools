@@ -1,7 +1,7 @@
 /* ZETOOLS · application de la maquette (routeur par #, vues, état local). */
 (function () {
   'use strict';
-  const { PHOTOS, VIDEOS, CATEGORIES, MEMBRES, ANNONCES, RESERVATIONS, ARTICLES, CREDITS } = window.ZT_DONNEES;
+  const { PHOTOS, VIDEOS, CATEGORIES, MEMBRES, ANNONCES, RESERVATIONS, ARTICLES, CREDITS, SERVICES } = window.ZT_DONNEES;
   const Z = window.ZT;
   const AUJOURDHUI = Z.versTexte(Z.versDate(new Date()));
   const vue = document.getElementById('vue');
@@ -12,7 +12,7 @@
     reservations: [],
     favoris: [],
     annonces: [],
-    lots: [], stocks: {}, retraits: [], enseigne: null,
+    lots: [], stocks: {}, retraits: [], enseigne: null, services: [],
     rdv: window.ZT_DONNEES.RDV_DEMO.map((r) => Object.assign({}, r)),
     offres: window.ZT_DONNEES.OFFRES_DEMO.map((o) => Object.assign({}, o)),
     conversations: [
@@ -34,7 +34,10 @@
 
   const toutesAnnonces = () => ANNONCES.concat(etat.annonces);
   const toutesReservations = () => RESERVATIONS.concat(etat.reservations);
-  const annonce = (id) => toutesAnnonces().find((a) => a.id === id);
+  const tousServices = () => SERVICES.concat(etat.services);
+  const service = (id) => tousServices().find((x) => x.id === id);
+  // une conversation peut porter sur un outil ou sur un service
+  const annonce = (id) => toutesAnnonces().find((a) => a.id === id) || service(id);
   const membre = (id) => MEMBRES[id] || { id: 'moi', nom: 'Vous', ville: 'Paris', note: 5, avis: 0, verifie: true, pro: false, locations: 0 };
 
   /* ---------- utilitaires ---------- */
@@ -145,6 +148,16 @@
     <section class="bloc" style="padding-top:0"><div class="conteneur">
       <div class="titre-section"><div><div class="surtitre">À la une</div><h2>Annonces près de chez vous</h2><p>Sélection en Île-de-France, mise à jour en continu.</p></div><a class="btn btn-contour" href="#/annonces">Toutes les annonces</a></div>
       <div class="grille">${une.map(carte).join('')}</div>
+    </div></section>
+
+    <section class="bloc" style="padding-top:0"><div class="conteneur">
+      <div class="titre-section"><div><div class="surtitre">Services</div><h2>Quelqu’un pour le faire à votre place</h2><p>Montage, fixations, jardinage, cours de bricolage : réservez un voisin ou un professionnel, à l’heure ou au forfait.</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn btn-contour" href="#/services">Tous les services</a><a class="btn btn-cta" href="#/proposer-service">Proposer mes services</a></div></div>
+      <div class="grille">${tousServices().slice(0, 4).map(carteService).join('')}</div>
+    </div></section>
+
+    <section class="bloc" style="padding-top:0"><div class="conteneur">
+      <div class="titre-section"><div><div class="surtitre">Fiches techniques</div><h2>Apprenez à le faire vous-même</h2><p>Des pas-à-pas gratuits, à télécharger en PDF : montage de meuble, étagère, perçage, peinture, entretien.</p></div><a class="btn btn-contour" href="#/fiches">Toutes les fiches</a></div>
+      <div class="grille">${window.ZT_DONNEES.FICHES.slice(0, 4).map(carteFiche).join('')}</div>
     </div></section>
 
     <section class="bloc" style="padding-top:0"><div class="conteneur">
@@ -260,17 +273,19 @@
 
   // « Proposer mon prix » : offre en attente, contre-offre, prix négocié ou formulaire
   function blocOffre(a, mode) {
-    const unite = mode === 'location' ? ' / jour' : '';
-    const affiche = mode === 'vente' ? a.prixVenteAffiche : a.prixJourAffiche;
-    if (affiche) return `<div class="alerte alerte-ok">🤝 Prix négocié accepté : <b>${Z.euros(mode === 'vente' ? a.prixVente : a.prixJour)}${unite}</b> au lieu de ${Z.euros(affiche)}. Offre valable 48 h.</div>`;
+    const champ = { vente: 'prixVente', location: 'prixJour', service: 'tarif' }[mode];
+    const unite = mode === 'location' ? ' / jour' : mode === 'service' ? uniteService(a) : '';
+    const qui = mode === 'service' ? 'prestataire' : 'propriétaire';
+    const affiche = a[champ + 'Affiche'];
+    if (affiche) return `<div class="alerte alerte-ok">🤝 Prix négocié accepté : <b>${Z.euros(a[champ])}${unite}</b> au lieu de ${Z.euros(affiche)}. Offre valable 48 h.</div>`;
     const mes = etat.offres.filter((x) => x.sens === 'envoyee' && x.annonceId === a.id && x.mode === mode);
     const enCours = mes.find((x) => ['en attente', 'contre-offre'].includes(x.statut) && !Z.offreExpiree(x, maintenant()));
-    if (enCours) return `<div class="alerte alerte-info">🤝 ${enCours.statut === 'contre-offre' ? `Le propriétaire vous propose <b>${Z.euros(enCours.contre)}${unite}</b>.` : `Votre offre de <b>${Z.euros(enCours.montant)}${unite}</b> attend la réponse du propriétaire.`} <a href="#/offres">Voir mes offres</a></div>`;
-    const mini = Math.ceil((mode === 'vente' ? a.prixVente : a.prixJour) * Z.REGLES.offres.plancher * 2) / 2;
+    if (enCours) return `<div class="alerte alerte-info">🤝 ${enCours.statut === 'contre-offre' ? `Le ${qui} vous propose <b>${Z.euros(enCours.contre)}${unite}</b>.` : `Votre offre de <b>${Z.euros(enCours.montant)}${unite}</b> attend la réponse du ${qui}.`} <a href="#/offres">Voir mes offres</a></div>`;
+    const mini = Math.ceil(a[champ] * Z.REGLES.offres.plancher * 2) / 2;
     if (mes.length >= Z.REGLES.offres.maxParAnnonce) return '<div class="alerte alerte-info">Vous avez atteint le nombre maximum d’offres pour cette annonce.</div>';
     return `<div class="bloc-offre"><b>🤝 Proposer mon prix</b>
-      <div class="offre-saisie"><input type="number" id="montant-offre" min="${mini}" step="0.5" placeholder="Votre prix${unite} (min. ${Z.euros(mini)})" aria-label="Votre prix"><button class="btn btn-contour" data-action="offrir" data-mode="${mode}">Envoyer l’offre</button></div>
-      <span class="discret">Le propriétaire a 48 h pour accepter, refuser ou vous faire une contre-proposition. Rien n’est débité avant son accord.</span></div>`;
+      <div class="offre-saisie"><input type="number" id="montant-offre" min="${mini}" step="0.5" placeholder="Votre prix${unite} (min. ${Z.euros(mini)})" aria-label="Votre prix"><button type="button" class="btn btn-contour" data-action="offrir" data-mode="${mode}">Envoyer l’offre</button></div>
+      <span class="discret">Le ${qui} a 48 h pour accepter, refuser ou vous faire une contre-proposition. Rien n’est débité avant son accord.</span></div>`;
   }
   function zoneTransaction(a) {
     const o = selection.onglet;
@@ -454,6 +469,8 @@
       <div class="titre-section"><div><h2>Mon espace</h2><p>Compte de démonstration · profil vérifié</p></div><a class="btn btn-cta" href="#/deposer">＋ Déposer une annonce</a></div>
       <h3>Mon calendrier de location</h3>
       ${mesRes.length ? `<table class="tableau"><thead><tr><th>Outil</th><th>Du</th><th>Au</th><th>Total payé</th><th>Caution bloquée</th><th>Statut</th></tr></thead><tbody>${mesRes.sort((x, y) => x.debut.localeCompare(y.debut)).map((r) => { const a = annonce(r.outilId); return `<tr><td><a href="#/annonce/${a.id}">${esc(a.titre)}</a></td><td>${Z.formatDate(r.debut)}</td><td>${Z.formatDate(r.fin)}</td><td>${r.total ? Z.euros(r.total) : '—'}</td><td>${Z.euros(r.caution ?? a.caution)}</td><td><span class="statut">${esc(r.statut)}</span></td></tr>`; }).join('')}</tbody></table>` : '<div class="vide">Aucune location pour l’instant.</div>'}
+      <h3 style="margin-top:32px">Mes services proposés</h3>
+      ${etat.services.length ? `<div class="grille">${etat.services.map(carteService).join('')}</div>` : '<div class="vide">Vous savez monter un meuble, tailler une haie, poser une étagère ? <a href="#/proposer-service">Proposez vos services</a>.</div>'}
       <h3 style="margin-top:32px">Mes offres de prix</h3>
       <div class="panneau bandeau-action"><div>${etat.offres.filter((o) => o.sens === 'recue' && o.statut === 'en attente').length} offre(s) reçue(s) à traiter · ${etat.offres.filter((o) => o.sens === 'envoyee').length} envoyée(s).</div><a class="btn btn-contour" href="#/offres">🤝 Voir les offres</a></div>
       <h3 style="margin-top:32px">Mes rendez-vous</h3>
@@ -542,7 +559,9 @@
   }
 
   function vueAtelier() {
-    return `<div class="page"><div class="conteneur"><div class="titre-section"><div><div class="surtitre">L’Atelier</div><h2>Le guide du bon bricoleur</h2><p>Conseils pratiques, choix du matériel, entretien.</p></div></div>${grilleArticles()}</div></div>`;
+    return `<div class="page"><div class="conteneur"><div class="titre-section"><div><div class="surtitre">L’Atelier</div><h2>Le guide du bon bricoleur</h2><p>Conseils pratiques, choix du matériel, entretien.</p></div></div>${grilleArticles()}
+      <div class="titre-section" style="margin-top:40px"><div><div class="surtitre">À télécharger</div><h2>Fiches techniques en PDF</h2><p>Monter un meuble, fixer une étagère, percer un mur : des pas-à-pas gratuits à imprimer.</p></div><a class="btn btn-contour" href="#/fiches">Toutes les fiches</a></div>
+      <div class="grille">${window.ZT_DONNEES.FICHES.slice(0, 4).map(carteFiche).join('')}</div></div></div>`;
   }
 
   function vueAide() {
@@ -1151,13 +1170,220 @@
   }
 
   /* =====================================================================
+     SERVICES : un membre propose ses services, comme on propose un outil
+     (fiche, tarif, calendrier de réservation à l'heure, offre de prix)
+     ===================================================================== */
+  const uniteService = (s) => (s.unite === 'forfait' ? ' le forfait' : ' / heure');
+  const statutPrestataire = (s) => (s.siret ? 'Professionnel · SIRET vérifié' : 'Particulier · coup de main occasionnel');
+  function carteService(s) {
+    const m = membre(s.membre);
+    return `<a class="carte" href="#/service/${s.id}">
+      <div class="visuel">${s.photo ? `<img loading="lazy" src="${s.photo}" alt="${esc(s.titre)}">` : ''}
+        <div class="badges"><span class="badge badge-service">Service</span>${s.siret ? '<span class="badge badge-vente">PRO</span>' : ''}</div></div>
+      <div class="infos"><span class="badge badge-etat" style="align-self:start">${metierIco(s.metier)} ${esc(metierNom(s.metier))}</span>
+        <h3>${esc(s.titre)}</h3><div class="prix">${Z.euros(s.tarif)} <small>${uniteService(s)}</small></div>
+        <div class="meta"><span>📍 ${esc(s.ville)} · ${s.rayonKm} km</span><span>★ ${m.note.toFixed(1)} (${m.avis})</span></div></div></a>`;
+  }
+  let filtreServices = { metier: '', q: '', lieu: '' };
+  function vueServices() {
+    const liste = Z.filtrerServices(tousServices(), filtreServices);
+    const puce = (v, lib) => `<button class="puce ${filtreServices.metier === v ? 'active' : ''}" data-metier-service="${v}">${lib}</button>`;
+    return `<section class="hero hero-court hero-video" style="background-image:url('${PHOTOS.artisans}')">${videoFond(VIDEOS.artisans)}<div class="conteneur">
+        <div class="surtitre" style="color:var(--jaune)">Services entre voisins et professionnels</div>
+        <h1>Pas le temps, pas la main ? <em>Réservez quelqu’un</em>.</h1>
+        <p class="sous">Montage de meubles, fixations, jardinage, cours de bricolage : choisissez un prestataire, un jour et une heure. Vous payez en ligne, le prestataire est réglé une fois le service rendu.</p>
+      </div></section>
+      <div class="page"><div class="conteneur">
+        <div class="titre-section"><div><h2>${liste.length} service${liste.length > 1 ? 's' : ''} près de chez vous</h2></div><a class="btn btn-cta" href="#/proposer-service">＋ Proposer mes services</a></div>
+        <div class="puces" style="margin-bottom:20px">${puce('', 'Tous les métiers')}${METIERS.map((x) => puce(x.id, `${x.icone} ${x.nom}`)).join('')}</div>
+        <div class="grille">${liste.map(carteService).join('') || '<div class="vide">Aucun service pour ce métier pour le moment. <a href="#/travaux">Publiez une demande de travaux</a> : les artisans abonnés vous répondent.</div>'}</div>
+        <div class="panneau bandeau-action"><div><b>Un chantier plus important ?</b><br>Pour des travaux sur devis (plomberie, électricité, maçonnerie, rénovation), publiez gratuitement votre demande : les artisans vérifiés de votre secteur vous répondent.</div><a class="btn btn-contour" href="#/travaux">Trouver un artisan</a></div>
+      </div></div>`;
+  }
+  function brancherServices() {
+    vue.querySelectorAll('[data-metier-service]').forEach((b) => b.addEventListener('click', () => { filtreServices.metier = b.dataset.metierService; router(); }));
+  }
+  let selService = { id: null };
+  function zoneService(s) {
+    const [an, mo] = selService.mois.split('-').map(Number);
+    const premier = new Date(Date.UTC(an, mo - 1, 1)); const nb = new Date(Date.UTC(an, mo, 0)).getUTCDate();
+    const nomMois = premier.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+    let cases = ['L', 'M', 'M', 'J', 'V', 'S', 'D'].map((j) => `<span>${j}</span>`).join('') + '<span></span>'.repeat((premier.getUTCDay() + 6) % 7);
+    for (let j = 1; j <= nb; j++) {
+      const t = `${an}-${String(mo).padStart(2, '0')}-${String(j).padStart(2, '0')}`;
+      const dis = t < AUJOURDHUI || !Z.creneauxJour(t, { maintenant: maintenant() }).length;
+      cases += `<button type="button" data-jour-svc="${t}" class="${dis ? 'passe' : ''} ${t === selService.jour ? 'choisi' : ''}" ${dis ? 'disabled' : ''}>${j}</button>`;
+    }
+    const pris = rdvConfirmes().map((r) => r.creneau);
+    const slots = selService.jour ? Z.creneauxJour(selService.jour, { maintenant: maintenant(), pris }) : [];
+    const d = Z.devisService(s, selService.heures);
+    const heures = s.unite === 'forfait' ? '' : `<label class="ligne">Durée <select id="heures-svc">${Array.from({ length: Z.REGLES.service.heuresMax - (s.dureeMin || 1) + 1 }, (_, i) => i + (s.dureeMin || 1)).map((h) => `<option value="${h}" ${h === d.heures ? 'selected' : ''}>${h} h</option>`).join('')}</select></label>`;
+    return `<div class="ligne"><span>Tarif</span><b>${Z.euros(s.tarif)}${uniteService(s)}</b></div>
+      <div class="ligne discret"><span>${s.unite === 'forfait' ? `Forfait d’environ ${s.dureeForfait || 1} h` : `${s.dureeMin || 1} h minimum`} · se déplace à ${s.rayonKm} km</span><span></span></div>
+      <div class="calendrier" style="margin:12px 0"><div class="tete"><button type="button" data-mois-svc="-1" aria-label="Mois précédent">‹</button><span>${nomMois}</span><button type="button" data-mois-svc="1" aria-label="Mois suivant">›</button></div><div class="jours">${cases}</div></div>
+      ${selService.jour ? `<b style="text-transform:capitalize">${quand(selService.jour + 'T00:00').replace(/ à .*/, '')}</b><div class="creneaux">${slots.map((c) => `<button type="button" data-creneau-svc="${c.debut}" class="${selService.creneau === c.debut ? 'choisi' : ''}" ${c.libre ? '' : 'disabled title="Déjà pris dans votre agenda"'}>${c.heure}</button>`).join('') || '<span class="discret">Plus de créneau ce jour-là.</span>'}</div>` : '<div class="alerte alerte-info">Choisissez un jour dans le calendrier, puis une heure.</div>'}
+      ${heures}
+      ${selService.creneau ? `<div class="alerte alerte-ok" style="text-transform:none">${quand(selService.creneau)} · ${d.heures} h</div>
+        <div class="ligne"><span>${d.forfait ? 'Forfait' : `${Z.euros(s.tarif)} × ${d.heures} h`}</span><span>${Z.euros(d.base)}</span></div>
+        <div class="ligne"><span>Frais de service</span><span>${Z.euros(d.fraisService)}</span></div>
+        <div class="ligne total"><span>Total</span><span>${Z.euros(d.total)}</span></div>
+        <div class="ligne discret"><span>Payé au prestataire une fois le service rendu</span><span>${Z.euros(d.versementPrestataire)}</span></div>
+        <button class="btn btn-cta" style="width:100%;margin-top:10px" data-action="reserver-service">Réserver et payer ${Z.euros(d.total)}</button>` : ''}
+      ${blocOffre(s, 'service')}
+      <a class="btn btn-contour" style="width:100%;margin-top:10px" href="#/rendez-vous?type=service&avec=${s.membre}&objet=${encodeURIComponent(s.titre)}">📅 Proposer plusieurs créneaux au prestataire</a>`;
+  }
+  function vueService(id) {
+    const s = Z.appliquerOffres(service(id), etat.offres, maintenant());
+    if (!s) return '<div class="page"><div class="conteneur vide">Service introuvable. <a href="#/services">Retour aux services</a></div></div>';
+    const m = membre(s.membre);
+    if (selService.id !== id) selService = { id, mois: AUJOURDHUI.slice(0, 7), jour: '', creneau: '', heures: s.dureeMin || 1 };
+    return `<div class="page"><div class="conteneur">
+      <div class="fil"><a href="#/">Accueil</a> › <a href="#/services">Services</a> › ${esc(s.titre)}</div>
+      <div class="fiche">
+        <div>
+          <div class="photo-principale">${s.photo ? `<img src="${s.photo.replace('w=900', 'w=1400')}" alt="${esc(s.titre)}">` : ''}</div>
+          <div class="panneau" style="margin-top:16px">
+            <h2 style="margin-top:0">Le service</h2><p>${esc(s.description)}</p>
+            <div class="ligne"><span>Métier</span><b>${metierIco(s.metier)} ${esc(metierNom(s.metier))}</b></div>
+            <div class="ligne"><span>Prestataire</span><b>${statutPrestataire(s)}${s.decennale ? ' · assurance décennale' : ''}</b></div>
+            <div class="ligne"><span>Outils</span><b>${s.outils ? 'Vient avec ses outils' : 'Sur vos outils (ou loués sur ZETools)'}</b></div>
+            <div class="ligne"><span>Zone d’intervention</span><b>📍 ${esc(s.ville)} (${esc(s.cp)}) · ${s.rayonKm} km autour</b></div>
+            ${(s.inclus || []).length ? `<h3>Compris dans le prix</h3><ul class="liste-avantages">${s.inclus.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}
+            ${s.siret ? '' : '<p class="note-legale">Service proposé par un particulier, à titre occasionnel : pas de facture professionnelle ni de garantie décennale. Pour des travaux réglementés (électricité, plomberie, gros œuvre), choisissez un professionnel.</p>'}
+          </div>
+        </div>
+        <div>
+          <div class="panneau">
+            <div class="badges" style="display:flex;gap:6px;flex-wrap:wrap"><span class="badge badge-service">Service ${Z.euros(s.tarif)}${uniteService(s)}</span><span class="badge badge-etat">${esc(metierNom(s.metier))}</span></div>
+            <h1>${esc(s.titre)}</h1>
+            <div class="vendeur" style="margin-top:12px"><div class="avatar">${initiales(m.nom)}</div><div><b>${esc(m.nom)}</b>${s.siret ? ' <span class="badge badge-vente">PRO</span>' : ''}<br><span class="verifie">✔ Profil vérifié</span> · ★ ${m.note.toFixed(1)} (${m.avis} avis)</div></div>
+            <div id="zone-service" style="margin-top:14px">${zoneService(s)}</div>
+          </div>
+          <div class="panneau"><b>💬 Une question ?</b><p style="margin:6px 0 10px;color:var(--texte-doux)">Écrivez au prestataire. Téléphone, e-mail et adresse restent masqués jusqu’à la réservation.</p><a class="btn btn-contour" href="#/messages?annonce=${s.id}">Envoyer un message</a></div>
+        </div>
+      </div></div></div>`;
+  }
+  function brancherService(id) {
+    const zone = document.getElementById('zone-service'); if (!zone) return;
+    const courant = () => Z.appliquerOffres(service(id), etat.offres, maintenant());
+    const rafraichir = () => { zone.innerHTML = zoneService(courant()); };
+    zone.addEventListener('change', (e) => { if (e.target.id === 'heures-svc') { selService.heures = Number(e.target.value); rafraichir(); } });
+    zone.addEventListener('click', (e) => {
+      const b = e.target.closest('button'); if (!b) return;
+      const s = courant();
+      if (b.dataset.moisSvc) { const [a, m] = selService.mois.split('-').map(Number); const n = new Date(Date.UTC(a, m - 1 + Number(b.dataset.moisSvc), 1)).toISOString().slice(0, 7); if (n >= AUJOURDHUI.slice(0, 7)) selService.mois = n; return rafraichir(); }
+      if (b.dataset.jourSvc) { selService.jour = b.dataset.jourSvc; selService.creneau = ''; return rafraichir(); }
+      if (b.dataset.creneauSvc) { selService.creneau = b.dataset.creneauSvc; return rafraichir(); }
+      if (b.dataset.action === 'offrir') {
+        const base = service(id); const montant = Number(document.getElementById('montant-offre').value);
+        const v = Z.verifierOffre(base, 'service', montant, etat.offres.filter((x) => x.sens === 'envoyee' && x.annonceId === id && x.mode === 'service').length);
+        if (!v.ok) return toast(v.raison);
+        etat.offres.push(Z.creerOffre(base, 'service', montant, maintenant())); sauver();
+        toast(`Offre de ${Z.euros(montant)} envoyée. Réponse sous 48 h.`); return aller('#/offres');
+      }
+      if (b.dataset.action === 'reserver-service') {
+        const d = Z.devisService(s, selService.heures);
+        const rdv = { id: 'r' + Date.now(), sens: 'envoye', type: 'service', avec: s.membre, serviceId: s.id, objet: s.titre, creneaux: [selService.creneau], dureeHeures: d.heures,
+          lieu: 'À mon domicile (adresse transmise après réservation)', statut: 'proposé', montant: d.total, message: '' };
+        const v = Z.verifierProposition(rdv, maintenant()); if (!v.ok) return toast(v.erreurs[0]);
+        const c = Z.confirmerRdv(rdv, selService.creneau, etat.rdv); if (!c.ok) return toast(c.raison);
+        etat.rdv.push(c.rdv); deverrouillerConversation(s.id); sauver();
+        toast(`Prestation réservée (simulation) : ${Z.euros(d.total)} payés et conservés jusqu’à la fin du service.`);
+        selService = { id: null }; aller('#/agenda');
+      }
+    });
+  }
+  function vueProposerService() {
+    return `<div class="page"><div class="conteneur" style="max-width:820px">
+      <div class="titre-section"><div><div class="surtitre">Services</div><h2>Proposer mes services</h2><p>Gratuit. Vous fixez votre tarif, vos clients réservent un jour et une heure, vous êtes payé une fois le service rendu.</p></div></div>
+      <form class="panneau formulaire" id="form-service">
+        <label class="large">Votre service<input name="titre" required maxlength="80" placeholder="Ex. : Montage de meubles en kit, pose de tringles, tonte de pelouse"></label>
+        <label>Métier<select name="metier" required>${METIERS.map((x) => `<option value="${x.id}">${x.icone} ${x.nom}</option>`).join('')}</select></label>
+        <label>Vous êtes<select name="statut"><option value="particulier">Un particulier (coups de main occasionnels)</option><option value="pro">Un professionnel (SIRET)</option></select></label>
+        <label>Tarif (€)<input name="tarif" type="number" min="1" step="0.5" required placeholder="25"></label>
+        <label>Facturé<select name="unite"><option value="heure">à l’heure</option><option value="forfait">au forfait</option></select></label>
+        <label>Durée minimum, ou durée du forfait (h)<input name="duree" type="number" min="1" max="8" step="1" value="1"></label>
+        <label>Code postal<input name="cp" required pattern="\\d{5}" placeholder="94300"></label>
+        <label>Rayon de déplacement (km)<input name="rayon" type="number" min="1" max="50" value="10"></label>
+        <label class="case"><input type="checkbox" name="outils" checked> Je viens avec mes outils</label>
+        <label class="large">Description<textarea name="description" rows="4" placeholder="Votre expérience, ce qui est compris, ce qui ne l’est pas… (vos coordonnées seront masquées)"></textarea></label>
+        <div class="large alerte alerte-info" id="aide-service">Particulier : seuls les petits services occasionnels sont ouverts (petit bricolage, montage, jardinage, cours). L’électricité, la plomberie et la maçonnerie sont réservées aux professionnels qualifiés, avec SIRET. Vos revenus sont à déclarer ; une activité régulière suppose un statut professionnel (micro-entreprise).</div>
+        <div class="large"><button class="btn btn-cta">Publier mon service</button></div>
+      </form></div></div>`;
+  }
+  function brancherProposerService() {
+    const f = document.getElementById('form-service');
+    f.addEventListener('submit', (e) => {
+      e.preventDefault(); const fd = new FormData(f); const cp = String(fd.get('cp')); const forfait = fd.get('unite') === 'forfait';
+      const pos = Z.positionCodePostal(cp);
+      const s = { id: 'us' + Date.now(), modes: ['service'], titre: String(fd.get('titre')), metier: String(fd.get('metier')), membre: 'moi', siret: fd.get('statut') === 'pro',
+        tarif: Number(fd.get('tarif')), unite: String(fd.get('unite')), dureeMin: forfait ? 1 : Number(fd.get('duree')) || 1, dureeForfait: forfait ? Number(fd.get('duree')) || 1 : undefined,
+        ville: pos ? pos.libelle : 'Île-de-France', cp, rayonKm: Number(fd.get('rayon')) || 10, outils: fd.get('outils') === 'on', photo: PHOTOS.artisans,
+        description: Z.masquerCoordonnees(String(fd.get('description') || ''), false).texte, inclus: [] };
+      const v = Z.verifierService(s);
+      if (!v.ok) return toast(v.erreurs[0]);
+      etat.services.push(s); sauver(); toast('Service publié.'); aller('#/service/' + s.id);
+    });
+  }
+
+  /* =====================================================================
+     FICHES TECHNIQUES : guides pas à pas, téléchargeables en PDF
+     ===================================================================== */
+  const { FICHES } = window.ZT_DONNEES;
+  function carteFiche(f) {
+    return `<a class="carte carte-fiche" href="#/fiche-technique/${f.id}">
+      <div class="visuel visuel-fiche"><span>${f.icone}</span><div class="badges"><span class="badge badge-location">PDF gratuit</span></div></div>
+      <div class="infos"><span class="badge badge-etat" style="align-self:start">${esc(f.theme)} · ${esc(f.niveau)}</span>
+        <h3>${esc(f.titre)}</h3><div class="meta"><span>⏱ ${esc(f.duree)}</span><span>${f.etapes.length} étapes</span></div></div></a>`;
+  }
+  function telechargerFiche(id) {
+    const f = FICHES.find((x) => x.id === id); if (!f) return;
+    const P = window.ZT_PDF; const J = window.ZT_JURIDIQUE;
+    const lien = document.createElement('a');
+    lien.href = URL.createObjectURL(new Blob([P.octets(P.fichePdf(f, J && J.SOCIETE))], { type: 'application/pdf' }));
+    lien.download = P.nomFichier(f); document.body.appendChild(lien); lien.click(); lien.remove();
+    toast('Fiche téléchargée en PDF.');
+  }
+  function vueFiches() {
+    return `<div class="page"><div class="conteneur">
+      <div class="titre-section"><div><div class="surtitre">L’Atelier · fiches techniques</div><h2>Apprenez à le faire vous-même</h2><p>Des fiches pas à pas, gratuites, à télécharger en PDF et à imprimer : outils, fournitures, étapes, sécurité. Chaque outil cité se loue ou s’achète d’occasion sur ZETools.</p></div><a class="btn btn-contour" href="#/atelier">Les articles de L’Atelier</a></div>
+      <div class="grille">${FICHES.map(carteFiche).join('')}</div>
+      <div class="panneau bandeau-action"><div><b>Pas envie de le faire vous-même ?</b><br>Un voisin ou un professionnel s’en charge, à l’heure ou au forfait.</div><a class="btn btn-cta" href="#/services">Voir les services</a></div>
+    </div></div>`;
+  }
+  function vueFicheTechnique(id) {
+    const f = FICHES.find((x) => x.id === id);
+    if (!f) return '<div class="page"><div class="conteneur vide">Fiche introuvable. <a href="#/fiches">Toutes les fiches techniques</a></div></div>';
+    const liste = (items, ord) => `<${ord ? 'ol' : 'ul'} class="liste-fiche">${items.map((x) => `<li>${x}</li>`).join('')}</${ord ? 'ol' : 'ul'}>`;
+    return `<div class="page"><div class="conteneur" style="max-width:900px">
+      <div class="fil"><a href="#/">Accueil</a> › <a href="#/fiches">Fiches techniques</a> › ${esc(f.titre)}</div>
+      <article class="panneau fiche-technique">
+        <div class="entete-fiche"><span class="icone-fiche">${f.icone}</span><div><div class="surtitre">Fiche technique · ${esc(f.theme)}</div><h1>${esc(f.titre)}</h1>
+          <div class="puces"><span class="puce">Niveau : ${esc(f.niveau)}</span><span class="puce">⏱ ${esc(f.duree)}</span><span class="puce">Budget : ${esc(f.budget)}</span></div></div></div>
+        <p class="resume-fiche">${esc(f.resume)}</p>
+        <button class="btn btn-cta" data-pdf="${f.id}">📄 Télécharger la fiche en PDF</button>
+        <h3>Outils nécessaires</h3>
+        <ul class="liste-fiche">${f.outils.map((o) => `<li>${esc(o.nom)}${o.q ? ` · <a href="#/annonces?q=${encodeURIComponent(o.q)}">louer ou acheter d’occasion</a>` : ''}</li>`).join('')}</ul>
+        ${f.materiaux.length ? `<h3>Matériaux et fournitures</h3>${liste(f.materiaux.map(esc))}` : ''}
+        <h3>Étapes</h3>${liste(f.etapes.map(esc), true)}
+        <h3>Sécurité</h3>${liste(f.securite.map(esc))}
+        ${f.astuce ? `<div class="alerte alerte-info"><b>L’astuce du bricoleur.</b> ${esc(f.astuce)}</div>` : ''}
+        <p class="note-legale">Fiche indicative rédigée par ZETools. Suivez toujours la notice du fabricant de vos outils et de vos fournitures. En cas de doute, faites appel à un professionnel.</p>
+        <div class="actions-rdv"><button class="btn btn-cta" data-pdf="${f.id}">📄 Télécharger en PDF</button><a class="btn btn-contour" href="#/services">Le faire faire par un prestataire</a><a class="btn btn-contour" href="#/fiches">Toutes les fiches</a></div>
+      </article></div></div>`;
+  }
+  function brancherFicheTechnique() {
+    vue.querySelectorAll('[data-pdf]').forEach((b) => b.addEventListener('click', () => telechargerFiche(b.dataset.pdf)));
+  }
+
+  /* =====================================================================
      OFFRES DE PRIX : chacun propose son prix, l'autre accepte, refuse ou contre-propose
      ===================================================================== */
   function vueOffres() {
     const M = maintenant();
     const unite = (o) => (o.mode === 'location' ? ' / jour' : '');
     const etiquette = (o) => { const st = Z.offreExpiree(o, M) ? 'expirée' : o.statut; return `<span class="badge ${st === 'acceptée' ? 'badge-echange' : st === 'refusée' || st === 'expirée' ? 'badge-vente' : 'badge-location'}">${st}</span>`; };
-    const tete = (o) => `<div><b>${esc(o.titre)}</b> ${etiquette(o)}<br><span class="discret">${o.mode === 'vente' ? 'Achat' : 'Location'} · prix affiché ${Z.euros(o.prixAffiche)}${unite(o)} · ${o.sens === 'recue' ? 'offre de' : 'propriétaire :'} ${esc(nomContact(o.avec))}</span></div>`;
+    const tete = (o) => `<div><b>${esc(o.titre)}</b> ${etiquette(o)}<br><span class="discret">${{ vente: 'Achat', location: 'Location', service: 'Service' }[o.mode]} · prix affiché ${Z.euros(o.prixAffiche)}${unite(o)} · ${o.sens === 'recue' ? 'offre de' : o.mode === 'service' ? 'prestataire :' : 'propriétaire :'} ${esc(nomContact(o.avec))}</span></div>`;
     const montants = (o) => `<div class="montants"><span>Offre <b>${Z.euros(o.montant)}${unite(o)}</b> <small>(−${Z.remiseSurNeuf(o.montant, o.prixAffiche)} %)</small></span>${o.contre ? `<span>Contre-proposition <b>${Z.euros(o.contre)}${unite(o)}</b></span>` : ''}${o.prixFinal ? `<span class="final">Prix convenu <b>${Z.euros(o.prixFinal)}${unite(o)}</b></span>` : ''}</div>`;
     const vivante = (o) => !Z.offreExpiree(o, M);
     const recue = (o) => `<div class="rdv">${tete(o)}${montants(o)}${o.statut === 'en attente' && vivante(o) ? `<div class="actions-rdv"><button class="btn btn-vert" data-offre="${o.id}" data-reponse="accepter">✔ Accepter ${Z.euros(o.montant)}</button>
@@ -1165,7 +1391,7 @@
         <button class="btn btn-contour" data-offre="${o.id}" data-reponse="refuser">Refuser</button></div>` : o.statut === 'contre-offre' && vivante(o) ? '<span class="discret">En attente de la réponse de l’acheteur.</span>' : ''}</div>`;
     const envoyee = (o) => `<div class="rdv">${tete(o)}${montants(o)}<div class="actions-rdv">${!vivante(o) ? '' : o.statut === 'en attente' ? `<button class="btn btn-contour" data-offre="${o.id}" data-reponse="demo">Démo : simuler la réponse du propriétaire</button><button class="btn btn-contour" data-offre="${o.id}" data-reponse="refuser">Retirer mon offre</button>`
         : o.statut === 'contre-offre' ? `<button class="btn btn-vert" data-offre="${o.id}" data-reponse="accepter">✔ Accepter ${Z.euros(o.contre)}</button><button class="btn btn-contour" data-offre="${o.id}" data-reponse="refuser">Refuser</button>`
-        : o.statut === 'acceptée' ? `<a class="btn btn-cta" href="#/annonce/${o.annonceId}">${o.mode === 'vente' ? 'Payer' : 'Réserver'} au prix convenu</a>` : ''}</div></div>`;
+        : o.statut === 'acceptée' ? `<a class="btn btn-cta" href="#/${o.mode === 'service' ? 'service' : 'annonce'}/${o.annonceId}">${o.mode === 'vente' ? 'Payer' : 'Réserver'} au prix convenu</a>` : ''}</div></div>`;
     const recues = etat.offres.filter((o) => o.sens === 'recue'), envoyees = etat.offres.filter((o) => o.sens === 'envoyee');
     return `<div class="page"><div class="conteneur" style="max-width:900px">
       <div class="titre-section"><div><div class="surtitre">Négociation</div><h2>Offres de prix</h2><p>Proposez votre prix sur une annonce : le propriétaire accepte, refuse ou vous fait une contre-proposition. Si vous êtes d’accord, la vente ou la location se conclut au prix convenu, avec le même paiement sécurisé.</p></div><a class="btn btn-cta" href="#/annonces">Trouver un outil</a></div>
@@ -1212,6 +1438,11 @@
       case 'rendez-vous': html = vueRendezVous(params); apres = brancherRendezVous; break;
       case 'agenda': html = vueAgenda(); apres = brancherAgenda; break;
       case 'offres': html = vueOffres(); apres = brancherOffres; break;
+      case 'services': html = vueServices(); apres = brancherServices; break;
+      case 'service': html = vueService(seg[1]); apres = () => brancherService(seg[1]); break;
+      case 'proposer-service': html = vueProposerService(); apres = brancherProposerService; break;
+      case 'fiches': html = vueFiches(); break;
+      case 'fiche-technique': html = vueFicheTechnique(seg[1]); apres = brancherFicheTechnique; break;
       case 'securite': html = vueLegal('securite'); break;
       case 'atelier': html = vueAtelier(); break;
       case 'aide': html = vueAide(); break;

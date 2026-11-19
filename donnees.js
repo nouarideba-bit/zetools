@@ -254,13 +254,83 @@
       message: 'Je peux samedi matin ou lundi soir, dites-moi ce qui vous arrange.' },
   ];
 
+  // Services proposés par des membres : particuliers (coups de main occasionnels) et professionnels (SIRET)
+  const SERVICES = [
+    { id: 's1', modes: ['service'], titre: 'Montage de meubles en kit et pose d’étagères', metier: 'bricolage', membre: 'm1', siret: false,
+      tarif: 22, unite: 'heure', dureeMin: 1, ville: 'Montreuil', cp: '93100', rayonKm: 8, outils: true, photo: U('1623161551706-318825cd18ef'),
+      description: 'Armoires, lits, bureaux, dressings : je monte vos meubles en kit et je fixe étagères et meubles hauts. Je viens avec ma visseuse, mon niveau et mes chevilles.',
+      inclus: ['Déplacement dans un rayon de 8 km', 'Outillage et petite quincaillerie', 'Nettoyage en fin de montage'] },
+    { id: 's2', modes: ['service'], titre: 'Pose de cuisine et agencement sur mesure', metier: 'menuiserie', membre: 'm2', siret: true, decennale: true,
+      tarif: 45, unite: 'heure', dureeMin: 2, ville: 'Vincennes', cp: '94300', rayonKm: 12, outils: true, photo: U('1621905251918-48416bd8575a'),
+      description: 'Menuisier agenceur depuis 15 ans. Pose de cuisines, plans de travail, dressings et placards sur mesure. Devis détaillé avant intervention pour les chantiers de plus d’une journée.',
+      inclus: ['Devis écrit gratuit', 'Facture et garantie professionnelle', 'Outillage d’atelier complet'] },
+    { id: 's3', modes: ['service'], titre: 'Taille de haie et entretien de jardin', metier: 'jardin', membre: 'm5', siret: true,
+      tarif: 35, unite: 'heure', dureeMin: 2, ville: 'Nogent-sur-Marne', cp: '94130', rayonKm: 15, outils: true, photo: U('1617576683096-00fc8eecb3af'),
+      description: 'Taille de haies, tonte, débroussaillage, ramassage et évacuation des déchets verts. Matériel thermique et batterie professionnel.',
+      inclus: ['Évacuation des déchets verts', 'Matériel professionnel', 'Facture, service à la personne'] },
+    { id: 's4', modes: ['service'], titre: 'Fixation murale : télévision, tringles, miroirs', metier: 'bricolage', membre: 'm4', siret: false,
+      tarif: 35, unite: 'forfait', dureeForfait: 1, ville: 'Saint-Maur-des-Fossés', cp: '94100', rayonKm: 10, outils: true, photo: U('1585201731775-0597e1be4bfb'),
+      description: 'Forfait pour une fixation murale propre et de niveau : support de télévision, tringle à rideaux, miroir ou tableau lourd. Perforateur et chevilles adaptées à votre mur.',
+      inclus: ['Jusqu’à 3 points de fixation', 'Chevilles adaptées (placo, brique, béton)', 'Aspiration des poussières'] },
+    { id: 's5', modes: ['service'], titre: 'Cours de bricolage à domicile : prenez vos outils en main', metier: 'bricolage', membre: 'm3', siret: false,
+      tarif: 25, unite: 'heure', dureeMin: 1, ville: 'Boulogne-Billancourt', cp: '92100', rayonKm: 6, outils: false, photo: U('1504148455328-c376907d081c'),
+      description: 'Vous venez d’acheter ou de louer un outil sur ZETools ? Je vous montre comment vous en servir en sécurité : perceuse, scie sauteuse, ponceuse. Idéal pour un premier chantier.',
+      inclus: ['Conseils de sécurité', 'Exercices sur votre propre outil', 'Liste des consommables à prévoir'] },
+  ];
+
+  // Fiches techniques téléchargeables en PDF (contenu rédigé pour ZETools, indicatif)
+  const FICHES = [
+    { id: 'f1', icone: '🪑', titre: 'Monter un meuble en kit sans se tromper', theme: 'Montage', niveau: 'Débutant', duree: '1 à 2 h', budget: '0 € hors meuble',
+      resume: 'La méthode pour monter une armoire, une commode ou un bureau en kit d’équerre, sans abîmer les panneaux et sans vis en trop à la fin.',
+      outils: [{ nom: 'Visseuse sans fil à couple réglable, embouts cruciformes et six pans', q: 'visseuse' }, { nom: 'Maillet en caoutchouc', q: 'maillet' }, { nom: 'Mètre ruban et niveau à bulle', q: 'niveau' }, { nom: 'Petites coupelles pour trier la visserie', q: '' }],
+      materiaux: ['Colle à bois vinylique (facultatif, pour les tourillons)', 'Carton d’emballage pour protéger le sol', 'Vis et chevilles adaptées à votre mur pour la fixation anti-basculement'],
+      etapes: ['Dégagez une surface plus grande que le meuble couché et protégez le sol avec le carton d’emballage.', 'Faites l’inventaire des panneaux et de la quincaillerie avec la notice. S’il manque une pièce, ne commencez pas.', 'Triez la visserie par type dans des coupelles et repérez chaque panneau par sa lettre ou son numéro.', 'Posez d’abord tourillons et excentriques sur les panneaux. Une goutte de colle dans les trous de tourillons rigidifie le meuble, mais empêche tout démontage.', 'Assemblez la caisse à plat : côtés, dessus, dessous. Serrez les excentriques d’un quart de tour, sans forcer.', 'Contrôlez l’équerrage : les deux diagonales de la caisse doivent être égales. Fixez ensuite le fond, qui bloque l’équerrage.', 'Redressez le meuble à deux. Posez tablettes, portes et tiroirs, puis réglez les charnières avec leurs vis de réglage.', 'Fixez le meuble au mur avec le dispositif anti-basculement fourni.'],
+      securite: ['Réglez la visseuse sur un couple faible : l’aggloméré éclate si l’on serre trop fort.', 'Manipulez les grands panneaux à deux.', 'Un meuble haut non fixé au mur peut basculer : la fixation murale est indispensable, surtout avec des enfants.'],
+      astuce: 'Gardez la notice et la clé fournie dans une pochette collée au dos du meuble : elles serviront au prochain déménagement.' },
+    { id: 'f2', icone: '📏', titre: 'Fixer une étagère murale solide et de niveau', theme: 'Fixation', niveau: 'Débutant', duree: '45 min', budget: '10 à 30 €',
+      resume: 'Choisir la bonne cheville selon le mur, percer proprement et obtenir une étagère parfaitement horizontale.',
+      outils: [{ nom: 'Perceuse à percussion ou perforateur', q: 'perforateur' }, { nom: 'Forets adaptés au mur (béton, brique, bois ou métal pour le placo)', q: 'forets' }, { nom: 'Détecteur de câbles et de métaux', q: 'détecteur' }, { nom: 'Niveau à bulle, mètre, crayon', q: 'niveau' }, { nom: 'Visseuse et aspirateur', q: 'visseuse' }],
+      materiaux: ['Étagère avec ses équerres ou ses supports invisibles', 'Chevilles adaptées : métalliques à expansion pour la plaque de plâtre, longues ou chimiques pour la brique creuse, nylon pour le béton et la brique pleine', 'Vis du diamètre indiqué sur la boîte de chevilles'],
+      etapes: ['Identifiez le mur : il sonne creux (plaque de plâtre, brique creuse) ou plein (béton, brique pleine). La couleur de la poussière au perçage confirme : blanche pour le plâtre, rouge pour la brique, grise pour le béton.', 'Passez le détecteur. Ne percez jamais à l’aplomb ni à l’horizontale d’une prise ou d’un interrupteur.', 'Tracez un trait horizontal au niveau à bulle et marquez les points de perçage à travers les supports.', 'Percez au diamètre de la cheville, un centimètre plus profond que sa longueur. Sans percussion dans la plaque de plâtre, la brique creuse et le carrelage.', 'Aspirez la poussière et enfoncez les chevilles à fleur du mur.', 'Vissez les supports sans les bloquer, contrôlez le niveau, puis serrez.', 'Posez la tablette, fixez-la aux supports et chargez-la progressivement.'],
+      securite: ['Portez des lunettes de protection.', 'Près d’un circuit électrique, coupez le courant au tableau avant de percer.', 'Respectez la charge maximale indiquée sur la boîte de chevilles : elle dépend du mur.'],
+      astuce: 'Collez une enveloppe pliée sous le point de perçage avec du ruban adhésif : elle recueille la poussière.' },
+    { id: 'f3', icone: '🪚', titre: 'Fabriquer une étagère en bois sur mesure', theme: 'Fabrication', niveau: 'Intermédiaire', duree: 'Une demi-journée, plus le séchage', budget: '40 à 90 €',
+      resume: 'Une bibliothèque simple en planches massives, aux dimensions exactes de votre niche ou de votre mur.',
+      outils: [{ nom: 'Scie circulaire avec guide, ou scie sauteuse', q: 'scie' }, { nom: 'Ponceuse excentrique', q: 'ponceuse' }, { nom: 'Perceuse-visseuse, foret de 3 mm et fraise à chanfreiner', q: 'perceuse' }, { nom: 'Serre-joints, équerre de menuisier, mètre', q: 'serre-joints' }],
+      materiaux: ['Planches de pin ou de chêne, 18 à 22 mm d’épaisseur', 'Vis à bois 4 × 40 mm, colle à bois', 'Abrasifs grains 80, 120, 180 et 240', 'Huile ou vernis de finition', 'Fond en contreplaqué de 5 mm ou traverse arrière'],
+      etapes: ['Dessinez un plan coté. Pour une planche de 18 mm chargée de livres, limitez la portée à 80 cm environ entre deux montants.', 'Tracez les coupes à l’équerre et numérotez les pièces.', 'Sciez avec la belle face vers le bas : la lame fait des éclats sur le dessus.', 'Poncez au grain 80, puis 120, puis 180, et cassez légèrement les arêtes.', 'Pré-percez à 3 mm et fraisez l’entrée des trous : le bois ne fend pas et les têtes de vis s’effacent.', 'Assemblez montants et tablettes à la colle et aux vis, sous serre-joints. Contrôlez l’équerrage par les diagonales.', 'Posez le fond ou une traverse arrière : c’est ce qui empêche le meuble de se déformer en parallélogramme.', 'Dépoussiérez, puis appliquez deux couches de finition en égrenant au grain 240 entre les deux.', 'Fixez l’étagère au mur.'],
+      securite: ['Lunettes, protections auditives et masque anti-poussière pendant le sciage et le ponçage.', 'Bloquez toujours la pièce avec des serre-joints : ne la tenez jamais à la main près de la lame.', 'Débranchez l’outil ou retirez la batterie avant de changer une lame.'],
+      astuce: 'Faites débiter les planches à la bonne longueur en magasin : il ne vous restera que les coupes de finition.' },
+    { id: 'f4', icone: '🧱', titre: 'Percer un mur : le bon foret, la bonne cheville', theme: 'Perçage', niveau: 'Débutant', duree: '20 min', budget: '5 à 15 €',
+      resume: 'Plaque de plâtre, brique, béton, carrelage : à chaque support sa méthode pour un trou net et une fixation qui tient.',
+      outils: [{ nom: 'Perceuse à percussion (brique pleine, parpaing) ou perforateur SDS (béton)', q: 'perforateur' }, { nom: 'Jeu de forets : béton, bois, métal, carrelage', q: 'forets' }, { nom: 'Détecteur de câbles et de métaux', q: 'détecteur' }, { nom: 'Aspirateur et ruban adhésif de masquage', q: 'aspirateur' }],
+      materiaux: ['Chevilles adaptées au support et à la charge', 'Vis correspondantes'],
+      etapes: ['Reconnaissez le support : plaque de plâtre (sonne creux, poussière blanche), brique (poussière rouge), béton (poussière grise, très dur).', 'Repérez câbles et tuyaux au détecteur. Les gaines électriques courent à la verticale et à l’horizontale des prises et interrupteurs.', 'Plaque de plâtre : foret à métaux, sans percussion, cheville métallique à expansion.', 'Brique creuse : sans percussion pour ne pas casser les alvéoles, cheville longue ou scellement chimique.', 'Béton et brique pleine : percussion ou perforateur, foret béton, cheville nylon.', 'Carrelage : collez un ruban de masquage, percez sans percussion avec un foret spécial, à vitesse lente, puis changez de foret pour le mur.', 'Percez bien perpendiculairement, un centimètre plus profond que la cheville, et aspirez le trou avant de la poser.'],
+      securite: ['Lunettes de protection ; masque si vous percez beaucoup.', 'Coupez le courant au tableau en cas de doute sur le passage d’un câble.', 'Tenez la machine à deux mains et utilisez la poignée latérale d’un perforateur.'],
+      astuce: 'Un morceau de ruban adhésif enroulé sur le foret sert de butée de profondeur.' },
+    { id: 'f5', icone: '🖌️', titre: 'Poncer et repeindre un meuble en bois', theme: 'Rénovation', niveau: 'Intermédiaire', duree: 'Un week-end avec les séchages', budget: '30 à 60 €',
+      resume: 'Redonner une seconde vie à une commode ou à une table : préparation du support, sous-couche et deux couches bien tendues.',
+      outils: [{ nom: 'Ponceuse excentrique et cale à poncer', q: 'ponceuse' }, { nom: 'Pinceau à rechampir et petit rouleau laqueur', q: '' }, { nom: 'Tournevis, bâche de protection', q: '' }],
+      materiaux: ['Abrasifs grains 120, 180 et 240', 'Dégraissant ou lessive, chiffons', 'Pâte à bois', 'Sous-couche adaptée (primaire d’accrochage pour un meuble mélaminé ou verni)', 'Peinture pour boiseries'],
+      etapes: ['Démontez poignées, portes et tiroirs. Protégez le sol.', 'Lessivez, rincez et laissez sécher complètement.', 'Poncez au grain 120. Sur un vernis sain, il suffit de dépolir pour donner de l’accroche : inutile de mettre le bois à nu.', 'Dépoussiérez à l’aspirateur, puis au chiffon légèrement humide.', 'Rebouchez trous et éclats à la pâte à bois, laissez sécher, poncez au grain 180.', 'Appliquez la sous-couche et laissez sécher le temps indiqué.', 'Égrenez au grain 240 et dépoussiérez.', 'Passez deux couches fines de peinture dans le sens du fil du bois, en respectant le temps de séchage entre les couches.', 'Remontez la quincaillerie. Attendez plusieurs jours avant un usage intensif : la peinture durcit lentement.'],
+      securite: ['Masque anti-poussière FFP2 et lunettes pendant le ponçage.', 'Les peintures des meubles anciens peuvent contenir du plomb : ne les poncez pas à sec, faites-les tester ou utilisez un décapant adapté.', 'Aérez la pièce pendant l’application et le séchage.'],
+      astuce: 'Deux couches fines valent mieux qu’une couche épaisse : moins de coulures, un film plus dur.' },
+    { id: 'f6', icone: '🔋', titre: 'Entretenir sa perceuse-visseuse et ses batteries', theme: 'Entretien', niveau: 'Débutant', duree: '15 min', budget: '0 €',
+      resume: 'Les gestes simples qui doublent la durée de vie d’un outil sans fil, et qui lui gardent sa valeur à la revente ou à la location.',
+      outils: [{ nom: 'Pinceau sec ou soufflette', q: '' }, { nom: 'Chiffon propre', q: '' }, { nom: 'Huile fine', q: '' }],
+      materiaux: [],
+      etapes: ['Retirez la batterie avant toute intervention.', 'Dépoussiérez les ouïes d’aération au pinceau sec : un moteur qui respire ne surchauffe pas.', 'Ouvrez le mandrin à fond, chassez la poussière, déposez une goutte d’huile fine sur les mors.', 'Triez forets et embouts : un foret émoussé fait forcer la machine et vide la batterie.', 'Stockez les batteries lithium à moitié chargées, au sec, entre 10 et 25 °C. Évitez la décharge complète.', 'Ne laissez pas la batterie en permanence sur le chargeur et ne rechargez pas une batterie encore chaude.', 'Essuyez les contacts de la batterie et du chargeur avec un chiffon sec.', 'Notez la date d’achat et les interventions : c’est le carnet de santé de l’outil, un vrai argument sur ZETools.'],
+      securite: ['Une batterie gonflée, choquée ou qui chauffe anormalement ne doit plus servir : déposez-la dans un point de collecte.', 'Ne stockez jamais une batterie en plein soleil ni dans une voiture en été.', 'N’utilisez que le chargeur prévu par le fabricant.'],
+      astuce: 'Une batterie qui ne tient plus la charge se remplace : l’outil, lui, peut servir encore dix ans.' },
+  ];
+
   // Offres de prix reçues en démonstration (sur des annonces fictives du compte de démonstration)
   const OFFRES_DEMO = [
     { id: 'o-demo-1', sens: 'recue', avec: 'm2', titre: 'Votre scie sauteuse 650 W', mode: 'vente', prixAffiche: 45, montant: 32, statut: 'en attente', expire: '2026-12-31T20:00' },
     { id: 'o-demo-2', sens: 'recue', avec: 'm1', titre: 'Votre échelle télescopique 3,80 m', mode: 'location', prixAffiche: 5, montant: 4, statut: 'en attente', expire: '2026-12-31T20:00' },
   ];
 
-  const D = { PHOTOS, VIDEOS, CATEGORIES, MEMBRES, ANNONCES, RESERVATIONS, ARTICLES, CREDITS, METIERS, ARTISANS, DEMANDES, TYPES_ENSEIGNE, ENSEIGNES, LOTS, RDV_DEMO, OFFRES_DEMO };
+  const D = { PHOTOS, VIDEOS, CATEGORIES, MEMBRES, ANNONCES, RESERVATIONS, ARTICLES, CREDITS, METIERS, ARTISANS, DEMANDES, TYPES_ENSEIGNE, ENSEIGNES, LOTS, RDV_DEMO, OFFRES_DEMO, SERVICES, FICHES };
   if (typeof module !== 'undefined' && module.exports) module.exports = D;
   else racine.ZT_DONNEES = D;
 })(typeof window !== 'undefined' ? window : globalThis);

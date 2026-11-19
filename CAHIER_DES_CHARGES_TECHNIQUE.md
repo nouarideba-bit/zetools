@@ -27,6 +27,8 @@ Documents liés :
   7. **Offres de prix.** L’acheteur ou le locataire propose son prix ; le propriétaire accepte, refuse ou contre-propose une fois. Offre valable 48 h, plancher à 50 % du prix affiché.
   8. **Déstockage des enseignes.** Espace privé pour les grandes surfaces de bricolage, négoces de matériaux, fabricants, loueurs et quincailleries : lots neufs à prix cassés, stock par magasin, paiement en ligne, retrait en magasin. Commission de 8 %.
   9. **Agenda.** Proposition de 1 à 3 créneaux (date et heure) pour des travaux, un échange, une réparation ou une remise ; confirmation, contre-proposition, annulation, export iCalendar.
+  10. **Services entre membres.** Un particulier ou un professionnel publie une offre de service, à l’heure ou au forfait. Le client réserve un créneau et paie ; le prix est versé une fois le service rendu. Métiers réglementés réservés aux professionnels avec SIRET.
+  11. **Fiches techniques.** Guides pas à pas gratuits, téléchargeables en PDF, qui renvoient vers la location des outils cités et vers les services.
 - **Zone pilote :** Île-de-France.
 
 ## 2. Architecture et stack
@@ -151,6 +153,10 @@ Documents liés :
 - **Déstockage :** tables `enseignes`, `magasins`, `lots_destockage`, `lot_stocks`, `commandes_lots`. Le stock se décrémente dans la même transaction SQL que la commande. Phase 2 : import CSV ou flux EDI, synchronisation avec le logiciel de caisse.
 - **Agenda :** tables `rendez_vous` et `rdv_creneaux`, contrainte d’exclusion contre les doubles réservations, rappels par notification 24 h et 2 h avant, flux iCalendar par membre.
 - **Documents juridiques :** `juridique.js` (site) et dossier `juridique/` (Markdown pour l’avocat).
+- **Services :** table `prestations` ; une réservation crée un `rendez_vous` de type `service` et une transaction séquestrée. Prévoir un plafond d’activité pour les comptes « particulier » et la vérification du SIRET.
+- **Fiches techniques :** table `fiches_techniques` (contenu structuré : outils, fournitures, étapes, sécurité). La maquette produit le PDF dans le navigateur (`pdf.js`) ; en production, le produire côté serveur et le mettre en cache sur le CDN, avec un compteur de téléchargements.
+
+**[Vigilance] Services rendus par des particuliers.** Risque de travail dissimulé si l’activité devient habituelle, et métiers soumis à qualification : voir les notes remises à l’avocat.
 
 **[Vigilance] Prix barrés.** Toute annonce de réduction de prix par un professionnel doit afficher le prix le plus bas pratiqué au cours des 30 jours précédents (article L. 112-1-1 du Code de la consommation). L’enseigne l’atteste lot par lot ; ZETools conserve l’attestation horodatée.
 
@@ -168,7 +174,7 @@ Documents liés :
 
 ## 6. Ce que la maquette valide déjà
 
-112 tests automatisés réussis :
+128 tests automatisés réussis :
 - prix, remises et commissions ;
 - disponibilités ;
 - masquage des coordonnées ;
@@ -181,6 +187,8 @@ Documents liés :
 - offres de prix : plancher, contre-proposition, expiration, prix convenu ;
 - lots de déstockage : prix de référence, stock par magasin, limite par client, commission ;
 - rendez-vous : créneaux, dimanches, conflits, annulation, export iCalendar ;
+- services : validation, métiers réglementés, devis à l’heure et au forfait, offre de prix ;
+- fiches techniques : structure du PDF, table des objets, encodage des accents, coupure des lignes ;
 - cohérence des tarifs entre les textes juridiques et les règles.
 
 La maquette sert de brief visuel et fonctionnel au prestataire.

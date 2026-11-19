@@ -499,3 +499,52 @@ CREATE TABLE rdv_creneaux (                                       -- 1 à 3 cré
 -- À faire respecter pour l'auteur et pour l'invité (ici : l'auteur ; même contrainte côté invité via un déclencheur).
 ALTER TABLE rendez_vous ADD CONSTRAINT rdv_auteur_sans_chevauchement
   EXCLUDE USING gist (auteur_id WITH =, creneau WITH &&) WHERE (statut = 'confirme');
+
+-- ---------- Services proposés par les membres (ajout du 19/11/2026) ----------
+ALTER TYPE type_rdv ADD VALUE IF NOT EXISTS 'service';
+CREATE TYPE unite_tarif AS ENUM ('heure', 'forfait');
+CREATE TABLE prestations (
+  id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  prestataire_id  uuid NOT NULL REFERENCES utilisateurs(id),
+  metier_id       text NOT NULL REFERENCES metiers(id),
+  titre           text NOT NULL,
+  description     text NOT NULL,
+  tarif           integer NOT NULL CHECK (tarif > 0),              -- centimes, à l'heure ou au forfait
+  unite           unite_tarif NOT NULL DEFAULT 'heure',
+  duree_min       interval NOT NULL DEFAULT '1 hour',              -- durée minimum, ou durée du forfait
+  vient_avec_outils boolean NOT NULL DEFAULT true,
+  base            geography(Point, 4326) NOT NULL,
+  rayon_km        smallint NOT NULL DEFAULT 10 CHECK (rayon_km BETWEEN 1 AND 50),
+  statut          statut_annonce NOT NULL DEFAULT 'en_moderation',
+  publiee_le      timestamptz
+);
+CREATE INDEX ON prestations USING gist (base);
+CREATE INDEX ON prestations (metier_id, statut);
+-- Métiers réglementés (électricité, plomberie, maçonnerie…) : le prestataire doit avoir un profil professionnel
+-- au SIRET vérifié (profils_pro.siret_verifie_le IS NOT NULL). Contrôle dans l'API et par déclencheur.
+ALTER TABLE metiers ADD COLUMN reglemente boolean NOT NULL DEFAULT false;
+ALTER TABLE rendez_vous ADD COLUMN prestation_id uuid REFERENCES prestations(id);
+ALTER TABLE offres_prix ADD COLUMN prestation_id uuid REFERENCES prestations(id);
+ALTER TABLE offres_prix ALTER COLUMN annonce_id DROP NOT NULL;
+ALTER TABLE offres_prix ADD CONSTRAINT offre_sur_annonce_ou_prestation CHECK ((annonce_id IS NULL) <> (prestation_id IS NULL));
+-- Remarque : l'énumération type_transaction doit recevoir la valeur 'service' pour les transactions et les offres.
+ALTER TYPE type_transaction ADD VALUE IF NOT EXISTS 'service';
+ALTER TABLE offres_prix DROP CONSTRAINT IF EXISTS offres_prix_mode_check;
+
+-- ---------- Fiches techniques téléchargeables en PDF ----------
+CREATE TABLE fiches_techniques (
+  id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  slug        text UNIQUE NOT NULL,
+  titre       text NOT NULL,
+  theme       text NOT NULL,
+  niveau      text NOT NULL,                                        -- débutant, intermédiaire, confirmé
+  duree       text NOT NULL,
+  budget      text NOT NULL,
+  resume      text NOT NULL,
+  contenu     jsonb NOT NULL,                                       -- { outils: [], materiaux: [], etapes: [], securite: [], astuce }
+  relue_par   text,                                                 -- professionnel ayant validé la fiche
+  relue_le    date,
+  pdf_url     text,                                                 -- PDF produit côté serveur, servi par le CDN
+  telechargements integer NOT NULL DEFAULT 0,
+  publiee_le  timestamptz
+);

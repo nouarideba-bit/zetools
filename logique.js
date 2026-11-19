@@ -37,7 +37,9 @@
     rdv: { heureDebut: 8, heureFin: 20, pasMinutes: 60, maxCreneaux: 3, delaiMinHeures: 2, annulationGratuiteHeures: 24 },
     // Offres de prix : l'acheteur ou le locataire propose son prix, le propriétaire accepte, refuse ou contre-propose
     offres: { plancher: 0.5, validiteHeures: 48, maxParAnnonce: 3, seuilAcceptationDemo: 0.8 },
-    typesRdv: { travaux: 'Travaux', echange: 'Échange de matériel', reparation: 'Réparation', remise: 'Remise d’un outil' },
+    typesRdv: { travaux: 'Travaux', echange: 'Échange de matériel', reparation: 'Réparation', remise: 'Remise d’un outil', service: 'Prestation de service' },
+    // Services proposés par les membres (particuliers et professionnels), réservés à l'heure ou au forfait
+    service: { fraisClient: 0.08, commission: 0.12, heuresMax: 8, metiersReglementes: ['plomberie', 'electricite', 'maconnerie'] },
   };
 
   const arrondi = (x) => Math.round(x * 100) / 100;
@@ -381,11 +383,39 @@
       'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
   }
 
+  /* ---------- Services proposés par les membres ---------- */
+  const estReglemente = (metier) => REGLES.service.metiersReglementes.includes(metier);
+  function verifierService(s) {
+    const erreurs = [];
+    if (!s.titre || String(s.titre).trim().length < 4) erreurs.push('Décrivez votre service en quelques mots.');
+    if (!s.metier) erreurs.push('Choisissez un métier.');
+    if (!(s.tarif > 0)) erreurs.push('Indiquez votre tarif.');
+    if (!['heure', 'forfait'].includes(s.unite)) erreurs.push('Choisissez un tarif à l’heure ou au forfait.');
+    if (!/^\d{5}$/.test(String(s.cp || ''))) erreurs.push('Indiquez un code postal à 5 chiffres.');
+    if (estReglemente(s.metier) && !s.siret) erreurs.push('Ce métier est réservé aux professionnels qualifiés : un numéro SIRET vérifié est exigé.');
+    return { ok: erreurs.length === 0, erreurs };
+  }
+  /** Devis d'une prestation : à l'heure (durée minimum du prestataire, 8 h au plus) ou au forfait. */
+  function devisService(s, heures, opts = {}) {
+    const S = REGLES.service; const forfait = s.unite === 'forfait';
+    const h = forfait ? (s.dureeForfait || 1) : Math.max(s.dureeMin || 1, Math.min(Math.round(heures || 0) || (s.dureeMin || 1), S.heuresMax));
+    const base = arrondi(forfait ? s.tarif : s.tarif * h);
+    const fraisService = arrondi(base * S.fraisClient);
+    const commission = opts.abonne ? 0 : arrondi(base * S.commission);
+    return { heures: h, forfait, base, fraisService, total: arrondi(base + fraisService), commission, versementPrestataire: arrondi(base - commission) };
+  }
+  function filtrerServices(services, f = {}) {
+    const q = (f.q || '').trim().toLowerCase(); const lieu = (f.lieu || '').trim().toLowerCase();
+    return services.filter((s) => (!f.metier || s.metier === f.metier)
+      && (!q || (s.titre + ' ' + (s.description || '')).toLowerCase().includes(q))
+      && (!lieu || String(s.cp).startsWith(lieu) || String(s.ville || '').toLowerCase().includes(lieu)));
+  }
+
   /* ---------- Offres de prix (négociation) ---------- */
-  const prixAffiche = (a, mode) => (mode === 'vente' ? a.prixVente : mode === 'location' ? a.prixJour : null);
+  const prixAffiche = (a, mode) => (mode === 'vente' ? a.prixVente : mode === 'location' ? a.prixJour : mode === 'service' ? a.tarif : null);
   function verifierOffre(a, mode, montant, dejaFaites = 0) {
     const O = REGLES.offres; const prix = prixAffiche(a, mode);
-    if (!(a.modes || []).includes(mode) || !(prix > 0)) return { ok: false, raison: 'Une offre de prix porte sur une vente ou une location.' };
+    if (!(a.modes || []).includes(mode) || !(prix > 0)) return { ok: false, raison: 'Une offre de prix porte sur une vente, une location ou un service.' };
     if (!(montant > 0)) return { ok: false, raison: 'Indiquez le prix que vous proposez.' };
     if (montant >= prix) return { ok: false, raison: 'Votre offre doit être inférieure au prix affiché. À ce prix, achetez ou réservez directement.' };
     const mini = arrondi(Math.ceil(prix * O.plancher * 2) / 2);
@@ -425,6 +455,7 @@
       if (o.annonceId !== a.id || o.sens !== 'envoyee' || o.statut !== 'acceptée' || maintenant > o.expire) continue;
       if (o.mode === 'vente') { r.prixVenteAffiche = a.prixVente; r.prixVente = o.prixFinal; }
       if (o.mode === 'location') { r.prixJourAffiche = a.prixJour; r.prixJour = o.prixFinal; }
+      if (o.mode === 'service') { r.tarifAffiche = a.tarif; r.tarif = o.prixFinal; }
     }
     return r;
   }
@@ -443,6 +474,7 @@
     positionCodePostal, distanceKm, positionApprochee, formatDistance, artisansProches, demandesPourArtisan, abonnementActif, coutAbonnement, peutRepondre,
     plafondPrix, verifierPrix, remiseSurNeuf,
     stockLot, verifierLot, devisLot, retirerDuStock,
+    estReglemente, verifierService, devisService, filtrerServices,
     verifierOffre, creerOffre, offreExpiree, repondreOffre, reponseVendeurDemo, appliquerOffres,
     creneauxJour, avancer, verifierProposition, confirmerRdv, annulationGratuite, versIcs,
   };

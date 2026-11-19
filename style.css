@@ -374,3 +374,18 @@ button.puce.active { background: var(--anthracite); color: #fff; }
 .entete .recherche-entete { min-width: 200px; }
 @media (max-width: 1240px) { .entete .lien-entete { font-size: .82rem; padding: 6px 4px; } .entete .conteneur { gap: 8px; } }
 @media (max-width: 1080px) { .entete .lien-entete { display: none; } }
+.badge-service { background: #1c7ed6; color: #fff; }
+
+/* ---------- fiches techniques ---------- */
+.visuel-fiche { display: grid; place-items: center; background: linear-gradient(135deg, var(--anthracite), var(--anthracite-2)); }
+.visuel-fiche > span { font-size: 4rem; }
+.fiche-technique h1 { margin: 4px 0 10px; font-size: 1.7rem; }
+.fiche-technique h3 { margin: 26px 0 8px; padding-bottom: 6px; border-bottom: 3px solid var(--jaune); display: table; }
+.entete-fiche { display: flex; gap: 18px; align-items: flex-start; }
+.icone-fiche { font-size: 3rem; background: var(--fond); border-radius: 16px; width: 84px; height: 84px; display: grid; place-items: center; flex-shrink: 0; }
+.resume-fiche { font-size: 1.05rem; color: var(--texte-doux); margin: 16px 0; }
+.liste-fiche { padding-left: 22px; margin: 0; }
+.liste-fiche li { margin: 8px 0; }
+ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
+.entete .btn-cta { white-space: nowrap; }
+@media (max-width: 1400px) { .entete .btn-deposer-texte { display: none; } }
