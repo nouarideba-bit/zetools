@@ -573,6 +573,96 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
 }
 @media (max-width: 520px) { .entete .actions-entete { flex-wrap: wrap; row-gap: 6px; max-width: 100%; } }
 
+/* ---------- Passeport outil ---------- */
+.badge-sante { background: #fff; color: var(--vert); border: 1px solid var(--vert-clair); }
+.badge-garantie { background: var(--vert-clair); color: var(--vert); font-weight: 700; }
+.jauge { --t: 96px; width: var(--t); height: var(--t); flex: none; border-radius: 50%; display: grid; place-items: center;
+  background: conic-gradient(var(--c) calc(var(--v) * 1%), #e6e9ec 0); }
+.jauge > div { width: calc(var(--t) - 14px); height: calc(var(--t) - 14px); border-radius: 50%; background: var(--carte); display: grid; place-content: center; text-align: center; line-height: 1; }
+.jauge b { font-size: calc(var(--t) * .3); color: var(--texte); }
+.jauge small { font-size: calc(var(--t) * .11); color: var(--texte-doux); }
+.passeport-fiche { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; margin-top: 16px; }
+.etapes-passeport { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+.etapes-passeport > div { background: var(--carte); border-radius: var(--rayon); box-shadow: var(--ombre); padding: 18px; }
+.etapes-passeport span { display: inline-grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--jaune); font-weight: 800; margin-bottom: 6px; }
+.etapes-passeport p { margin: 6px 0 0; color: var(--texte-doux); font-size: .92rem; }
+.liste-passeports { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 12px; }
+.ligne-passeport { display: flex; gap: 12px; align-items: center; background: var(--carte); border-radius: var(--rayon); box-shadow: var(--ombre); padding: 12px; color: inherit; text-decoration: none; }
+.ligne-passeport:hover { outline: 2px solid var(--jaune); }
+.ligne-passeport img { width: 64px; height: 64px; object-fit: cover; border-radius: 10px; }
+.ligne-passeport small { display: block; color: var(--texte-doux); margin-top: 3px; }
+.passeport { display: grid; grid-template-columns: 340px 1fr; gap: 20px; align-items: start; }
+.passeport-photo { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 12px; }
+.qr-passeport { display: grid; justify-items: center; gap: 6px; margin: 14px 0; }
+.qr-passeport small { color: var(--texte-doux); }
+.score-passeport { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
+.score-passeport > div:last-child { flex: 1; min-width: 220px; }
+.facteurs { list-style: none; padding: 0; margin: 8px 0 0; }
+.facteurs li { display: flex; justify-content: space-between; gap: 12px; padding: 5px 0; border-top: 1px solid rgba(0,0,0,.06); font-size: .93rem; }
+.facteurs .moins { color: #c92a2a; } .facteurs .plus { color: var(--vert); }
+.barre-batterie { height: 12px; border-radius: 6px; background: #e6e9ec; overflow: hidden; margin-top: 8px; }
+.barre-batterie span { display: block; height: 100%; background: linear-gradient(90deg, var(--vert), #4caf6a); }
+.historique { list-style: none; padding: 0; margin: 8px 0 0; }
+.historique li { display: grid; grid-template-columns: 110px 1fr; gap: 2px 12px; padding: 8px 0; border-top: 1px solid rgba(0,0,0,.06); }
+.historique time { color: var(--texte-doux); font-size: .88rem; grid-row: span 2; }
+.historique small { color: var(--texte-doux); }
+.onde { display: flex; gap: 3px; align-items: center; height: 44px; margin: 8px 0 12px; }
+.onde i { flex: 1; background: var(--jaune); border-radius: 2px; height: 20%; animation: onde .9s ease-in-out infinite alternate; }
+.onde i:nth-child(3n) { animation-delay: -.3s; } .onde i:nth-child(4n+1) { animation-delay: -.6s; } .onde i:nth-child(5n+2) { animation-delay: -.45s; }
+@keyframes onde { to { height: 100%; } }
+@media (prefers-reduced-motion: reduce) { .onde i { animation: none; height: 60%; } }
+.champ-court { display: grid; gap: 4px; font-weight: 600; font-size: .9rem; }
+.champ-court input { padding: 8px; border: 1px solid var(--acier-clair); border-radius: 8px; }
+
+/* ---------- Mode Projet ---------- */
+.lien-projet-hero { display: inline-block; margin-top: 12px; color: #fff; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+.lien-projet-hero:hover { color: var(--jaune); }
+.deux-espaces { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+.tuile-projet { background: linear-gradient(135deg, var(--vert), #1e4529); }
+.tuile-projet em, .tuile-passeport em { color: var(--jaune); }
+.tuile-passeport { background: linear-gradient(135deg, #2f3439, #4b545c); }
+.grille-projets { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+.carte-projet { display: grid; gap: 6px; background: var(--carte); border-radius: var(--rayon); box-shadow: var(--ombre); padding: 20px; color: inherit; text-decoration: none; border-top: 5px solid var(--jaune); }
+.carte-projet:hover { transform: translateY(-2px); }
+.carte-projet .ico { font-size: 2rem; } .carte-projet small { color: var(--texte-doux); } .carte-projet em { font-style: normal; font-weight: 700; color: var(--vert); }
+.form-projet { display: flex; gap: 12px; flex-wrap: wrap; align-items: end; }
+.form-projet label { display: grid; gap: 4px; font-weight: 600; font-size: .9rem; }
+.form-projet input, .form-projet select { padding: 8px 10px; border: 1px solid var(--acier-clair); border-radius: 8px; min-width: 110px; }
+.form-projet .case { display: flex; align-items: center; gap: 8px; font-weight: 500; }
+.form-projet .case input { min-width: 0; }
+.projet { display: grid; grid-template-columns: 1fr 340px; gap: 22px; align-items: start; }
+.projet h3 { margin: 22px 0 10px; }
+.ligne-kit { display: grid; grid-template-columns: 72px 1fr auto; gap: 12px; align-items: center; background: var(--carte); border-radius: var(--rayon); box-shadow: var(--ombre); padding: 10px 14px; margin-bottom: 10px; }
+.ligne-kit img { width: 72px; height: 72px; object-fit: cover; border-radius: 10px; }
+.ligne-kit a { color: inherit; }
+.ligne-kit small { display: block; color: var(--texte-doux); margin-top: 2px; }
+.ligne-kit .etape-kit { display: block; font-size: .78rem; text-transform: uppercase; letter-spacing: .04em; color: var(--vert); font-weight: 700; }
+.ligne-kit.partage { display: block; background: transparent; box-shadow: none; border: 1px dashed var(--acier-clair); padding: 8px 14px; }
+.prix-kit { text-align: right; font-weight: 800; font-size: 1.1rem; }
+.prix-kit small { font-weight: 400; font-size: .78rem; }
+.bascule-mode { display: inline-flex; margin-top: 6px; border: 1px solid var(--acier-clair); border-radius: 999px; overflow: hidden; font-size: .82rem; }
+.bascule-mode > * { padding: 4px 10px; text-decoration: none; }
+.bascule-mode .actif { background: var(--anthracite); color: #fff; font-weight: 700; }
+.savoir { display: flex; gap: 8px; flex-wrap: wrap; }
+.recap-projet { position: sticky; top: 90px; }
+.btn-petit { padding: 6px 10px; font-size: .82rem; }
+@media (max-width: 900px) {
+  .passeport, .projet, .etapes-passeport, .deux-espaces { grid-template-columns: 1fr; }
+  .recap-projet { position: static; }
+}
+@media (max-width: 520px) { .ligne-kit { grid-template-columns: 56px 1fr; } .ligne-kit img { width: 56px; height: 56px; } .prix-kit { grid-column: 1 / -1; text-align: left; } }
+
+/* ---------- Icônes vectorielles (remplacent les émojis) ---------- */
+.icone { display: block; flex: none; }
+.icone-btn { display: inline-grid; place-items: center; }
+.espace-tuile .ico { width: 48px; height: 48px; border-radius: 12px; background: rgba(255,255,255,.14); display: grid; place-items: center; }
+.tuile-cadeau .ico { background: rgba(35,39,43,.1); }
+.garantie .ico { width: 52px; height: 52px; margin: 0 auto 10px; border-radius: 14px; background: var(--vert-clair); color: var(--vert); display: grid; place-items: center; }
+.visuel-fiche .icone { color: var(--jaune); }
+.coeur { display: grid; place-items: center; color: var(--anthracite); }
+.coeur.actif { color: #d6336c; }
+.ico:empty { display: none; }
+
 </style>
 </head>
 <body>
@@ -585,19 +675,19 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
         <button type="submit">Chercher</button>
       </form>
       <nav class="actions-entete" aria-label="Mon compte">
-        <a class="lien-entete lien-offre" href="#/offre" title="Notre offre : services et tarifs">💼 Offre</a>
-        <a class="lien-entete lien-urgence" href="#/urgence" title="Urgence travaux : un professionnel vérifié, vite">🚨 Urgence</a>
-        <a class="lien-entete lien-niveau3" href="#/travaux" title="Trouver un artisan près de chez moi">📍 Artisans</a>
-        <a class="lien-entete lien-niveau2" href="#/services" title="Services : réserver un voisin ou un professionnel">🙋 Services</a>
-        <a class="lien-entete lien-niveau2" href="#/videos" title="Vidéothèque : des tutoriels à regarder sur ZETools">🎬 Vidéos</a>
-        <a class="lien-entete lien-niveau2" href="#/offrir" title="Offrir des travaux : un bon cadeau">🎁 Offrir</a>
-        <a class="lien-entete lien-secondaire" href="#/reparer" title="Outils à réparer">🪛 Réparer</a>
-        <a class="lien-entete lien-secondaire" href="#/destockage" title="Déstockage des enseignes : du neuf à prix cassés">🏷️ Déstockage</a>
-        <a class="icone-btn" href="#/offres" title="Offres de prix : proposer et négocier">🤝</a>
-        <a class="icone-btn" href="#/agenda" title="Mon agenda de rendez-vous">📅</a>
-        <a class="icone-btn" href="#/messages" title="Messagerie">💬<span class="bulle" id="bulle-msg">2</span></a>
-        <a class="icone-btn" href="#/favoris" title="Favoris">♡</a>
-        <a class="icone-btn" href="#/mon-espace" title="Mon espace">👤</a>
+        <a class="lien-entete lien-offre" href="#/offre" title="Notre offre : services et tarifs">Offre</a>
+        <a class="lien-entete lien-urgence" href="#/urgence" title="Urgence travaux : un professionnel vérifié, vite">Urgence</a>
+        <a class="lien-entete lien-niveau3" href="#/travaux" title="Trouver un artisan près de chez moi">Artisans</a>
+        <a class="lien-entete lien-niveau2" href="#/services" title="Services : réserver un voisin ou un professionnel">Services</a>
+        <a class="lien-entete lien-niveau2" href="#/videos" title="Vidéothèque : des tutoriels à regarder sur ZETools">Vidéos</a>
+        <a class="lien-entete lien-niveau2" href="#/offrir" title="Offrir des travaux : un bon cadeau">Offrir</a>
+        <a class="lien-entete lien-secondaire" href="#/reparer" title="Outils à réparer">Réparer</a>
+        <a class="lien-entete lien-secondaire" href="#/destockage" title="Déstockage des enseignes : du neuf à prix cassés">Déstockage</a>
+        <a class="icone-btn" href="#/offres" title="Offres de prix : proposer et négocier" aria-label="Offres de prix"><svg class="icone" viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r="1"/></svg></a>
+        <a class="icone-btn" href="#/agenda" title="Mon agenda de rendez-vous" aria-label="Agenda"><svg class="icone" viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></a>
+        <a class="icone-btn" href="#/messages" title="Messagerie" aria-label="Messagerie"><svg class="icone" viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2z"/></svg><span class="bulle" id="bulle-msg">2</span></a>
+        <a class="icone-btn" href="#/favoris" title="Favoris" aria-label="Favoris"><svg class="icone" viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg></a>
+        <a class="icone-btn" href="#/mon-espace" title="Mon espace" aria-label="Mon espace"><svg class="icone" viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></a>
         <a class="btn btn-cta" href="#/deposer">＋ <span class="btn-deposer-texte">Déposer une annonce</span></a>
       </nav>
     </div>
@@ -611,7 +701,7 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
         <div>
           <a class="logo" href="#/" style="color:#fff"><svg class="logo-zt" viewBox="0 0 100 100" aria-hidden="true"><polygon points="50,6 88.1,28 88.1,72 50,94 11.9,72 11.9,28" fill="#f5b700" stroke="#f5b700" stroke-width="8" stroke-linejoin="round"/><polygon points="28,26 72,26 72,37 45,63 72,63 72,74 28,74 28,63 55,37 28,37" fill="#23272b"/></svg><span><span class="marque-ze">ZE</span>TOOLS</span></a>
           <p>Le bon outil, au bon moment, à deux rues de chez vous. Moins d’achats inutiles, plus d’outils qui servent.</p>
-          <div class="reseaux"><a href="#/" title="Instagram">IG</a><a href="#/" title="Facebook">f</a><a href="#/" title="YouTube">▶</a><a href="#/" title="LinkedIn">in</a></div>
+          <div class="reseaux"><a href="#/" title="Instagram">IG</a><a href="#/" title="Facebook">f</a><a href="#/" title="YouTube">YT</a><a href="#/" title="LinkedIn">in</a></div>
         </div>
         <div><h4>Plateforme</h4><a href="#/offre">Notre offre et nos tarifs</a><a href="#/annonces?mode=vente">Acheter</a><a href="#/annonces?mode=location">Louer</a><a href="#/annonces?mode=echange">Échanger</a><a href="#/deposer">Déposer une annonce</a><a href="#/services">Services</a><a href="#/proposer-service">Proposer mes services</a><a href="#/urgence">Urgence travaux</a><a href="#/offrir">Offrir des travaux (bon cadeau)</a><a href="#/travaux">Trouver un artisan</a><a href="#/reparer">Outils à réparer</a><a href="#/espace-artisan">Espace artisan abonné</a><a href="#/destockage">Déstockage des enseignes</a><a href="#/offres">Offres de prix</a><a href="#/agenda">Agenda et rendez-vous</a></div>
         <div><h4>Ressources</h4><a href="#/atelier">L’Atelier · guide du bon bricoleur</a><a href="#/fiches">Fiches techniques en PDF</a><a href="#/videos">Vidéothèque</a><a href="#/aide">FAQ</a><a href="#/legal/securite">Sécurité et caution</a><a href="#/legal/prix">Règles de prix</a><a href="#/pros">Offres professionnelles</a><a href="#/espace-enseigne">Espace enseigne (privé)</a></div>
@@ -1246,6 +1336,153 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
     return { ok: true, debit, resteAPayer: arrondi(montantDu - debit), coupon: c };
   }
 
+  /* ---------- Passeport outil : le carnet de santé de chaque outil ---------- */
+  Object.assign(REGLES, {
+    passeport: {
+      seuilGarantie: 80,          // score minimal pour la garantie « ça marche ou remboursé »
+      joursGarantie: 30,
+      controleValideJours: 90,    // un contrôle plus ancien ne suffit plus pour la garantie
+      pointsParAn: 4, maxAge: 30, // l'âge pèse au plus 30 points
+      heuresSeuil: 200, maxUsage: 20,
+      batterieSeuil: 80,          // capacité restante en % sous laquelle le score baisse
+      // estimation de la batterie à partir de sa date de fabrication (gravée) et de son usage déclaré :
+      // ordre de grandeur pour une batterie lithium-ion d'outillage, à affiner avec les fabricants
+      batteriePerteParAn: 3, batteriePerteParCycle: 0.04, batterieMin: 0,
+      dureeTestAcoustique: 5,     // secondes de marche à vide devant le micro
+    },
+    locationAchat: { delaiJours: 1 },  // « Je le garde » possible jusqu'au lendemain de la fin de location
+    projet: { rayonsKm: [5, 10, 20], rayonDefautKm: 5 },
+  });
+  const JOURS = (a, b) => Math.round((versDate(b) - versDate(a)) / JOUR);
+  const NIVEAUX_SANTE = [[80, 'Excellent'], [60, 'Bon'], [40, 'À surveiller'], [0, 'Fatigué']];
+
+  function dernierControle(p) {
+    return (p.controles || []).slice().sort((x, y) => (x.date < y.date ? 1 : -1))[0] || null;
+  }
+
+  /** Score de santé sur 100, avec le détail de chaque point retiré pour que l'acheteur comprenne la note. */
+  function scoreSante(p, aujourdHui) {
+    const P = REGLES.passeport, facteurs = [];
+    const retirer = (points, libelle) => { if (points > 0) facteurs.push({ libelle, points: -Math.round(points) }); };
+    const ans = Math.max(0, JOURS(p.misEnService + (p.misEnService.length === 7 ? '-01' : ''), aujourdHui) / 365);
+    retirer(Math.min(P.maxAge, ans * P.pointsParAn), `Âge : ${ans < 1 ? 'moins d’un an' : Math.floor(ans) + (Math.floor(ans) > 1 ? ' ans' : ' an')}`);
+    if (p.heures > P.heuresSeuil) retirer(Math.min(P.maxUsage, (p.heures - P.heuresSeuil) / 20), `Usage intensif : ${p.heures} h de fonctionnement`);
+    const d = dernierControle(p);
+    if (!d) retirer(15, 'Aucun contrôle enregistré');
+    else {
+      const age = JOURS(d.date, aujourdHui);
+      if (age > 180) retirer(15, `Dernier contrôle il y a ${age} jours`);
+      else if (age > P.controleValideJours) retirer(5, `Dernier contrôle il y a ${age} jours`);
+    }
+    (p.controles || []).filter((c) => JOURS(c.date, aujourdHui) <= 365).forEach((c) => {
+      if (c.resultat === 'echec') retirer(25, `Contrôle échoué le ${formatDate(c.date)}`);
+      else if (c.resultat === 'reserve') retirer(10, `Réserve au contrôle du ${formatDate(c.date)}`);
+    });
+    if (p.batterie && p.batterie.capacite < P.batterieSeuil) retirer((P.batterieSeuil - p.batterie.capacite) / 2, `Batterie à ${p.batterie.capacite} % de sa capacité`);
+    const bonus = (p.reparations || []).filter((r) => r.pro && JOURS(r.date, aujourdHui) <= 365).length ? 5 : 0;
+    if (bonus) facteurs.push({ libelle: 'Révisé par un réparateur professionnel cette année', points: bonus });
+    const score = Math.max(0, Math.min(100, 100 + facteurs.reduce((t, f) => t + f.points, 0)));
+    return { score, niveau: NIVEAUX_SANTE.find(([min]) => score >= min)[1], facteurs, dernier: d };
+  }
+
+  /** La garantie « ça marche ou remboursé » : vente seulement, bon score, contrôle récent. */
+  function garantiePasseport(p, annonce, aujourdHui) {
+    const P = REGLES.passeport, s = scoreSante(p, aujourdHui), d = s.dernier;
+    if (!annonce.modes.includes('vente')) return { ok: false, raison: 'La garantie s’applique aux achats.' };
+    if (s.score < P.seuilGarantie) return { ok: false, raison: `Score inférieur à ${P.seuilGarantie} / 100.` };
+    if (!d || JOURS(d.date, aujourdHui) > P.controleValideJours || d.resultat !== 'ok') return { ok: false, raison: `Il faut un contrôle réussi de moins de ${P.controleValideJours} jours.` };
+    return { ok: true, jours: P.joursGarantie };
+  }
+
+  /** Ajoute un contrôle (vidéo de 10 s au retour, ou passage en atelier) et renvoie un nouveau passeport. */
+  function ajouterControle(p, c) {
+    if (!['ok', 'reserve', 'echec'].includes(c.resultat)) throw new Error('Résultat de contrôle inconnu');
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(c.date)) throw new Error('Date de contrôle invalide');
+    return Object.assign({}, p, { controles: (p.controles || []).concat([Object.assign({}, c)]) });
+  }
+
+  /** Estime la capacité restante d'une batterie : date de fabrication gravée + nombre de charges déclaré. Une estimation, pas une mesure. */
+  function estimerBatterie(dateFabrication, cycles, aujourdHui) {
+    const P = REGLES.passeport;
+    const d = /^\d{4}-\d{2}$/.test(dateFabrication || '') ? dateFabrication + '-01' : dateFabrication;
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(d || '') || d > aujourdHui) return null;
+    const ans = JOURS(d, aujourdHui) / 365, n = Math.max(0, Math.round(Number(cycles) || 0));
+    const capacite = Math.max(P.batterieMin, Math.min(100, Math.round(100 - ans * P.batteriePerteParAn - n * P.batteriePerteParCycle)));
+    return { capacite, cycles: n, estimee: true, fabrication: d.slice(0, 7) };
+  }
+
+  /** Test acoustique : lit les mesures du son du moteur à vide (régularité, bruit aigu de frottement, à-coups).
+      Dans la maquette, les mesures sont simulées ; en production, un modèle entraîné par type d'outil les fournirait. */
+  function analyseAcoustique(m) {
+    const alertes = [];
+    if (m.regularite < 0.85) alertes.push('régime irrégulier (à-coups, charbons ou interrupteur)');
+    if (m.aigus > 0.35) alertes.push('sifflement ou frottement aigu (roulement usé)');
+    if (m.chocs > 2) alertes.push('claquements répétés (pignon ou percussion)');
+    const resultat = alertes.length === 0 ? 'ok' : alertes.length === 1 ? 'reserve' : 'echec';
+    return { resultat, alertes, note: alertes.length ? 'Test acoustique : ' + alertes.join(', ') : 'Test acoustique : moteur régulier, aucun frottement détecté' };
+  }
+
+  /** Location-achat : « Je le garde ». La location payée (hors frais de service et assurance) est déduite du prix de vente. */
+  function prixSiJeLeGarde(outil, reservation, aujourdHui) {
+    if (!outil.modes.includes('vente') || !(outil.prixVente > 0)) return { ok: false, raison: 'Cet outil n’est pas à vendre.' };
+    if (reservation.statut !== 'confirmée') return { ok: false, raison: 'La location n’est plus active.' };
+    if (aujourdHui > versTexte(new Date(versDate(reservation.fin).getTime() + REGLES.locationAchat.delaiJours * JOUR))) return { ok: false, raison: 'Le délai pour garder l’outil est dépassé.' };
+    const loyer = devisLocation(outil, reservation.debut, reservation.fin, { assurance: false }).location;
+    const deduit = arrondi(Math.min(loyer, outil.prixVente));
+    return { ok: true, prixVente: outil.prixVente, deduit, reste: arrondi(outil.prixVente - deduit) };
+  }
+
+  /* ---------- Mode Projet : un chantier décrit, un kit complet, un seul paiement ---------- */
+  /** Quantité de conditionnements de chaque consommable selon la taille du projet. */
+  function consommablesProjet(projet, quantite) {
+    const q = Math.max(1, Math.round(Number(quantite) || 1));
+    return (projet.consommables || []).map((c) => {
+      const besoin = c.parProjet != null ? c.parProjet : c.parUnite * q, paquets = Math.ceil(besoin / c.conditionnement - 1e-9);
+      return { nom: c.nom, besoin: Math.round(besoin * 100) / 100, unite: c.unite, paquets, prix: c.prix, total: arrondi(paquets * c.prix) };
+    });
+  }
+
+  /** Compose le kit : pour chaque besoin, l'outil le plus proche dans le rayon choisi, loué (s'il est libre) ou acheté ;
+      un même outil sert à plusieurs besoins. opts.achats : identifiants que le client préfère acheter. */
+  function composerProjet(projet, opts) {
+    const { quantite, cp, debut, fin, annonces, reservations, aujourdHui } = opts;
+    const achats = new Set(opts.achats || []), rayon = opts.rayonKm || null;
+    const client = positionCodePostal(cp);
+    const v = verifierDisponibilite({ id: '__' }, [], debut, fin, aujourdHui);
+    if (!v.ok) return { ok: false, raison: v.raison };
+    const choisis = new Map(), lignes = [], manquants = [];
+    for (const b of projet.besoins) {
+      const deja = b.outils.find((id) => choisis.has(id));
+      if (deja) { lignes.push({ besoin: b.libelle, annonce: choisis.get(deja).annonce, partage: true }); continue; }
+      const candidats = b.outils.map((id) => annonces.find((a) => a.id === id)).filter(Boolean)
+        .map((a) => {
+          const pos = positionCodePostal(a.cp);
+          const libre = a.modes.includes('location') && verifierDisponibilite(a, reservations || [], debut, fin, aujourdHui).ok;
+          const vente = a.modes.includes('vente') && a.prixVente > 0;
+          const mode = vente && (achats.has(a.id) || !libre) ? 'achat' : libre ? 'location' : null;
+          // achat « par défaut » (aucune location libre) : seulement si rien d'autre ne convient
+          const parDefaut = mode === 'achat' && !achats.has(a.id);
+          return { annonce: a, mode, libre, vente, parDefaut, km: client && pos ? Math.round(distanceKm(client, pos) * 10) / 10 : null };
+        })
+        .filter((c) => c.mode && (rayon == null || c.km == null || c.km <= rayon))
+        .sort((x, y) => (x.parDefaut - y.parDefaut) || ((x.km ?? 99) - (y.km ?? 99)));
+      if (!candidats.length) { manquants.push(b.libelle); continue; }
+      const c = candidats[0];
+      if (c.mode === 'location') { c.devis = devisLocation(c.annonce, debut, fin, { assurance: false }); c.prix = c.devis.totalLocataire; }
+      else c.prix = c.annonce.prixVente;
+      choisis.set(c.annonce.id, c); lignes.push(Object.assign({ besoin: b.libelle, partage: false }, c));
+    }
+    const consommables = consommablesProjet(projet, quantite);
+    const outils = [...choisis.values()];
+    const totalOutils = arrondi(outils.reduce((t, c) => t + c.prix, 0));
+    const totalConsommables = arrondi(consommables.reduce((t, c) => t + c.total, 0));
+    return { ok: true, lignes, outils, manquants, consommables, totalOutils, totalConsommables,
+      total: arrondi(totalOutils + totalConsommables),
+      cautions: arrondi(outils.filter((c) => c.mode === 'location').reduce((t, c) => t + (c.annonce.caution || 0), 0)),
+      achats: outils.filter((c) => c.mode === 'achat').length, locations: outils.filter((c) => c.mode === 'location').length,
+      proprietaires: new Set(outils.map((c) => c.annonce.membre)).size };
+  }
+
   const ZT = {
     REGLES, MASQUE, nbJours, tauxRemise, tauxCommission, devisLocation, devisVente,
     verifierDisponibilite, joursOccupes, masquerCoordonnees, filtrer, formatDate, euros, versTexte, versDate,
@@ -1257,6 +1494,8 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
     creneauxJour, avancer, verifierProposition, confirmerRdv, annulationGratuite, versIcs,
     joursFeries, majorationUrgence, devisUrgence, artisansUrgence,
     genererCodeCoupon, verifierCodeCoupon, formaterCode, ajouterMois, verifierCoupon, creerCoupon, couponExpire, utiliserCoupon,
+    scoreSante, garantiePasseport, ajouterControle, dernierControle, consommablesProjet, composerProjet,
+    estimerBatterie, analyseAcoustique, prixSiJeLeGarde,
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = ZT;
   else racine.ZT = ZT;
@@ -1729,7 +1968,64 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
     { id: 'o-demo-2', sens: 'recue', avec: 'm1', titre: 'Votre échelle télescopique 3,80 m', mode: 'location', prixAffiche: 5, montant: 4, statut: 'en attente', expire: '2026-12-31T20:00' },
   ];
 
-  const D = { PHOTOS, VIDEOS, CATEGORIES, MEMBRES, ANNONCES, RESERVATIONS, ARTICLES, CREDITS, METIERS, ARTISANS, DEMANDES, TYPES_ENSEIGNE, ENSEIGNES, LOTS, RDV_DEMO, OFFRES_DEMO, SERVICES, FICHES, SITE_PUBLIC, TYPES_URGENCE, THEMES_VIDEO, VIDEOS_TUTOS, THEME_FICHE, THEMES_COUPON, PROCHES };
+  /* Passeports outil (fictifs) : carnet de santé de l'outil, consultable par QR code.
+     Contrôle « vidéo » : 10 secondes de l'outil en marche filmées au retour de location ; « atelier » : passage chez un réparateur. */
+  const PASSEPORTS = {
+    a1: { misEnService: '2023-04', heures: 120, batterie: { capacite: 91, cycles: 140 },
+      controles: [{ date: '2026-06-02', type: 'video', resultat: 'ok', note: 'Couple et percussion normaux' }, { date: '2026-10-28', type: 'video', resultat: 'ok', note: 'Retour de location, aucun jeu dans le mandrin' }],
+      reparations: [] },
+    a2: { misEnService: '2021-09', heures: 260,
+      controles: [{ date: '2026-03-14', type: 'video', resultat: 'reserve', note: 'Percussion un peu faible' }, { date: '2026-04-02', type: 'atelier', resultat: 'ok', note: 'Charbons changés' }, { date: '2026-11-08', type: 'video', resultat: 'ok', note: 'Retour de location, frappe nette' }],
+      reparations: [{ date: '2026-04-02', objet: 'Remplacement des charbons', par: 'Répar’Outils 93', pro: true }] },
+    a3: { misEnService: '2024-02', heures: 60, batterie: { capacite: 95, cycles: 70 },
+      controles: [{ date: '2026-09-21', type: 'video', resultat: 'ok', note: 'RAS' }], reparations: [] },
+    a10: { misEnService: '2019-05', heures: 0,
+      controles: [{ date: '2026-10-05', type: 'video', resultat: 'ok', note: 'Inventaire complet : 120 pièces sur 120' }], reparations: [] },
+    a11: { misEnService: '2018-11', heures: 310, batterie: { capacite: 35, cycles: 620 },
+      controles: [{ date: '2026-08-30', type: 'video', resultat: 'echec', note: 'La batterie ne tient pas la charge' }], reparations: [] },
+    a13: { misEnService: '2022-06', heures: 0,
+      controles: [{ date: '2026-11-02', type: 'video', resultat: 'ok', note: 'Montée sous 2 t, aucune fuite hydraulique' }], reparations: [] },
+    a14: { misEnService: '2022-03', heures: 90, batterie: { capacite: 84, cycles: 210 },
+      controles: [{ date: '2026-10-19', type: 'video', resultat: 'ok', note: 'Couple de desserrage conforme' }], reparations: [] },
+    a16: { misEnService: '2024-09', heures: 0,
+      controles: [{ date: '2026-11-11', type: 'video', resultat: 'ok', note: 'Logiciel à jour, lecture OBD testée sur deux véhicules' }], reparations: [] },
+    a17: { misEnService: '2023-01', heures: 0, batterie: { capacite: 78, cycles: 95 },
+      controles: [{ date: '2026-07-15', type: 'video', resultat: 'ok', note: 'Démarrage d’un diesel 2.0 réussi' }], reparations: [] },
+    a18: { misEnService: '2024-05', heures: 0,
+      controles: [{ date: '2026-10-30', type: 'atelier', resultat: 'ok', note: 'Continuité et isolement contrôlés' }], reparations: [] },
+    a20: { misEnService: '2020-02', heures: 0,
+      controles: [{ date: '2026-09-12', type: 'atelier', resultat: 'ok', note: 'Étalonnage vérifié' }],
+      reparations: [{ date: '2026-09-12', objet: 'Changement des cordons de mesure', par: 'Répar’Outils 93', pro: true }] },
+  };
+
+  /* Mode Projet : le client décrit son chantier, ZETools compose le kit (outils des voisins + consommables + aide).
+     Prix des consommables : indicatifs, fournis par un partenaire à désigner. */
+  const PROJETS = [
+    { id: 'etageres', icone: '📚', titre: 'Fixer des étagères au mur', unite: 'étagère', uniteLibelle: 'Nombre d’étagères', defaut: 3, max: 20,
+      besoins: [{ libelle: 'Percer le mur', outils: ['a2', 'a1'] }, { libelle: 'Visser les supports', outils: ['a1', 'a3'] }],
+      consommables: [{ nom: 'Chevilles adaptées au mur', unite: 'chevilles', parUnite: 4, conditionnement: 20, prix: 6.5 },
+        { nom: 'Vis 5 × 50 mm', unite: 'vis', parUnite: 4, conditionnement: 25, prix: 4.2 },
+        { nom: 'Foret béton 6 mm', unite: 'foret', parProjet: 1, conditionnement: 1, prix: 4.9 }],
+      fiche: 'f2', service: 's4', duree: '2 h', niveau: 'Facile' },
+    { id: 'meubles', icone: '🪑', titre: 'Monter des meubles en kit', unite: 'meuble', uniteLibelle: 'Nombre de meubles', defaut: 2, max: 10,
+      besoins: [{ libelle: 'Visser l’assemblage', outils: ['a1', 'a3'] }],
+      consommables: [{ nom: 'Kit de fixation anti-basculement', unite: 'kit', parUnite: 1, conditionnement: 1, prix: 4.5 }],
+      fiche: 'f1', service: 's1', duree: '1 h 30 par meuble', niveau: 'Facile' },
+    { id: 'haie', icone: '🌳', titre: 'Tailler une haie', unite: 'mètre', uniteLibelle: 'Longueur de haie (m)', defaut: 15, max: 200,
+      besoins: [{ libelle: 'Tailler', outils: ['a9'] }, { libelle: 'Évacuer les branches', outils: ['a5'] }],
+      consommables: [{ nom: 'Sacs à déchets verts 100 L', unite: 'sacs', parUnite: 0.25, conditionnement: 5, prix: 7.9 }],
+      video: 'PyqQl1B4MkM', service: 's3', duree: 'une demi-journée', niveau: 'Facile' },
+    { id: 'roues', icone: '🛞', titre: 'Changer ses roues été / hiver', unite: 'roue', uniteLibelle: 'Nombre de roues', defaut: 4, max: 4,
+      besoins: [{ libelle: 'Lever le véhicule', outils: ['a13'] }, { libelle: 'Débloquer les écrous', outils: ['a14', 'a23'] }, { libelle: 'Caler les roues', outils: ['a23'] }],
+      consommables: [{ nom: 'Graisse cuivrée anti-grippage', unite: 'tube', parProjet: 1, conditionnement: 1, prix: 8.9 }],
+      duree: '1 h', niveau: 'Intermédiaire', securite: 'Posez toujours les chandelles avant de passer un bras sous la voiture, et resserrez les écrous au couple du constructeur.' },
+    { id: 'demarrage', icone: '🔋', titre: 'Panne de démarrage auto ou moto', unite: 'véhicule', uniteLibelle: 'Nombre de véhicules', defaut: 1, max: 3,
+      besoins: [{ libelle: 'Mesurer la batterie', outils: ['a20'] }, { libelle: 'Redémarrer', outils: ['a17'] }, { libelle: 'Lire les codes défaut', outils: ['a16'] }],
+      consommables: [{ nom: 'Graisse de protection pour cosses', unite: 'flacon', parProjet: 1, conditionnement: 1, prix: 5.9 }],
+      duree: '30 min', niveau: 'Facile', securite: 'Réseau 12 V uniquement : ne touchez jamais au circuit haute tension (câbles orange) d’un véhicule électrique ou hybride.' },
+  ];
+
+  const D = { PHOTOS, VIDEOS, CATEGORIES, MEMBRES, ANNONCES, RESERVATIONS, ARTICLES, CREDITS, METIERS, ARTISANS, DEMANDES, TYPES_ENSEIGNE, ENSEIGNES, LOTS, RDV_DEMO, OFFRES_DEMO, SERVICES, FICHES, SITE_PUBLIC, TYPES_URGENCE, THEMES_VIDEO, VIDEOS_TUTOS, THEME_FICHE, THEMES_COUPON, PROCHES, PASSEPORTS, PROJETS };
   if (typeof module !== 'undefined' && module.exports) module.exports = D;
   else racine.ZT_DONNEES = D;
 })(typeof window !== 'undefined' ? window : globalThis);
@@ -1846,6 +2142,13 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
         ['Article 22-2. Bons cadeaux travaux', `<p>Un bon cadeau d’une valeur de 20 à 500 € peut être acheté sur la plateforme et offert à un tiers. Il est utilisable, en une ou plusieurs fois, pour payer les services et les interventions réservés sur ZETools, dans la limite de son solde, pendant ${AC('durée de validité, 12 mois proposés')} à compter de sa remise au bénéficiaire. Le thème indiqué sur le bon est une suggestion : il ne restreint pas son usage.</p>
           <p>Le bon n’est ni remboursable ni échangeable contre des espèces, sauf disposition légale contraire. Le solde non utilisé à l’échéance ${AC('sort du solde expiré : perdu, prolongé sur demande ou remboursé, à arrêter après avis')}. Le code est personnel : ZETools ne répond pas de l’utilisation d’un code perdu ou divulgué avant que la perte lui ait été signalée ; après signalement, le solde restant est reporté sur un nouveau code.</p>
           <p>Lorsque le bon est envoyé par ZETools à l’adresse électronique indiquée par l’acheteur, celui-ci déclare avoir l’accord du bénéficiaire pour la transmission de cette adresse.</p>`],
+        ['Article 22-3. Passeport outil et garantie ZETools', `<p>Le passeport outil réunit les informations connues sur un outil : date de mise en service, durée d’usage, contrôles (vidéo au retour de location, test acoustique, passage en atelier), réparations et, pour les outils sans fil, une estimation de l’état de la batterie. Les informations déclarées par le propriétaire restent sous sa responsabilité ; il s’engage à les donner sincères et à jour.</p>
+          <p>Le score de santé sur 100 est calculé selon une méthode publiée sur la page du passeport : chaque point retiré y est expliqué. Le test acoustique et l’estimation de la batterie sont des aides à la décision : ils ne remplacent ni une expertise ni la description de l’annonce. ${AC('incidence éventuelle du score sur le classement des annonces, à décrire au titre de l’article L. 111-7 du Code de la consommation')}.</p>
+          <p>Lorsque l’outil vendu affiche un score d’au moins 80 sur 100 et un contrôle réussi de moins de 90 jours, ZETools accorde à l’acheteur une garantie commerciale « ça marche ou remboursé » de 30 jours à compter de la remise : si l’outil ne fonctionne pas conformément à son passeport, ZETools rembourse le prix contre retour de l’outil ${AC('modalités : preuve du dysfonctionnement, frais de retour, exclusions (casse, mauvaise utilisation, consommables), recours contre le vendeur')}. Cette garantie est gratuite. Elle s’ajoute, sans les remplacer, à la garantie légale de conformité due par un vendeur professionnel (articles L. 217-3 et suivants du Code de la consommation) et à la garantie des vices cachés (articles 1641 et suivants du Code civil).</p>`],
+        ['Article 22-4. Location-achat « Je le garde »', `<p>Lorsqu’un outil loué est aussi proposé à la vente, le locataire peut l’acheter jusqu’au lendemain de la date de fin de location en choisissant « Je le garde ». Le loyer payé, hors frais de service et assurance, est déduit du prix de vente affiché au jour de la réservation. La vente est conclue au paiement du solde ; la caution est alors libérée et le propriétaire reçoit le prix de vente, diminué de la commission de vente.</p>
+          <p>${AC('droit de rétractation lorsque le vendeur est un professionnel : point de départ et effet de la période de location déjà écoulée')}</p>`],
+        ['Article 22-5. Mode Projet', `<p>Le Mode Projet propose un ensemble d’outils, de consommables et, au choix, une prestation, pour un chantier décrit par le membre. Chaque élément forme un contrat distinct avec le membre ou le partenaire qui le fournit, aux conditions de son annonce ; ZETools agit en intermédiaire et encaisse un paiement unique pour leur compte. Les quantités de consommables sont calculées à titre indicatif ; le membre reste juge de ses besoins.</p>
+          <p>Les consommables sont vendus par ${AC('identité du partenaire vendeur et conditions de vente, de retrait et de retour')}. L’annulation d’un élément n’entraîne pas l’annulation des autres, sauf ${AC('règle d’indivisibilité éventuelle à arrêter')}.</p>`],
         ['Article 23. Durée, résiliation, modification', `<p>Le contrat est conclu pour une durée indéterminée. Le membre peut clôturer son compte à tout moment, depuis son espace, sans frais ; les transactions en cours vont à leur terme.</p>
           <p>ZETools peut modifier les présentes conditions. Les membres en sont informés par courrier électronique au moins 15 jours avant l’entrée en vigueur. Le membre qui refuse la modification peut clôturer son compte.</p>`],
         ['Article 24. Réclamations et médiation', `<p>Toute réclamation est adressée à ${AC('adresse du service clients')}. ZETools y répond dans un délai de 30 jours.</p>
@@ -1917,6 +2220,7 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
           <tr><td>Recherche par proximité</td><td>Code postal, ou position approximative si vous l’autorisez</td><td>Consentement pour la géolocalisation du navigateur ; exécution du contrat pour le code postal</td></tr>
           <tr><td>Messagerie et masquage des coordonnées</td><td>Contenu des messages</td><td>Exécution du contrat ; intérêt légitime (sécurité des membres)</td></tr>
           <tr><td>Vérification des professionnels</td><td>SIRET, attestations d’assurance, identité du représentant</td><td>Obligation légale ; intérêt légitime</td></tr>
+          <tr><td>Passeport outil, test acoustique</td><td>Historique de l’outil, vidéos de contrôle de l’outil, résultat de l’analyse du son du moteur. Le son est analysé sur le téléphone et n’est pas conservé ${AC('à confirmer selon la solution technique retenue')}.</td><td>Exécution du contrat ; intérêt légitime (confiance entre membres)</td></tr>
           <tr><td>Avis et réputation</td><td>Notes, avis, taux de réponse, annulations</td><td>Intérêt légitime</td></tr>
           <tr><td>Déclarations fiscales</td><td>Identité, numéro fiscal, montants perçus, nombre de transactions</td><td>Obligation légale (Code général des impôts)</td></tr>
           <tr><td>Lettres d’information</td><td>Adresse électronique</td><td>Consentement, ou intérêt légitime pour des services analogues déjà utilisés</td></tr>
@@ -2437,10 +2741,10 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
   /* ---------- état persistant (navigateur seulement) ---------- */
   const CLE = 'zetools-maquette-v1';
   const ETAT_INITIAL = () => ({
-    reservations: [],
+    reservations: [{ id: 'r-garde', outilId: 'a13', debut: Z.versTexte(new Date(Z.versDate(AUJOURDHUI).getTime() - 86400000)), fin: AUJOURDHUI, statut: 'confirmée', locataire: 'Vous', total: 13.44, caution: 80 }],
     favoris: [],
     annonces: [],
-    lots: [], stocks: {}, retraits: [], enseigne: null, services: [], coupons: [], urgences: [],
+    lots: [], stocks: {}, retraits: [], enseigne: null, services: [], coupons: [], urgences: [], controles: {}, batteries: {}, projets: [],
     rdv: window.ZT_DONNEES.RDV_DEMO.map((r) => Object.assign({}, r)),
     offres: window.ZT_DONNEES.OFFRES_DEMO.map((o) => Object.assign({}, o)),
     conversations: [
@@ -2472,8 +2776,34 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const catNom = (id) => (CATEGORIES.find((c) => c.id === id) || {}).nom || '';
   const initiales = (nom) => nom.split(/\s+/).map((m) => m[0]).join('').slice(0, 2).toUpperCase();
+
+  /* ---------- Icônes : un seul jeu, au trait fin (dessins inspirés de Lucide, licence ISC) ; pas d'émoji dans les pages ---------- */
+  const TRACES = {
+    offre: '<path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r="1"/>',
+    agenda: '<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+    message: '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2z"/>',
+    coeur: '<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>',
+    compte: '<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+    cadenas: '<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+    carte: '<rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/>',
+    verifie: '<circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>',
+    etoile: '<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/>',
+    bouclier: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
+    alerte: '<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4M12 17h.01"/>',
+    lecture: '<circle cx="12" cy="12" r="10"/><path d="m10 8 6 4-6 4z"/>',
+    cadeau: '<rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7M7.5 8a2.5 2.5 0 0 1 0-5C9 3 12 8 12 8s3-5 4.5-5a2.5 2.5 0 0 1 0 5"/>',
+    cle: '<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>',
+    sante: '<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>',
+    fichier: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/>',
+  };
+  function ico(nom, taille, plein) {
+    return `<svg class="icone" viewBox="0 0 24 24" width="${taille || 20}" height="${taille || 20}" fill="${plein ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${TRACES[nom]}</svg>`;
+  }
+  // Charte : aucun émoji pictographique dans les pages (rendu peu professionnel). On garde ★ des notes, ©, ® et ™.
+  const PICTO = /(?:[\u{1F1E6}-\u{1F1FF}]{2}|(?![★©®™])\p{Extended_Pictographic}(?:️|⃣|[\u{1F3FB}-\u{1F3FF}]|‍\p{Extended_Pictographic}️?)*)️? ?/gu;
+  const sansPictos = (html) => String(html).replace(PICTO, '').replace(/<(span|div) class="ico">\s*<\/\1>/g, '');
   function toast(texte) {
-    const t = document.createElement('div'); t.className = 'toast'; t.textContent = texte;
+    const t = document.createElement('div'); t.className = 'toast'; t.textContent = sansPictos(texte);
     document.body.appendChild(t); setTimeout(() => t.remove(), 3800);
   }
   function badges(a) {
@@ -2498,8 +2828,8 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
     const m = membre(a.membre); const fav = etat.favoris.includes(a.id);
     return `<a class="carte" href="#/annonce/${a.id}">
       <div class="visuel">${a.photo ? `<img loading="lazy" src="${a.photo}" alt="${esc(a.titre)}">` : ''}
-        <div class="badges">${badges(a)}</div>
-        <button class="coeur" data-fav="${a.id}" aria-label="Ajouter aux favoris">${fav ? '❤️' : '♡'}</button></div>
+        <div class="badges">${badges(a)}${badgeSante(a)}</div>
+        <button class="coeur${fav ? ' actif' : ''}" data-fav="${a.id}" aria-label="Ajouter aux favoris">${ico('coeur', 20, fav)}</button></div>
       <div class="infos"><span class="badge badge-etat" style="align-self:start">${esc(a.etat)}</span>
         <h3>${esc(a.titre)}</h3><div class="prix">${prixPrincipal(a)}</div>${ligneNeuf(a)}
         <div class="meta"><span>📍 ${esc(a.ville)}</span><span>★ ${m.note.toFixed(1)} (${m.avis})</span></div></div></a>`;
@@ -2510,7 +2840,7 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
     e.preventDefault(); e.stopPropagation();
     const id = f.dataset.fav;
     etat.favoris = etat.favoris.includes(id) ? etat.favoris.filter((x) => x !== id) : etat.favoris.concat(id);
-    sauver(); f.textContent = etat.favoris.includes(id) ? '❤️' : '♡';
+    sauver(); const fv = etat.favoris.includes(id); f.innerHTML = ico('coeur', 20, fv); f.classList.toggle('actif', fv);
     toast(etat.favoris.includes(id) ? 'Ajouté à vos favoris' : 'Retiré de vos favoris');
   });
 
@@ -2555,6 +2885,7 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
           <input name="lieu" placeholder="Ville ou code postal" aria-label="Localisation">
           <button class="btn btn-cta" type="submit">Rechercher</button>
         </form>
+        <a class="lien-projet-hero" href="#/projet">Ou décrivez votre chantier : on réunit les outils, les consommables et l’aide →</a>
         <div class="chiffres-hero"><div><b>×10</b>un outil prêté sert dix fois plus</div><div><b>-70 %</b>louer plutôt qu’acheter pour 2 jours</div><div><b>Île-de-France</b>zone pilote 2027</div></div>
       </div>
     </section>
@@ -2570,7 +2901,7 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
 
     <section class="bloc" style="padding-top:0"><div class="conteneur">
       <div class="titre-section"><div><div class="surtitre">Catégories</div><h2>Trouvez le bon matériel</h2></div></div>
-      <div class="categories categories-video">${CATEGORIES.map((c) => `<a class="categorie categorie-video" href="#/annonces?cat=${c.id}" title="${esc(VIDEOS.categories[c.id] ? VIDEOS.categories[c.id].titre : c.nom)}">${videoFond(VIDEOS.categories[c.id], 'sd')}<span class="etiquette"><span class="ico">${c.icone}</span>${c.nom}</span></a>`).join('')}</div>
+      <div class="categories categories-video">${CATEGORIES.map((c) => `<a class="categorie categorie-video" href="#/annonces?cat=${c.id}" title="${esc(VIDEOS.categories[c.id] ? VIDEOS.categories[c.id].titre : c.nom)}">${videoFond(VIDEOS.categories[c.id], 'sd')}<span class="etiquette">${c.nom}</span></a>`).join('')}</div>
     </div></section>
 
     <section class="bloc" style="padding-top:0"><div class="conteneur">
@@ -2585,9 +2916,13 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
 
     <section class="bloc" style="padding-top:0"><div class="conteneur">
       <div class="trois-espaces">
-        <a class="espace-tuile tuile-urgence" href="#/urgence"><span class="ico">🚨</span><b>Urgence travaux</b><span>Fuite, panne, porte claquée : un pro vérifié, son délai et son prix ferme avant le déplacement.</span><em>Trouver un pro maintenant →</em></a>
-        <a class="espace-tuile tuile-videos" href="#/videos"><span class="ico">🎬</span><b>Vidéothèque</b><span>Des tutoriels à regarder ici même : montage, perçage, peinture, outils, jardin.</span><em>Regarder les vidéos →</em></a>
-        <a class="espace-tuile tuile-cadeau" href="#/offrir"><span class="ico">🎁</span><b>Offrir des travaux</b><span>Un bon cadeau de 20 à 500 € pour un parent, un enfant, un ami, un collègue.</span><em>Offrir un bon cadeau →</em></a>
+        <a class="espace-tuile tuile-urgence" href="#/urgence"><span class="ico">${ico('alerte', 30)}</span><b>Urgence travaux</b><span>Fuite, panne, porte claquée : un pro vérifié, son délai et son prix ferme avant le déplacement.</span><em>Trouver un pro maintenant →</em></a>
+        <a class="espace-tuile tuile-videos" href="#/videos"><span class="ico">${ico('lecture', 30)}</span><b>Vidéothèque</b><span>Des tutoriels à regarder ici même : montage, perçage, peinture, outils, jardin.</span><em>Regarder les vidéos →</em></a>
+        <a class="espace-tuile tuile-cadeau" href="#/offrir"><span class="ico">${ico('cadeau', 30)}</span><b>Offrir des travaux</b><span>Un bon cadeau de 20 à 500 € pour un parent, un enfant, un ami, un collègue.</span><em>Offrir un bon cadeau →</em></a>
+      </div>
+      <div class="deux-espaces">
+        <a class="espace-tuile tuile-projet" href="#/projet"><span class="ico">${ico('cle', 30)}</span><b>Mode Projet</b><span>« Fixer 3 étagères », « changer mes roues » : les outils de vos voisins, les consommables calculés, la fiche et un coup de main, en un seul paiement.</span><em>Lancer mon projet →</em></a>
+        <a class="espace-tuile tuile-passeport" href="#/passeport"><span class="ico">${ico('sante', 30)}</span><b>Passeport outil</b><span>Chaque outil a son carnet de santé : âge, contrôles, réparations, batterie. Au-dessus de 80 / 100, l’achat est garanti 30 jours.</span><em>Voir les passeports →</em></a>
       </div>
     </div></section>
 
@@ -2637,11 +2972,11 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
     return `<section class="bloc reassurance"><div class="conteneur">
       <div class="titre-section"><div><div class="surtitre">Confiance et sécurité</div><h2>Protégé du premier message au retour de l’outil</h2><p>Ces protections ne valent que pour les transactions réglées sur ZETOOLS.</p></div></div>
       <div class="garanties">
-        <div class="garantie"><div class="ico">🔒</div><h3>Paiement sécurisé</h3><p>Fonds en séquestre chez un prestataire agréé, versés au vendeur après confirmation de la remise.</p></div>
-        <div class="garantie"><div class="ico">💳</div><h3>Caution protégée</h3><p>Simple empreinte bancaire pendant la location, libérée au retour de l’outil en bon état.</p></div>
-        <div class="garantie"><div class="ico">✅</div><h3>Profils vérifiés</h3><p>Identité, téléphone et, pour les pros, numéro SIRET contrôlés avant la première annonce payante.</p></div>
-        <div class="garantie"><div class="ico">⭐</div><h3>Avis communautaires</h3><p>Seuls les membres ayant réellement loué, acheté ou échangé peuvent laisser un avis.</p></div>
-        <div class="garantie"><div class="ico">🛡️</div><h3>Assurance casse</h3><p>Option casse et vol pendant la location, à partir de 3 € par réservation.</p></div>
+        <div class="garantie"><div class="ico">${ico('cadenas', 28)}</div><h3>Paiement sécurisé</h3><p>Fonds en séquestre chez un prestataire agréé, versés au vendeur après confirmation de la remise.</p></div>
+        <div class="garantie"><div class="ico">${ico('carte', 28)}</div><h3>Caution protégée</h3><p>Simple empreinte bancaire pendant la location, libérée au retour de l’outil en bon état.</p></div>
+        <div class="garantie"><div class="ico">${ico('verifie', 28)}</div><h3>Profils vérifiés</h3><p>Identité, téléphone et, pour les pros, numéro SIRET contrôlés avant la première annonce payante.</p></div>
+        <div class="garantie"><div class="ico">${ico('etoile', 28)}</div><h3>Avis communautaires</h3><p>Seuls les membres ayant réellement loué, acheté ou échangé peuvent laisser un avis.</p></div>
+        <div class="garantie"><div class="ico">${ico('bouclier', 28)}</div><h3>Assurance casse</h3><p>Option casse et vol pendant la location, à partir de 3 € par réservation.</p></div>
       </div></div></section>`;
   }
 
@@ -2694,6 +3029,7 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
             ${a.echangeContre ? `<div class="ligne"><span>Échange recherché</span><b>${esc(a.echangeContre)}</b></div>` : ''}
             <div class="ligne"><span>Remise</span><b>📍 ${esc(a.ville)} (${esc(a.cp)}) · adresse exacte après paiement</b></div>
           </div>
+          ${blocPasseportFiche(a)}
         </div>
         <div>
           <div class="panneau">
@@ -2764,6 +3100,7 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
     }
     return `<div class="ligne"><span>Tarif</span><b>${Z.euros(a.prixJour)} / jour</b></div>
       <div class="ligne discret"><span>-10 % dès 3 jours · -20 % dès 7 jours</span><span></span></div>
+      ${a.modes.includes('vente') ? `<div class="alerte alerte-ok">🔁 <b>Louez, puis gardez-le.</b> S’il vous plaît, cliquez « Je le garde » avant le lendemain du retour : la location payée est déduite du prix d’achat (${Z.euros(a.prixVente)}).</div>` : ''}
       ${calendrier(a)}${detail}${blocOffre(a, 'location')}`;
   }
 
@@ -2791,7 +3128,7 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
 
   function brancherFiche(a) {
     const zone = document.getElementById('zone-transaction');
-    const rafraichir = () => { zone.innerHTML = zoneTransaction(a); };
+    const rafraichir = () => { zone.innerHTML = sansPictos(zoneTransaction(a)); };
     document.getElementById('onglets-fiche').addEventListener('click', (e) => {
       const b = e.target.closest('[data-onglet]'); if (!b) return;
       selection.onglet = b.dataset.onglet;
@@ -2906,9 +3243,11 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
     return `<div class="page"><div class="conteneur">
       <div class="titre-section"><div><h2>Mon espace</h2><p>Compte de démonstration · profil vérifié</p></div><a class="btn btn-cta" href="#/deposer">＋ Déposer une annonce</a></div>
       <h3>Mon calendrier de location</h3>
-      ${mesRes.length ? `<table class="tableau"><thead><tr><th>Outil</th><th>Du</th><th>Au</th><th>Total payé</th><th>Caution bloquée</th><th>Statut</th></tr></thead><tbody>${mesRes.sort((x, y) => x.debut.localeCompare(y.debut)).map((r) => { const a = annonce(r.outilId); return `<tr><td><a href="#/annonce/${a.id}">${esc(a.titre)}</a></td><td>${Z.formatDate(r.debut)}</td><td>${Z.formatDate(r.fin)}</td><td>${r.total ? Z.euros(r.total) : '—'}</td><td>${Z.euros(r.caution ?? a.caution)}</td><td><span class="statut">${esc(r.statut)}</span></td></tr>`; }).join('')}</tbody></table>` : '<div class="vide">Aucune location pour l’instant.</div>'}
+      ${mesRes.length ? `<table class="tableau"><thead><tr><th>Outil</th><th>Du</th><th>Au</th><th>Total payé</th><th>Caution bloquée</th><th>Statut</th><th>Location-achat</th></tr></thead><tbody>${mesRes.sort((x, y) => x.debut.localeCompare(y.debut)).map((r) => { const a = annonce(r.outilId); return `<tr><td><a href="#/annonce/${a.id}">${esc(a.titre)}</a></td><td>${Z.formatDate(r.debut)}</td><td>${Z.formatDate(r.fin)}</td><td>${r.total ? Z.euros(r.total) : '—'}</td><td>${r.statut === 'achetée' ? '—' : Z.euros(r.caution ?? a.caution)}</td><td><span class="statut">${esc(r.statut)}</span></td><td>${celluleGarder(a, r)}</td></tr>`; }).join('')}</tbody></table>` : '<div class="vide">Aucune location pour l’instant.</div>'}
       <h3 style="margin-top:32px">Mes services proposés</h3>
       ${etat.services.length ? `<div class="grille">${etat.services.map(carteService).join('')}</div>` : '<div class="vide">Vous savez monter un meuble, tailler une haie, poser une étagère ? <a href="#/proposer-service">Proposez vos services</a>.</div>'}
+      <h3 style="margin-top:32px">Mes projets</h3>
+      ${(etat.projets || []).length ? `<table class="tableau"><thead><tr><th>Projet</th><th>Du</th><th>Au</th><th>Outils</th><th>Total payé</th></tr></thead><tbody>${etat.projets.map((pj) => `<tr><td>${esc(pj.icone)} ${esc(pj.titre)}</td><td>${Z.formatDate(pj.debut)}</td><td>${Z.formatDate(pj.fin)}</td><td>${pj.outils.length}</td><td>${Z.euros(pj.total)}</td></tr>`).join('')}</tbody></table>` : '<div class="panneau bandeau-action"><div>Décrivez votre chantier : ZETools réunit les outils de vos voisins, les consommables et un coup de main.</div><a class="btn btn-contour" href="#/projet">🧰 Lancer un projet</a></div>'}
       <h3 style="margin-top:32px">Mes bons cadeaux</h3>
       <div class="panneau bandeau-action"><div>${etat.coupons.length ? `${etat.coupons.length} bon(s) · solde disponible ${Z.euros(etat.coupons.filter((c) => !Z.couponExpire(c, AUJOURDHUI)).reduce((t, c) => t + c.solde, 0))}.` : 'Offrez des travaux à un proche, ou saisissez le code d’un bon reçu.'}</div><a class="btn btn-contour" href="#/offrir">🎁 Offrir ou utiliser un bon</a></div>
       <h3 style="margin-top:32px">Mes offres de prix</h3>
@@ -3155,7 +3494,7 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
   }
 
   function brancherTravaux() {
-    const rafraichir = () => { vue.innerHTML = vueTravaux(); brancherTravaux(); };
+    const rafraichir = () => { vue.innerHTML = sansPictos(vueTravaux()); brancherTravaux(); };
     const placer = (p) => { posClient = p; rafraichir(); };
     document.getElementById('geoloc').addEventListener('click', () => {
       const etatGeo = document.getElementById('etat-geo');
@@ -3528,7 +3867,7 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
   function brancherRendezVous() {
     const f = document.getElementById('form-rdv');
     const zone = document.getElementById('zone-calendrier');
-    const redessiner = () => { zone.innerHTML = calendrierRdv(); };
+    const redessiner = () => { zone.innerHTML = sansPictos(calendrierRdv()); };
     zone.addEventListener('click', (e) => {
       const b = e.target.closest('button'); if (!b) return;
       if (b.dataset.moisRdv) { const [a, m] = selRdv.mois.split('-').map(Number); const d = new Date(Date.UTC(a, m - 1 + Number(b.dataset.moisRdv), 1)); selRdv.mois = d.toISOString().slice(0, 7); }
@@ -3716,7 +4055,7 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
   function brancherService(id) {
     const zone = document.getElementById('zone-service'); if (!zone) return;
     const courant = () => Z.appliquerOffres(service(id), etat.offres, maintenant());
-    const rafraichir = () => { zone.innerHTML = zoneService(courant()); };
+    const rafraichir = () => { zone.innerHTML = sansPictos(zoneService(courant())); };
     zone.addEventListener('change', (e) => {
       if (e.target.id === 'heures-svc') { selService.heures = Number(e.target.value); rafraichir(); }
       if (e.target.id === 'assurance-svc') { selService.assurance = e.target.checked; rafraichir(); }
@@ -3818,7 +4157,7 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
   }
   function carteFiche(f) {
     return `<a class="carte carte-fiche" href="#/fiche-technique/${f.id}">
-      <div class="visuel visuel-fiche"><span>${f.icone}</span><div class="badges"><span class="badge badge-location">PDF gratuit</span>${(f.videos || []).length ? '<span class="badge badge-echange">▶ Vidéo</span>' : ''}</div></div>
+      <div class="visuel visuel-fiche">${ico('fichier', 56)}<div class="badges"><span class="badge badge-location">PDF gratuit</span>${(f.videos || []).length ? '<span class="badge badge-echange">▶ Vidéo</span>' : ''}</div></div>
       <div class="infos"><span class="badge badge-etat" style="align-self:start">${esc(f.theme)} · ${esc(f.niveau)}</span>
         <h3>${esc(f.titre)}</h3><div class="meta"><span>⏱ ${esc(f.duree)}</span><span>${f.etapes.length} étapes</span></div></div></a>`;
   }
@@ -3874,7 +4213,7 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
       const b = e.target.closest('[data-lire]'); if (b) { lire(b.dataset.lire, Number(b.dataset.debut) || 0); return; }
       const c = e.target.closest('[data-choix-video]'); if (!c) return;
       const v = f.videos[Number(c.dataset.choixVideo)];
-      cadre.innerHTML = facadeVideo(v);
+      cadre.innerHTML = sansPictos(facadeVideo(v));
       const lien = art.querySelector('[data-lien-yt]'); if (lien) lien.href = `https://www.youtube.com/watch?v=${v.yt}`;
       art.querySelectorAll('[data-choix-video]').forEach((x) => x.classList.toggle('active', x === c));
     });
@@ -3975,10 +4314,10 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
   function brancherVideos() {
     const cadre = document.getElementById('lecteur'); if (!cadre) return;
     const redessiner = (lire) => {
-      vue.innerHTML = vueVideos(new URLSearchParams()); brancherVideos();
+      vue.innerHTML = sansPictos(vueVideos(new URLSearchParams())); brancherVideos();
       const v = toutesVideos().find((x) => x.yt === selVideo.yt);
       const c = document.getElementById('lecteur');
-      if (lire && consentementYt) c.innerHTML = iframeYt(v, true);
+      if (lire && consentementYt) c.innerHTML = sansPictos(iframeYt(v, true));
       return c;
     };
     vue.querySelector('.filtres-videos').addEventListener('click', (e) => {
@@ -3987,7 +4326,7 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
     });
     vue.querySelector('.videotheque').addEventListener('click', (e) => {
       const lire = e.target.closest('[data-lire]');
-      if (lire) { consentementYt = true; const v = toutesVideos().find((x) => x.yt === lire.dataset.lire); cadre.innerHTML = iframeYt(v, true); return; }
+      if (lire) { consentementYt = true; const v = toutesVideos().find((x) => x.yt === lire.dataset.lire); cadre.innerHTML = sansPictos(iframeYt(v, true)); return; }
       const t = e.target.closest('[data-video]'); if (!t) return;
       selVideo.yt = t.dataset.video;
       redessiner(true).scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -4085,10 +4424,10 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
       </div></div>`;
   }
   function brancherUrgence() {
-    const rafraichir = () => { const y = window.scrollY; vue.innerHTML = vueUrgence(new URLSearchParams()); brancherUrgence(); window.scrollTo(0, y); };
+    const rafraichir = () => { const y = window.scrollY; vue.innerHTML = sansPictos(vueUrgence(new URLSearchParams())); brancherUrgence(); window.scrollTo(0, y); };
     vue.querySelectorAll('[data-type-urg]').forEach((b) => b.addEventListener('click', () => { selUrg.type = b.dataset.typeUrg; selUrg.artisan = 'premier'; rafraichir(); }));
     const cadre = vue.querySelector('[data-cadre-urg]');
-    if (cadre) cadre.addEventListener('click', (e) => { const b = e.target.closest('[data-lire]'); if (!b) return; consentementYt = true; cadre.innerHTML = iframeYt(VIDEOS_TUTOS.find((v) => v.yt === b.dataset.lire), true); });
+    if (cadre) cadre.addEventListener('click', (e) => { const b = e.target.closest('[data-lire]'); if (!b) return; consentementYt = true; cadre.innerHTML = sansPictos(iframeYt(VIDEOS_TUTOS.find((v) => v.yt === b.dataset.lire), true)); });
     const geo = document.getElementById('geoloc-urg');
     if (geo) geo.addEventListener('click', () => {
       const etatGeo = document.getElementById('etat-geo-urg');
@@ -4233,10 +4572,10 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
   function brancherOffrir() {
     const f = document.getElementById('form-cadeau'); if (!f) return;
     const lire = () => { const fd = new FormData(f); ['pour', 'de', 'message', 'autre', 'email', 'date'].forEach((k) => { if (fd.has(k)) selCadeau[k] = String(fd.get(k)); }); selCadeau.mode = fd.get('mode') || 'pdf'; };
-    const redessiner = () => { const y = window.scrollY; vue.innerHTML = vueOffrir(new URLSearchParams()); brancherOffrir(); window.scrollTo(0, y); };
+    const redessiner = () => { const y = window.scrollY; vue.innerHTML = sansPictos(vueOffrir(new URLSearchParams())); brancherOffrir(); window.scrollTo(0, y); };
     const apercu = () => {
       lire(); const m = selCadeau.autre !== '' ? Number(selCadeau.autre) : selCadeau.montant;
-      document.getElementById('apercu-carte').innerHTML = apercuCoupon({ pour: selCadeau.pour, de: selCadeau.de, montant: m, theme: selCadeau.theme, message: selCadeau.message });
+      document.getElementById('apercu-carte').innerHTML = sansPictos(apercuCoupon({ pour: selCadeau.pour, de: selCadeau.de, montant: m, theme: selCadeau.theme, message: selCadeau.message }));
       document.getElementById('compteur-cadeau').textContent = selCadeau.message.length;
       document.getElementById('a-payer').textContent = Number.isFinite(m) && m > 0 ? Z.euros(m) : '—';
       if (f.querySelector('[name=autre]').value !== '') f.querySelectorAll('[data-montant]').forEach((b) => b.classList.remove('active'));
@@ -4262,17 +4601,227 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
       etat.coupons.push(c); sauver();
       selCadeau = Object.assign({}, selCadeau, { pour: '', message: '', autre: '', email: '', date: '' });
       toast(`Paiement de ${Z.euros(c.montant)} accepté (simulation). Bon cadeau ${c.code} créé.`);
-      vue.innerHTML = vueOffrir(new URLSearchParams()); brancherOffrir(); window.scrollTo(0, 0);
+      vue.innerHTML = sansPictos(vueOffrir(new URLSearchParams())); brancherOffrir(); window.scrollTo(0, 0);
     });
     vue.querySelectorAll('[data-pdf-coupon]').forEach((b) => b.addEventListener('click', () => telechargerCoupon(b.dataset.pdfCoupon)));
     const fermer = vue.querySelector('[data-fermer-confirmation]');
     if (fermer) fermer.addEventListener('click', () => { etat.coupons.forEach((c) => { delete c.nouveau; }); sauver(); redessiner(); });
     document.getElementById('form-code').addEventListener('submit', (e) => {
       e.preventDefault(); lire(); const brut = document.getElementById('code-coupon').value.trim(); codeSaisi = brut ? Z.formaterCode(brut) : '';
-      vue.innerHTML = vueOffrir(new URLSearchParams()); brancherOffrir(); document.getElementById('utiliser-coupon').scrollIntoView();
+      vue.innerHTML = sansPictos(vueOffrir(new URLSearchParams())); brancherOffrir(); document.getElementById('utiliser-coupon').scrollIntoView();
     });
   }
 
+
+
+  /* ---------- Passeport outil ---------- */
+  const { PASSEPORTS, PROJETS } = window.ZT_DONNEES;
+  function passeportDe(id) {
+    const base = PASSEPORTS[id], ajout = (etat.controles || {})[id] || [];
+    if (!base && !ajout.length && !(etat.batteries || {})[id]) return null;
+    const p = base || { misEnService: AUJOURDHUI.slice(0, 7), heures: 0, controles: [], reparations: [] };
+    const bat = (etat.batteries || {})[id];
+    return Object.assign({}, p, { controles: (p.controles || []).concat(ajout) }, bat ? { batterie: bat } : {});
+  }
+  const COULEUR_SANTE = { Excellent: 'var(--vert)', Bon: '#3b7d4f', 'À surveiller': 'var(--orange)', Fatigué: '#c92a2a' };
+  function badgeSante(a) {
+    const p = a && passeportDe(a.id); if (!p) return '';
+    const s = Z.scoreSante(p, AUJOURDHUI);
+    return `<span class="badge badge-sante" title="Passeport outil : ${s.niveau}">Santé ${s.score}/100</span>`;
+  }
+  function jauge(s, taille) {
+    return `<div class="jauge" style="--v:${s.score};--c:${COULEUR_SANTE[s.niveau]};${taille ? `--t:${taille}px` : ''}"><div><b>${s.score}</b><small>/ 100</small></div></div>`;
+  }
+  const TYPE_CONTROLE = { video: '🎥 Contrôle vidéo au retour', atelier: '🛠️ Contrôle en atelier', acoustique: '🎙️ Test acoustique' };
+  const RESULTAT = { ok: ['✅', 'Réussi'], reserve: ['⚠️', 'Avec réserve'], echec: ['❌', 'Échoué'] };
+  function blocPasseportFiche(a) {
+    if (!a.modes || !(a.modes.includes('vente') || a.modes.includes('location'))) return '';
+    const p = passeportDe(a.id);
+    if (!p) return `<div class="panneau passeport-fiche"><div><b>🩺 Passeport outil</b><p class="discret" style="margin:4px 0 0">Pas encore établi : le propriétaire filme 10 secondes de l’outil en marche et le passeport se crée.</p></div><a class="btn btn-contour" href="#/passeport/${a.id}">En savoir plus</a></div>`;
+    const s = Z.scoreSante(p, AUJOURDHUI), g = Z.garantiePasseport(p, a, AUJOURDHUI);
+    return `<div class="panneau passeport-fiche">${jauge(s, 74)}<div style="flex:1"><b>🩺 Passeport outil · ${s.niveau}</b>
+      <p class="discret" style="margin:4px 0">${s.dernier ? `Dernier contrôle : ${RESULTAT[s.dernier.resultat][1].toLowerCase()}, le ${Z.formatDate(s.dernier.date)}` : 'Aucun contrôle'}${p.batterie ? ` · batterie à ${p.batterie.capacite} %` : ''}</p>
+      ${g.ok ? `<span class="badge badge-garantie">✔ Achat garanti ${g.jours} jours : ça marche ou remboursé</span>` : ''}</div>
+      <a class="btn btn-contour" href="#/passeport/${a.id}">Voir le passeport</a></div>`;
+  }
+
+  function vuePasseports() {
+    const liste = toutesAnnonces().filter((a) => passeportDe(a.id)).map((a) => ({ a, s: Z.scoreSante(passeportDe(a.id), AUJOURDHUI) })).sort((x, y) => y.s.score - x.s.score);
+    const P = Z.REGLES.passeport;
+    return `<div class="page"><div class="conteneur">
+      <div class="titre-section"><div><div class="surtitre">Passeport outil</div><h2>Un outil d’occasion dont on connaît l’histoire</h2><p>Âge, heures de marche, contrôles, réparations, santé de la batterie : tout est consigné et lisible avant d’acheter ou de louer.</p></div></div>
+      <div class="etapes-passeport">
+        <div><span>1</span><b>Un QR code sur l’outil</b><p>Collé sous l’outil, il ouvre son passeport depuis n’importe quel téléphone.</p></div>
+        <div><span>2</span><b>10 secondes de vidéo au retour</b><p>À chaque location, l’outil est filmé en marche. Le contrôle s’ajoute au carnet.</p></div>
+        <div><span>3</span><b>Un score sur 100, expliqué</b><p>Chaque point retiré est justifié. À ${P.seuilGarantie} et plus, avec un contrôle de moins de ${P.controleValideJours} jours, l’achat est garanti ${P.joursGarantie} jours.</p></div>
+      </div>
+      <div class="liste-passeports">${liste.map(({ a, s }) => `<a class="ligne-passeport" href="#/passeport/${a.id}">${jauge(s, 56)}<img src="${a.photo}" alt=""><div><b>${esc(a.titre)}</b><small>${esc(a.ville)} · ${s.niveau}${Z.garantiePasseport(passeportDe(a.id), a, AUJOURDHUI).ok ? ' · <span class="badge badge-garantie">garanti 30 jours</span>' : ''}</small></div></a>`).join('')}</div>
+    </div></div>`;
+  }
+
+  function vuePasseport(id) {
+    if (!id) return vuePasseports();
+    const a = annonce(id);
+    if (!a || !a.modes) return '<div class="page"><div class="conteneur vide">Outil introuvable. <a href="#/passeport">Tous les passeports</a></div></div>';
+    const p = passeportDe(id), url = window.ZT_DONNEES.SITE_PUBLIC + '#/passeport/' + id;
+    const qr = window.ZT_QR ? window.ZT_QR.qrSvg(url, 132) : '';
+    const tete = `<div class="fil"><a href="#/">Accueil</a> › <a href="#/passeport">Passeports</a> › ${esc(a.titre)}</div>`;
+    const simulateur = `<div class="panneau"><b>🎙️ Test acoustique (${Z.REGLES.passeport.dureeTestAcoustique} s)</b><p class="discret">Faites tourner l’outil à vide devant le micro du téléphone. L’analyse du son repère un régime irrégulier, un roulement qui frotte ou des claquements. <i>Dans la maquette, les mesures sont simulées : aucun micro n’est utilisé.</i></p>
+      <div class="onde" id="onde" hidden>${'<i></i>'.repeat(24)}</div><button class="btn btn-cta" id="test-acoustique">Lancer le test acoustique</button></div>
+      <div class="panneau"><b>🔋 Santé de la batterie (estimation)</b><p class="discret">Recopiez la date de fabrication gravée sur la batterie et le nombre de charges approximatif. Le passeport en déduit la capacité restante probable.</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:end"><label class="champ-court">Date de fabrication<input type="month" id="bat-date" max="${AUJOURDHUI.slice(0, 7)}"></label><label class="champ-court">Charges environ<input type="number" id="bat-cycles" min="0" max="3000" value="100"></label><button class="btn btn-contour" id="estimer-batterie">Estimer</button></div></div>
+      <div class="panneau"><b>🎥 Contrôle de retour (démonstration)</b><p class="discret">Au retour d’une location, le propriétaire filme 10 secondes de l’outil en marche et note le résultat.</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><select id="resultat-controle" aria-label="Résultat du contrôle"><option value="ok">✅ Réussi</option><option value="reserve">⚠️ Avec réserve</option><option value="echec">❌ Échoué</option></select>
+      <input id="note-controle" placeholder="Observation (facultatif)" maxlength="80" style="flex:1;min-width:160px"><button class="btn btn-cta" id="ajouter-controle">Enregistrer le contrôle</button></div></div>`;
+    if (!p) return `<div class="page"><div class="conteneur">${tete}<div class="panneau"><h2 style="margin-top:0">🩺 Passeport à créer</h2><p>Cet outil n’a pas encore de carnet de santé. Le premier contrôle le crée.</p></div>${simulateur}</div></div>`;
+    const s = Z.scoreSante(p, AUJOURDHUI), g = Z.garantiePasseport(p, a, AUJOURDHUI);
+    const histo = p.controles.map((c) => Object.assign({ genre: 'controle' }, c)).concat((p.reparations || []).map((r) => Object.assign({ genre: 'reparation' }, r))).sort((x, y) => (x.date < y.date ? 1 : -1));
+    return `<div class="page"><div class="conteneur">${tete}
+      <div class="passeport">
+        <div>
+          <div class="panneau" style="text-align:center"><img class="passeport-photo" src="${a.photo}" alt="${esc(a.titre)}"><h1 style="font-size:1.35rem">${esc(a.titre)}</h1><p class="discret">${esc(a.marque)} · en service depuis ${esc(p.misEnService.split('-').reverse().join('/'))}${p.heures ? ` · ${p.heures} h de marche` : ''}</p>
+            <div class="qr-passeport">${qr}<small>Le QR code collé sur l’outil ouvre cette page.</small></div>
+            <a class="btn btn-contour" href="#/annonce/${a.id}">Voir l’annonce</a></div>
+        </div>
+        <div>
+          <div class="panneau score-passeport">${jauge(s, 120)}<div><div class="surtitre">Score de santé</div><h2 style="margin:2px 0">${s.niveau}</h2>
+            <ul class="facteurs">${s.facteurs.length ? s.facteurs.map((f) => `<li><span>${esc(f.libelle)}</span><b class="${f.points > 0 ? 'plus' : 'moins'}">${f.points > 0 ? '+' : ''}${f.points}</b></li>`).join('') : '<li><span>Aucun point retiré</span><b class="plus">100</b></li>'}</ul></div></div>
+          ${g.ok ? `<div class="alerte alerte-ok">✔ <b>Achat garanti ${g.jours} jours : ça marche ou remboursé.</b> Si l’outil ne fonctionne pas comme décrit dans son passeport, ZETools vous rembourse sur retour de l’outil. Cette garantie s’ajoute aux droits légaux du vendeur professionnel, sans les remplacer.</div>` : `<div class="alerte alerte-info">Garantie ZETools non disponible : ${esc(g.raison)}</div>`}
+          ${p.batterie ? `<div class="panneau"><b>🔋 Batterie</b><div class="barre-batterie"><span style="width:${p.batterie.capacite}%"></span></div><p class="discret" style="margin:4px 0 0">${p.batterie.capacite} % de la capacité d’origine · ${p.batterie.cycles} cycles de charge${p.batterie.estimee ? ` · <b>estimation</b> d’après la fabrication (${esc(p.batterie.fabrication.split('-').reverse().join('/'))}), pas une mesure` : ''}</p></div>` : ''}
+          <div class="panneau"><b>📋 Historique</b><ol class="historique">${histo.map((h) => h.genre === 'controle'
+            ? `<li><time>${Z.formatDate(h.date)}</time><span>${RESULTAT[h.resultat][0]} ${TYPE_CONTROLE[h.type] || 'Contrôle'} · ${RESULTAT[h.resultat][1].toLowerCase()}</span>${h.note ? `<small>${esc(h.note)}</small>` : ''}</li>`
+            : `<li><time>${Z.formatDate(h.date)}</time><span>🔧 ${esc(h.objet)}</span><small>par ${esc(h.par)}</small></li>`).join('')}</ol></div>
+          ${simulateur}
+        </div>
+      </div></div></div>`;
+  }
+  function brancherPasseport(id) {
+    if (!id) return;
+    const enregistrer = (c, message) => {
+      etat.controles = etat.controles || {};
+      etat.controles[id] = (etat.controles[id] || []).concat([c]);
+      sauver(); toast(message); router();
+    };
+    const t = document.getElementById('test-acoustique');
+    if (t) t.addEventListener('click', () => {
+      const onde = document.getElementById('onde'); onde.hidden = false; t.disabled = true; t.textContent = 'Écoute en cours…';
+      setTimeout(() => {
+        // mesures simulées, le plus souvent saines ; en production, elles viendraient du micro et d'un modèle par type d'outil
+        const m = { regularite: 0.8 + Math.random() * 0.2, aigus: Math.random() * 0.45, chocs: Math.random() < 0.15 ? 3 : 0 };
+        const res = Z.analyseAcoustique(m);
+        enregistrer({ date: AUJOURDHUI, type: 'acoustique', resultat: res.resultat, note: res.note }, res.resultat === 'ok' ? 'Test acoustique réussi : moteur régulier.' : 'Test acoustique : ' + res.alertes.join(', ') + '.');
+      }, Z.REGLES.passeport.dureeTestAcoustique * 1000);
+    });
+    const e = document.getElementById('estimer-batterie');
+    if (e) e.addEventListener('click', () => {
+      const est = Z.estimerBatterie(document.getElementById('bat-date').value, document.getElementById('bat-cycles').value, AUJOURDHUI);
+      if (!est) return toast('Indiquez le mois et l’année de fabrication gravés sur la batterie.');
+      etat.batteries = etat.batteries || {}; etat.batteries[id] = est;
+      sauver(); toast(`Batterie estimée à ${est.capacite} % de sa capacité d’origine.`); router();
+    });
+    const b = document.getElementById('ajouter-controle'); if (!b) return;
+    b.addEventListener('click', () => {
+      enregistrer({ date: AUJOURDHUI, type: 'video', resultat: document.getElementById('resultat-controle').value, note: document.getElementById('note-controle').value.trim() }, 'Contrôle enregistré : le score est recalculé.');
+    });
+  }
+
+  /* ---------- Mode Projet ---------- */
+  const demain = (j, n) => Z.versTexte(new Date(Z.versDate(j).getTime() + n * 86400000));
+  function lireProjet(params) {
+    const pr = PROJETS.find((x) => x.id === params.get('p'));
+    if (!pr) return null;
+    const RP = Z.REGLES.projet;
+    const q = Math.min(pr.max, Math.max(1, parseInt(params.get('q'), 10) || pr.defaut));
+    const cp = /^\d{5}$/.test(params.get('cp') || '') ? params.get('cp') : '94300';
+    const du = params.get('du') || demain(AUJOURDHUI, 1), au = params.get('au') && params.get('au') >= du ? params.get('au') : du;
+    const rayon = RP.rayonsKm.includes(Number(params.get('r'))) ? Number(params.get('r')) : RP.rayonDefautKm;
+    const achats = (params.get('achat') || '').split(',').filter(Boolean);
+    const aide = params.get('aide') === '1';
+    const r = Z.composerProjet(pr, { quantite: q, cp, debut: du, fin: au, rayonKm: rayon, achats, annonces: toutesAnnonces(), reservations: toutesReservations(), aujourdHui: AUJOURDHUI });
+    const svc = pr.service ? tousServices().find((x) => x.id === pr.service) : null;
+    const dsvc = svc && aide ? Z.devisService(svc, 1) : null;
+    const total = r.ok ? Math.round((r.total + (dsvc ? dsvc.total : 0)) * 100) / 100 : 0;
+    return { pr, q, cp, du, au, rayon, achats, aide, r, svc, dsvc, total };
+  }
+  function urlProjet(o, change) {
+    const u = new URLSearchParams(Object.assign({ p: o.pr.id, q: o.q, cp: o.cp, du: o.du, au: o.au, r: o.rayon, achat: o.achats.join(',') }, o.aide ? { aide: '1' } : {}, change || {}));
+    if (!u.get('achat')) u.delete('achat');
+    return '#/projet?' + u.toString();
+  }
+  function vueProjet(params) {
+    const intro = `<div class="titre-section"><div><div class="surtitre">Mode Projet</div><h2>Décrivez votre chantier, on réunit tout</h2><p>Les outils de vos voisins dans le rayon choisi, à louer ou à acheter, les consommables calculés pour vous, la fiche pas-à-pas et, si vous le souhaitez, un coup de main. Un seul paiement.</p></div></div>`;
+    const o = lireProjet(params);
+    if (!o) return `<div class="page"><div class="conteneur">${intro}<div class="grille-projets">${PROJETS.map((x) => `<a class="carte-projet" href="#/projet?p=${x.id}"><span class="ico">${x.icone}</span><b>${esc(x.titre)}</b><small>${esc(x.niveau)} · ${esc(x.duree)}</small><em>${x.besoins.length} étape${x.besoins.length > 1 ? 's' : ''} outillée${x.besoins.length > 1 ? 's' : ''} →</em></a>`).join('')}</div></div></div>`;
+    const { pr, q, cp, du, au, rayon, achats, aide, r, svc, dsvc, total } = o;
+    const fiche = pr.fiche && window.ZT_DONNEES.FICHES.find((f) => f.id === pr.fiche);
+    const formulaire = `<form class="panneau form-projet" id="form-projet">
+      <input type="hidden" name="p" value="${pr.id}"><input type="hidden" name="achat" value="${esc(achats.join(','))}">
+      <label>${esc(pr.uniteLibelle)}<input type="number" name="q" min="1" max="${pr.max}" value="${q}"></label>
+      <label>Code postal<input name="cp" inputmode="numeric" maxlength="5" value="${esc(cp)}"></label>
+      <label>Rayon<select name="r">${Z.REGLES.projet.rayonsKm.map((k) => `<option value="${k}" ${k === rayon ? 'selected' : ''}>${k} km</option>`).join('')}</select></label>
+      <label>Du<input type="date" name="du" min="${AUJOURDHUI}" value="${du}"></label>
+      <label>Au<input type="date" name="au" min="${du}" value="${au}"></label>
+      ${svc ? `<label class="case"><input type="checkbox" name="aide" value="1" ${aide ? 'checked' : ''}> Un coup de main : ${esc(svc.titre)}</label>` : ''}
+      <button class="btn btn-cta" type="submit">Recalculer mon kit</button></form>`;
+    const entete = `<div class="fil"><a href="#/projet">Mode Projet</a> › ${esc(pr.titre)}</div><h1>${pr.icone} ${esc(pr.titre)}</h1><p class="discret">${esc(pr.niveau)} · ${esc(pr.duree)} · ${q} ${esc(pr.unite)}${q > 1 ? 's' : ''}</p>`;
+    if (!r.ok) return `<div class="page"><div class="conteneur">${entete}${formulaire}<div class="alerte alerte-info">${esc(r.raison)}</div></div></div>`;
+    const plusLarge = Z.REGLES.projet.rayonsKm.find((k) => k > rayon);
+    const bascule = (l) => {
+      if (!(l.vente && l.libre)) return l.mode === 'achat' ? '<small class="discret">aucune location libre : à l’achat</small>' : '';
+      const veut = l.mode === 'achat', liste = veut ? achats.filter((x) => x !== l.annonce.id) : achats.concat(l.annonce.id);
+      const lien = urlProjet(o, { achat: liste.join(',') });
+      return `<span class="bascule-mode">${veut ? `<a href="${lien}">Louer</a>` : '<span class="actif">Louer</span>'}${veut ? `<span class="actif">Acheter ${Z.euros(l.annonce.prixVente)}</span>` : `<a href="${lien}">Acheter ${Z.euros(l.annonce.prixVente)}</a>`}</span>`;
+    };
+    return `<div class="page"><div class="conteneur">${entete}${formulaire}
+      <div class="projet">
+        <div>
+          <h3>🔧 Les outils, chez vos voisins (${rayon} km autour de ${esc(cp)})</h3>
+          ${r.lignes.map((l) => l.partage
+            ? `<div class="ligne-kit partage"><span class="etape-kit">${esc(l.besoin)}</span><span>Même outil que ci-dessus : <b>${esc(l.annonce.titre)}</b></span></div>`
+            : `<div class="ligne-kit"><img src="${l.annonce.photo}" alt=""><div><span class="etape-kit">${esc(l.besoin)}</span><a href="#/annonce/${l.annonce.id}"><b>${esc(l.annonce.titre)}</b></a><small>📍 ${esc(l.annonce.ville)}${l.km != null ? ` · ${Z.formatDistance(l.km)}` : ''} ${badgeSante(l.annonce)}</small>${bascule(l)}</div>
+              <div class="prix-kit">${Z.euros(l.prix)}<small>${l.mode === 'location' ? `location ${l.devis.jours} j · caution ${Z.euros(l.annonce.caution)}` : 'achat, l’outil est à vous'}</small></div></div>`).join('')}
+          ${r.manquants.map((m) => `<div class="alerte alerte-info">Aucun outil pour « ${esc(m)} » dans un rayon de ${rayon} km à ces dates.${plusLarge ? ` <a href="${urlProjet(o, { r: plusLarge })}">Élargir à ${plusLarge} km</a>` : ` <a href="#/annonces">Voir tous les outils</a>`}</div>`).join('')}
+          <h3>🧾 Les consommables, calculés pour vous</h3>
+          <table class="tableau"><thead><tr><th>Produit</th><th>Besoin</th><th>Quantité</th><th>Total</th></tr></thead><tbody>${r.consommables.map((c) => `<tr><td>${esc(c.nom)}</td><td>${c.besoin} ${esc(c.unite)}</td><td>${c.paquets} × ${Z.euros(c.prix)}</td><td>${Z.euros(c.total)}</td></tr>`).join('')}</tbody></table>
+          <p class="discret">Prix indicatifs d’un partenaire à désigner, remis avec le premier outil.</p>
+          <h3>📘 Le savoir-faire</h3>
+          <div class="savoir">${fiche ? `<a class="btn btn-contour" href="#/fiche-technique/${fiche.id}">📄 Fiche : ${esc(fiche.titre)}</a>` : ''}${pr.video ? `<a class="btn btn-contour" href="#/videos?v=${pr.video}">🎬 Regarder le tutoriel</a>` : ''}<a class="btn btn-contour" href="#/videos">Toute la vidéothèque</a></div>
+          ${pr.securite ? `<div class="alerte alerte-info" style="margin-top:12px">⚠️ ${esc(pr.securite)}</div>` : ''}
+        </div>
+        <aside class="panneau recap-projet">
+          <h3 style="margin-top:0">Votre kit projet</h3>
+          <div class="ligne"><span>Outils : ${r.locations} en location, ${r.achats} à l’achat · ${r.proprietaires} voisin${r.proprietaires > 1 ? 's' : ''}</span><b>${Z.euros(r.totalOutils)}</b></div>
+          <div class="ligne"><span>Consommables</span><b>${Z.euros(r.totalConsommables)}</b></div>
+          ${dsvc ? `<div class="ligne"><span>Coup de main (${dsvc.heures} h)</span><b>${Z.euros(dsvc.total)}</b></div>` : ''}
+          <div class="ligne total"><span>Total, un seul paiement</span><b>${Z.euros(total)}</b></div>
+          <div class="ligne discret"><span>Cautions bloquées, non débitées</span><span>${Z.euros(r.cautions)}</span></div>
+          <p class="discret" style="font-size:.85rem">Frais de service inclus. Assurance casse au choix sur chaque location. Une location peut se transformer en achat : « Je le garde », le loyer est déduit du prix.</p>
+          <button class="btn btn-cta" id="reserver-projet" ${r.outils.length ? '' : 'disabled'} style="width:100%">Réserver tout le projet</button>
+          <p class="discret" style="font-size:.8rem;margin-bottom:0">Paiement simulé : aucune carte n’est demandée.</p>
+        </aside>
+      </div></div></div>`;
+  }
+  function brancherProjet(params) {
+    const f = document.getElementById('form-projet');
+    if (f) f.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const d = new FormData(f), u = new URLSearchParams();
+      ['p', 'q', 'cp', 'r', 'du', 'au', 'achat'].forEach((k) => { if (d.get(k)) u.set(k, d.get(k)); });
+      if (d.get('aide')) u.set('aide', '1');
+      aller('#/projet?' + u.toString());
+    });
+    const b = document.getElementById('reserver-projet'); if (!b) return;
+    b.addEventListener('click', () => {
+      const o = lireProjet(params);
+      if (!o || !o.r.ok || !o.r.outils.length) return toast((o && o.r.raison) || 'Aucun outil disponible à ces dates.');
+      const { pr, q, du, au, r, svc, total } = o, idp = 'pj' + Date.now();
+      r.outils.filter((c) => c.mode === 'location').forEach((c, i) => etat.reservations.push({ id: idp + '-' + i, outilId: c.annonce.id, debut: du, fin: au, statut: 'confirmée', locataire: 'Vous', total: c.devis.totalLocataire, caution: c.annonce.caution, projet: idp }));
+      etat.projets = (etat.projets || []).concat([{ id: idp, projetId: pr.id, icone: pr.icone, titre: pr.titre, quantite: q, debut: du, fin: au, total, outils: r.outils.map((c) => ({ id: c.annonce.id, mode: c.mode, prix: c.prix })), service: o.dsvc ? svc.id : null }]);
+      sauver();
+      toast(`Projet réservé (simulation) : ${r.locations} location(s), ${r.achats} achat(s), ${Z.euros(total)} en un seul paiement.`);
+      aller('#/mon-espace');
+    });
+  }
 
   /* ---------- Notre offre : tout ce que propose ZETools, et ce que cela coûte ---------- */
   function vueOffre() {
@@ -4286,6 +4835,8 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
       ['🚨', 'Urgence travaux', 'Un professionnel vérifié, au plus vite', `Déplacement ${Z.euros(R.urgence.forfaitDeplacement)} · +${pc(R.urgence.majorationNuit)} la nuit, le dimanche et les jours fériés`, `Devis écrit au-delà de ${Z.euros(R.urgence.seuilDevisEcrit)}`, '#/urgence'],
       ['🎁', 'Offrir des travaux', `Bon cadeau de ${R.coupon.min} à ${R.coupon.max} €, valable ${R.coupon.validiteMois} mois`, 'Aucun frais : le bon vaut ce que vous payez', 'Utilisable en plusieurs fois', '#/offrir'],
       ['🏷️', 'Déstockage des enseignes', 'Du neuf en fin de série, retrait en magasin', 'Aucun frais pour l’acheteur', `Enseigne : ${pc(R.commissionDestockage)} par vente`, '#/destockage'],
+      ['🧰', 'Mode Projet', 'Outils des voisins, consommables et aide en un seul panier', 'Les frais de chaque élément, rien de plus', 'Chaque propriétaire : sa commission habituelle', '#/projet'],
+      ['🩺', 'Passeport outil', `Score de santé ; achat garanti ${R.passeport.joursGarantie} jours dès ${R.passeport.seuilGarantie} / 100`, 'Gratuit', 'Gratuit', '#/passeport'],
       ['🎬', 'Vidéos et fiches techniques', 'Tutoriels et pas-à-pas en PDF', 'Gratuit', 'Gratuit', '#/videos'],
     ];
     return `<div class="page"><div class="conteneur">
@@ -4323,6 +4874,8 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
       case 'deposer': html = vueDeposer(params); apres = brancherDeposer; break;
       case 'pros': html = vuePros(); break;
       case 'offre': html = vueOffre(); break;
+      case 'passeport': html = vuePasseport(seg[1]); apres = () => brancherPasseport(seg[1]); break;
+      case 'projet': html = vueProjet(params); apres = () => brancherProjet(params); break;
       case 'travaux': if (params.get('metier') !== null) { filtreTravaux.metier = params.get('metier'); filtreTravaux.vise = ''; } html = vueTravaux(); apres = brancherTravaux; break;
       case 'espace-artisan': html = vueEspaceArtisan(); apres = brancherEspaceArtisan; break;
       case 'reparer': html = vueReparer(); break;
@@ -4347,7 +4900,7 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
       case 'credits': html = vueCredits(); break;
       default: html = '<div class="page"><div class="conteneur vide">Page introuvable. <a href="#/">Retour à l’accueil</a></div></div>';
     }
-    vue.innerHTML = html;
+    vue.innerHTML = sansPictos(html);
     if (apres) apres();
     activerVideos();
     document.getElementById('bulle-msg').textContent = etat.conversations.length;
@@ -4374,7 +4927,20 @@ ol.liste-fiche li::marker { font-weight: 800; color: var(--vert); }
       versAnnonces({ mode: fd.get('mode'), q: fd.get('q'), cat: fd.get('cat'), lieu: fd.get('lieu') });
     });
   }
+  function celluleGarder(a, r) {
+    if (r.statut === 'achetée' && r.achat) return `✔ Acheté ${Z.euros(r.achat.prix)} <small class="discret">(−${Z.euros(r.achat.deduit)})</small>`;
+    if (!etat.reservations.some((x) => x.id === r.id)) return '';
+    const g = Z.prixSiJeLeGarde(a, r, AUJOURDHUI);
+    return g.ok ? `<button class="btn btn-cta btn-petit" data-garder="${r.id}">Je le garde : ${Z.euros(g.reste)}</button><small class="discret" style="display:block">au lieu de ${Z.euros(g.prixVente)}</small>` : '';
+  }
   function brancherEspace() {
+    document.querySelectorAll('[data-garder]').forEach((b) => b.addEventListener('click', () => {
+      const r = etat.reservations.find((x) => x.id === b.dataset.garder), a = r && annonce(r.outilId);
+      const g = a && Z.prixSiJeLeGarde(a, r, AUJOURDHUI);
+      if (!g || !g.ok) return toast((g && g.raison) || 'Impossible de garder cet outil.');
+      r.statut = 'achetée'; r.achat = { prix: g.reste, deduit: g.deduit, date: AUJOURDHUI };
+      sauver(); toast(`Outil acheté (simulation) : ${Z.euros(g.reste)} payés, ${Z.euros(g.deduit)} de location déduits. Caution libérée.`); router();
+    }));
     const b = document.getElementById('reinitialiser');
     if (b) b.addEventListener('click', () => { etat = ETAT_INITIAL(); sauver(); toast('Démonstration réinitialisée.'); router(); });
   }
